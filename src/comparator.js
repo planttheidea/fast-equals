@@ -29,19 +29,19 @@ const createComparator = (createIsEqual) => {
       const arrayA = Array.isArray(objectA);
       const arrayB = Array.isArray(objectB);
 
+      let index = 0;
+
       if (arrayA || arrayB) {
         if (arrayA !== arrayB || objectA.length !== objectB.length) {
           return false;
         }
-
-        let index = 0;
 
         while (index < objectA.length) {
           if (!isEqualComparator(objectA[index], objectB[index])) {
             return false;
           }
 
-          ++index;
+          index++;
         }
 
         return true;
@@ -84,8 +84,7 @@ const createComparator = (createIsEqual) => {
         return false;
       }
 
-      let index = 0,
-          keyA;
+      let keyA;
 
       while (index < keysA.length) {
         keyA = keysA[index];
@@ -94,7 +93,7 @@ const createComparator = (createIsEqual) => {
           return false;
         }
 
-        ++index;
+        index++;
       }
 
       return true;
