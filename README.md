@@ -8,8 +8,9 @@ Unlike most equality validation libraries, the following types are handled out-o
 * `RegExp` objects
 * `Map` / `Set` iterables
 
+You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
+
 ## Table of contents
-* [Summary](#summary)
 * [Usage](#usage)
 * [Available methods](#available-methods)
   * [deepEqual](#deepequal)
@@ -17,8 +18,6 @@ Unlike most equality validation libraries, the following types are handled out-o
   * [createCustomEqual](#createcustomequal)
 * [Benchmarks](#benchmarks)
 * [Development](#development)
-
-You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
 ## Usage
 
