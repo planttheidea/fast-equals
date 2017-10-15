@@ -1,5 +1,13 @@
 # fast-equals
 
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
+
+Unlike most equality validation libraries, the following types are handled out-of-the-box:
+* `NaN`
+* `Date` objects
+* `RegExp` objects
+* `Map` / `Set` iterables
+
 ## Table of contents
 * [Summary](#summary)
 * [Usage](#usage)
@@ -9,16 +17,6 @@
   * [createCustomEqual](#createcustomequal)
 * [Benchmarks](#benchmarks)
 * [Development](#development)
-
-## Summary
-
-Performs [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
-
-Unlike most equality validation libraries, the following types are handled out-of-the-box:
-* `NaN`
-* `Date` objects
-* `RegExp` objects
-* `Map` / `Set` iterables
 
 You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
