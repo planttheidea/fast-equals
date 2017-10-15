@@ -12,7 +12,7 @@
 
 ## Summary
 
-Performs a [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
+Performs [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 * `NaN`
@@ -131,14 +131,14 @@ All benchmarks are based on averages of running comparisons based on the followi
 | deep-eql               | 14,600              | 0.74%                    |
 | assert.deepStrictEqual | 454                 | 1.32%                    |
 
-Caveats:
+Caveats that impact the benchmark:
 * `fast-deep-equal` does not support `NaN`
 * `nano-equal` does not strictly compare object property structure, array length, or object type
 * `shallow-equal-fuzzy` does not strictly compare object type or regexp values
 * `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values
 * `assert.deepStrictEqual` does not support `NaN`
 
-`Map`s and `Set`s were excluded entirely because other than `lodash` no other library supported them, and incorrectly inflated the averages.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because other than `lodash` no other library supported their comparison.
 
 ### Development
 
