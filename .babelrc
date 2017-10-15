@@ -1,0 +1,49 @@
+{
+  "env": {
+    "development": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ],
+        "stage-2"
+      ]
+    },
+    "es": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "stage-2"
+      ]
+    },
+    "production": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ],
+        "stage-2"
+      ]
+    },
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "loose": true
+          }
+        ],
+        "stage-2"
+      ]
+    }
+  }
+}
