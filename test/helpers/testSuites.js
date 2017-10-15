@@ -436,8 +436,8 @@ module.exports = [
         description: 'big object',
         value1: {
           prop1: 'value1',
-          prop2: 'value2',
-          prop3: 'value3',
+          prop2: fn,
+          prop3: null,
           prop4: {
             subProp1: 'sub value1',
             subProp2: {
@@ -450,9 +450,9 @@ module.exports = [
           prop7: /foo/
         },
         value2: {
-          prop2: 'value2',
+          prop2: fn,
           prop6: new Date(2016, 2, 10),
-          prop3: 'value3',
+          prop3: null,
           prop4: {
             subProp1: 'sub value1',
             subProp2: {
@@ -476,8 +476,8 @@ module.exports = [
         description: 'big object',
         value1: {
           prop1: 'value1',
-          prop2: 'value2',
-          prop3: 'value3',
+          prop2: fn,
+          prop3: null,
           prop4: {
             subProp1: 'sub value1',
             subProp2: {
@@ -490,9 +490,9 @@ module.exports = [
           prop7: /foo/
         },
         value2: {
-          prop2: 'value2',
+          prop2: fn,
           prop6: new Date('2017/04/17'),
-          prop3: 'value3',
+          prop3: null,
           prop4: {
             subProp2: {
               subSubProp1: 'sub sub value1',

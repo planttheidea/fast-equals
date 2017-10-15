@@ -58,7 +58,7 @@
     "benchmark": "npm run transpile:lib -- --no-comments && node benchmark/index.js",
     "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
     "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
-    "clean": "npm run clean:lib && npm run clean:dist && npm run clean:docs",
+    "clean": "npm run clean:es && npm run clean:lib && npm run clean:dist",
     "clean:dist": "rimraf dist",
     "clean:es": "rimraf es",
     "clean:lib": "rimraf lib",

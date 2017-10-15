@@ -20,9 +20,8 @@ const createComparator = (createIsEqual) => {
     }
 
     const typeOfA = typeof objectA;
-    const typeOfB = typeof objectB;
 
-    if (typeOfA !== typeOfB) {
+    if (typeOfA !== typeof objectB) {
       return false;
     }
 
@@ -80,9 +79,8 @@ const createComparator = (createIsEqual) => {
       }
 
       const keysA = Object.keys(objectA);
-      const keysB = Object.keys(objectB);
 
-      if (keysA.length !== keysB.length) {
+      if (keysA.length !== Object.keys(objectB).length) {
         return false;
       }
 
