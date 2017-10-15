@@ -138,7 +138,7 @@ Caveats that impact the benchmark:
 * `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values
 * `assert.deepStrictEqual` does not support `NaN`
 
-All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because other than `lodash` no other library supported their comparison.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison.
 
 ### Development
 
