@@ -3,9 +3,15 @@
   "ava": {
     "babel": "inherit",
     "failFast": true,
-    "files": ["test/*.js"],
-    "require": ["babel-register"],
-    "source": ["src/*.js"],
+    "files": [
+      "test/*.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "source": [
+      "src/*.js"
+    ],
     "verbose": true
   },
   "bugs": {
@@ -45,7 +51,13 @@
     "webpack-dev-server": "^2.9.1"
   },
   "homepage": "https://github.com/planttheidea/fast-equals#readme",
-  "keywords": ["fast", "equal", "equals", "deep-equal", "equivalent"],
+  "keywords": [
+    "fast",
+    "equal",
+    "equals",
+    "deep-equal",
+    "equivalent"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -67,8 +79,7 @@
     "lint": "NODE_ENV=test eslint src",
     "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
-    "prepublish:compile":
-      "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
     "start": "npm run dev",
     "test": "NODE_PATH=. NODE_ENV=production BABEL_ENV=test ava",
     "test:coverage": "nyc npm test",
@@ -76,5 +87,5 @@
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
     "transpile:lib": "npm run clean:lib && babel src --out-dir lib"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
