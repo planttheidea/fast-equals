@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.1Kb when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 * `NaN`
@@ -122,15 +122,15 @@ All benchmarks are based on averages of running comparisons based on the followi
 
 |                        | Operations / second | Relative margin of error |
 |------------------------|---------------------|--------------------------|
-| **fast-equals**        | **201,249**         | **0.60%**                |
-| nano-equal             | 119,409             | 1.38%                    |
-| fast-deep-equal        | 92,048              | 0.44%                    |
-| shallow-equal-fuzzy    | 80,478              | 0.58%                    |
-| underscore.isEqual     | 49,145              | 0.49%                    |
-| deep-equal             | 31,906              | 0.73%                    |
-| lodash.isEqual         | 24,293              | 0.50%                    |
-| deep-eql               | 14,600              | 0.74%                    |
-| assert.deepStrictEqual | 454                 | 1.32%                    |
+| **fast-equals**        | **190,315**         | **0.57%**                |
+| nano-equal             | 123,255             | 0.76%                    |
+| fast-deep-equal        | 102,990             | 0.50%                    |
+| shallow-equal-fuzzy    | 83,553              | 0.47%                    |
+| underscore.isEqual     | 51,321              | 0.51%                    |
+| deep-equal             | 32,694              | 0.80%                    |
+| lodash.isEqual         | 25,872              | 0.59%                    |
+| deep-eql               | 14,804              | 0.81%                    |
+| assert.deepStrictEqual | 448                 | 1.42%                    |
 
 Caveats that impact the benchmark:
 * `fast-deep-equal` does not support `NaN`

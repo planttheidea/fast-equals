@@ -15,32 +15,6 @@ export const createIsStrictlyEqual = () => {
 };
 
 /**
- * @function isFunction
- *
- * @description
- * is the object passed a function
- *
- * @param {*} object the object to test
- * @returns {boolean} is the value a function
- */
-export const isFunction = (object) => {
-  return typeof object === 'function';
-};
-
-/**
- * @function isNAN
- *
- * @description
- * is the object passed NaN
- *
- * @param {*} object the object to test
- * @returns {boolean} is the object NaN
- */
-export const isNAN = (object) => {
-  return object !== object;
-};
-
-/**
  * @function toPairs
  *
  * @param {Map|Set} iterable the iterable to convert to [key, value] pairs (entries)
