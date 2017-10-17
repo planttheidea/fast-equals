@@ -5,18 +5,6 @@ import {alternativeValues, mainValues} from 'test/helpers/dataTypes';
 // src
 import * as utils from 'src/utils';
 
-test('if isFunction will return true for a function, false otherwise', (t) => {
-  Object.keys(mainValues).forEach((key) => {
-    t[key === 'fn'](utils.isFunction(mainValues[key]));
-  });
-});
-
-test('if isNAN will return true for a NaN, false otherwise', (t) => {
-  Object.keys(mainValues).forEach((key) => {
-    t[key === 'nan'](utils.isNAN(mainValues[key]));
-  });
-});
-
 test('if createIsStrictlyEqual will return true when strictly equal, false otherwise', (t) => {
   Object.keys(mainValues).forEach((key) => {
     t[key !== 'nan'](utils.createIsStrictlyEqual()(mainValues[key], mainValues[key]), `${key} - true`);

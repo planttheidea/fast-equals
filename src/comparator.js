@@ -1,8 +1,8 @@
 // utils
-import {isFunction, isNAN, toPairs} from './utils';
+import {toPairs} from './utils';
 
 const createComparator = (createIsEqual) => {
-  const isEqualComparator = isFunction(createIsEqual) ? createIsEqual(comparator) : comparator; // eslint-disable-line
+  const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line
 
   /**
    * @function comparator
@@ -29,19 +29,17 @@ const createComparator = (createIsEqual) => {
       const arrayA = Array.isArray(objectA);
       const arrayB = Array.isArray(objectB);
 
-      let index = 0;
+      let index;
 
       if (arrayA || arrayB) {
         if (arrayA !== arrayB || objectA.length !== objectB.length) {
           return false;
         }
 
-        while (index < objectA.length) {
-          if (!isEqualComparator(objectA[index], objectB[index])) {
+        for (index = 0; index < objectA.length; index++) {
+          if (!isEqual(objectA[index], objectB[index])) {
             return false;
           }
-
-          index++;
         }
 
         return true;
@@ -67,8 +65,11 @@ const createComparator = (createIsEqual) => {
         );
       }
 
-      if (isFunction(objectA.forEach)) {
-        if (!isFunction(objectB.forEach)) {
+      const iterableA = typeof objectA.forEach === 'function';
+      const iterableB = typeof objectB.forEach === 'function';
+
+      if (iterableA || iterableB) {
+        if (iterableA !== iterableB || objectA.size !== objectB.size) {
           return false;
         }
 
@@ -84,22 +85,20 @@ const createComparator = (createIsEqual) => {
         return false;
       }
 
-      let keyA;
+      let key;
 
-      while (index < keysA.length) {
-        keyA = keysA[index];
+      for (index = 0; index < keysA.length; index++) {
+        key = keysA[index];
 
-        if (!Object.prototype.hasOwnProperty.call(objectB, keyA) || !isEqualComparator(objectA[keyA], objectB[keyA])) {
+        if (!Object.prototype.hasOwnProperty.call(objectB, key) || !isEqual(objectA[key], objectB[key])) {
           return false;
         }
-
-        index++;
       }
 
       return true;
     }
 
-    return isNAN(objectA) && isNAN(objectB);
+    return objectA !== objectA && objectB !== objectB;
   }
 
   return comparator;
