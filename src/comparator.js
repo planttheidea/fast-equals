@@ -1,5 +1,5 @@
 // utils
-import {areIterablesEqual, toPairs} from './utils';
+import {areIterablesEqual} from './utils';
 
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';

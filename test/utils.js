@@ -5,6 +5,56 @@ import {alternativeValues, mainValues} from 'test/helpers/dataTypes';
 // src
 import * as utils from 'src/utils';
 
+test('if areIterablesEqual returns false when objects are different sizes', (t) => {
+  const objectA = new Map();
+  const objectB = new Map().set('foo', 'bar');
+  const comparator = (a, b) => {
+    return a === b;
+  };
+
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+});
+
+test('if areIterablesEqual returns false when objects have different keys', (t) => {
+  const objectA = new Map().set('foo', 'bar');
+  const objectB = new Map().set('bar', 'baz');
+  const comparator = (a, b) => {
+    return a === b;
+  };
+
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+});
+
+test('if areIterablesEqual returns false when objects have different values', (t) => {
+  const objectA = new Map().set('foo', 'bar');
+  const objectB = new Map().set('foo', 'baz');
+  const comparator = (a, b) => {
+    return (
+      a.length === b.length &&
+      a.every((value, index) => {
+        return b[index] === value;
+      })
+    );
+  };
+
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+});
+
+test('if areIterablesEqual returns true when objects have the same size, keys, and values', (t) => {
+  const objectA = new Map().set('foo', 'bar');
+  const objectB = new Map().set('foo', 'bar');
+  const comparator = (a, b) => {
+    return (
+      a.length === b.length &&
+      a.every((value, index) => {
+        return b[index] === value;
+      })
+    );
+  };
+
+  t.true(utils.areIterablesEqual(objectA, objectB, comparator));
+});
+
 test('if createIsStrictlyEqual will return true when strictly equal, false otherwise', (t) => {
   Object.keys(mainValues).forEach((key) => {
     t[key !== 'nan'](utils.createIsStrictlyEqual()(mainValues[key], mainValues[key]), `${key} - true`);
