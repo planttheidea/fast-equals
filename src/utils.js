@@ -33,3 +33,24 @@ export const toPairs = (iterable) => {
 
   return pairs;
 };
+
+/**
+ * @function areIterablesEqual
+ *
+ * @description
+ * determine if the iterables are equivalent in value
+ *
+ * @param {Map|Set} objectA the object to test
+ * @param {Map|Set} objectB the object to test against
+ * @param {function} comparator the comparator to determine deep equality
+ * @returns {boolean} are the objects equal in value
+ */
+export const areIterablesEqual = (objectA, objectB, comparator) => {
+  if (objectA.size !== objectB.size) {
+    return false;
+  }
+  const pairsA = toPairs(objectA);
+  const pairsB = toPairs(objectB);
+
+  return comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values);
+};

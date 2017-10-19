@@ -1,5 +1,8 @@
 // utils
-import {toPairs} from './utils';
+import {areIterablesEqual} from './utils';
+
+const HAS_MAP_SUPPORT = typeof Map === 'function';
+const HAS_SET_SUPPORT = typeof Set === 'function';
 
 const createComparator = (createIsEqual) => {
   const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line
@@ -65,18 +68,22 @@ const createComparator = (createIsEqual) => {
         );
       }
 
-      const iterableA = typeof objectA.forEach === 'function';
-      const iterableB = typeof objectB.forEach === 'function';
+      if (HAS_MAP_SUPPORT) {
+        const mapA = objectA instanceof Map;
+        const mapB = objectB instanceof Map;
 
-      if (iterableA || iterableB) {
-        if (iterableA !== iterableB || objectA.size !== objectB.size) {
-          return false;
+        if (mapA || mapB) {
+          return mapA === mapB && areIterablesEqual(objectA, objectB, comparator);
         }
+      }
 
-        const pairsA = toPairs(objectA);
-        const pairsB = toPairs(objectB);
+      if (HAS_SET_SUPPORT) {
+        const setA = objectA instanceof Set;
+        const setB = objectB instanceof Set;
 
-        return comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values);
+        if (setA || setB) {
+          return setA === setB && areIterablesEqual(objectA, objectB, comparator);
+        }
       }
 
       const keysA = Object.keys(objectA);

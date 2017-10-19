@@ -393,6 +393,13 @@ module.exports = [
         value2: {foo: 'bar'},
         deepEqual: false,
         shallowEqual: false
+      },
+      {
+        description: 'Map and Set are not equal',
+        value1: new Map().set('foo', 'foo'),
+        value2: new Set().add('foo'),
+        deepEqual: false,
+        shallowEqual: false
       }
     ]
   },
