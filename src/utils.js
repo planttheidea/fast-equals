@@ -33,3 +33,13 @@ export const toPairs = (iterable) => {
 
   return pairs;
 };
+
+export const areIterablesEqual = (objectA, objectB, comparator) => {
+  if (objectA.size !== objectB.size) {
+    return false;
+  }
+  const pairsA = toPairs(objectA);
+  const pairsB = toPairs(objectB);
+
+  return comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values);
+};
