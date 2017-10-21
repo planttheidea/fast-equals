@@ -73,7 +73,7 @@ const createComparator = (createIsEqual) => {
         const mapB = objectB instanceof Map;
 
         if (mapA || mapB) {
-          return mapA === mapB && areIterablesEqual(objectA, objectB, comparator);
+          return mapA === mapB && areIterablesEqual(objectA, objectB, comparator, true);
         }
       }
 
@@ -82,7 +82,7 @@ const createComparator = (createIsEqual) => {
         const setB = objectB instanceof Set;
 
         if (setA || setB) {
-          return setA === setB && areIterablesEqual(objectA, objectB, comparator);
+          return setA === setB && areIterablesEqual(objectA, objectB, comparator, false);
         }
       }
 

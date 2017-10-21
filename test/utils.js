@@ -12,7 +12,7 @@ test('if areIterablesEqual returns false when objects are different sizes', (t) 
     return a === b;
   };
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
 });
 
 test('if areIterablesEqual returns false when objects have different keys', (t) => {
@@ -22,7 +22,7 @@ test('if areIterablesEqual returns false when objects have different keys', (t) 
     return a === b;
   };
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
 });
 
 test('if areIterablesEqual returns false when objects have different values', (t) => {
@@ -37,7 +37,7 @@ test('if areIterablesEqual returns false when objects have different values', (t
     );
   };
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
 });
 
 test('if areIterablesEqual returns true when objects have the same size, keys, and values', (t) => {
@@ -52,7 +52,37 @@ test('if areIterablesEqual returns true when objects have the same size, keys, a
     );
   };
 
-  t.true(utils.areIterablesEqual(objectA, objectB, comparator));
+  t.true(utils.areIterablesEqual(objectA, objectB, comparator, true));
+});
+
+test('if areIterablesEqual returns false when objects have the same size but different values when they are sets', (t) => {
+  const objectA = new Set().add('foo');
+  const objectB = new Set().add('bar');
+  const comparator = (a, b) => {
+    return (
+      a.length === b.length &&
+      a.every((value, index) => {
+        return b[index] === value;
+      })
+    );
+  };
+
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, false));
+});
+
+test('if areIterablesEqual returns true when objects have the same size and values when they are sets', (t) => {
+  const objectA = new Set().add('bar');
+  const objectB = new Set().add('bar');
+  const comparator = (a, b) => {
+    return (
+      a.length === b.length &&
+      a.every((value, index) => {
+        return b[index] === value;
+      })
+    );
+  };
+
+  t.true(utils.areIterablesEqual(objectA, objectB, comparator, false));
 });
 
 test('if createIsStrictlyEqual will return true when strictly equal, false otherwise', (t) => {
