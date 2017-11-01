@@ -3,11 +3,11 @@ export const createIsSameValueZero = () => {
    * @function isSameValueZero
    *
    * @description
-   * are the objects passed strictly equal
+   * are the objects passed strictly equal or both NaN
    *
    * @param {*} objectA the object to compare against
    * @param {*} objectB the object to test
-   * @returns {boolean} are the objects strictly equal
+   * @returns {boolean} are the objects equal by the SameValueZero principle
    */
   return (objectA, objectB) => {
     return objectA === objectB || (objectA !== objectA && objectB !== objectB);
