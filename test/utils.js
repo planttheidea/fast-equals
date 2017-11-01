@@ -85,12 +85,12 @@ test('if areIterablesEqual returns true when objects have the same size and valu
   t.true(utils.areIterablesEqual(objectA, objectB, comparator, false));
 });
 
-test('if createIsStrictlyEqual will return true when strictly equal, false otherwise', (t) => {
+test('if createIsSameValueZero will return true when strictly equal or NaN, false otherwise', (t) => {
   Object.keys(mainValues).forEach((key) => {
-    t[key !== 'nan'](utils.createIsStrictlyEqual()(mainValues[key], mainValues[key]), `${key} - true`);
+    t.true(utils.createIsSameValueZero()(mainValues[key], mainValues[key]), `${key} - true`);
 
     if (alternativeValues.hasOwnProperty(key)) {
-      t.false(utils.createIsStrictlyEqual()(mainValues[key], alternativeValues[key]), `${key} - false`);
+      t.false(utils.createIsSameValueZero()(mainValues[key], alternativeValues[key]), `${key} - false`);
     }
   });
 });

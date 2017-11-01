@@ -1,6 +1,6 @@
-export const createIsStrictlyEqual = () => {
+export const createIsSameValueZero = () => {
   /**
-   * @function isStrictlyEqual
+   * @function isSameValueZero
    *
    * @description
    * are the objects passed strictly equal
@@ -10,7 +10,7 @@ export const createIsStrictlyEqual = () => {
    * @returns {boolean} are the objects strictly equal
    */
   return (objectA, objectB) => {
-    return objectA === objectB;
+    return objectA === objectB || (objectA !== objectA && objectB !== objectB);
   };
 };
 
