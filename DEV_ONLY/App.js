@@ -16,7 +16,7 @@ console.groupEnd('number');
 
 console.group('zero');
 console.log('true', fe.deep(0, 0));
-console.log('false', fe.deep(0, -0));
+console.log('true', fe.deep(0, -0));
 console.groupEnd('zero');
 
 console.group('Infinity');
