@@ -21,6 +21,34 @@ module.exports = [
         shallowEqual: false
       },
       {
+        description: 'equal zero',
+        value1: 0,
+        value2: 0,
+        deepEqual: true,
+        shallowEqual: true
+      },
+      {
+        description: 'equal positive and negative zero',
+        value1: -0,
+        value2: 0,
+        deepEqual: true,
+        shallowEqual: true
+      },
+      {
+        description: 'equal Infinity',
+        value1: Infinity,
+        value2: Infinity,
+        deepEqual: true,
+        shallowEqual: true
+      },
+      {
+        description: 'not equal Infinity',
+        value1: -Infinity,
+        value2: Infinity,
+        deepEqual: false,
+        shallowEqual: false
+      },
+      {
         description: 'number and array are not equal',
         value1: 1,
         value2: [],

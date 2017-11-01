@@ -14,6 +14,16 @@ console.log('true', fe.deep(123, 123));
 console.log('false', fe.deep(123, 234));
 console.groupEnd('number');
 
+console.group('zero');
+console.log('true', fe.deep(0, 0));
+console.log('true', fe.deep(0, -0));
+console.groupEnd('zero');
+
+console.group('Infinity');
+console.log('true', fe.deep(Infinity, Infinity));
+console.log('false', fe.deep(Infinity, -Infinity));
+console.groupEnd('Infinity');
+
 console.group('null');
 console.log('true', fe.deep(null, null));
 console.log('false', fe.deep(null, undefined));

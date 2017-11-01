@@ -122,21 +122,23 @@ All benchmarks are based on averages of running comparisons based on the followi
 
 |                        | Operations / second | Relative margin of error |
 |------------------------|---------------------|--------------------------|
-| **fast-equals**        | **190,315**         | **0.57%**                |
-| nano-equal             | 123,255             | 0.76%                    |
-| fast-deep-equal        | 102,990             | 0.50%                    |
-| shallow-equal-fuzzy    | 83,553              | 0.47%                    |
-| underscore.isEqual     | 51,321              | 0.51%                    |
-| deep-equal             | 32,694              | 0.80%                    |
-| lodash.isEqual         | 25,872              | 0.59%                    |
-| deep-eql               | 14,804              | 0.81%                    |
-| assert.deepStrictEqual | 448                 | 1.42%                    |
+| **fast-equals**        | **197,615**         | **0.53%**                |
+| nano-equal             | 121.843             | 0.49%                    |
+| fast-deep-equal        | 102,257             | 0.41%                    |
+| shallow-equal-fuzzy    | 80,224              | 0.55%                    |
+| underscore.isEqual     | 51,110              | 0.52%                    |
+| deep-equal             | 32,907              | 0.82%                    |
+| lodash.isEqual         | 26,021              | 0.48%                    |
+| deep-eql               | 14,589              | 0.66%                    |
+| assert.deepStrictEqual | 441                 | 1.39%                    |
 
 Caveats that impact the benchmark:
 * `fast-deep-equal` does not support `NaN`
 * `nano-equal` does not strictly compare object property structure, array length, or object type
 * `shallow-equal-fuzzy` does not strictly compare object type or regexp values
+* `underscore.isEqual` does not support `SameValueZero` equality for primitives
 * `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values
+* `deep-eql` does not support `SameValueZero` equality for primitives
 * `assert.deepStrictEqual` does not support `NaN`
 
 All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison.

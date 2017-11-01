@@ -1,5 +1,8 @@
 # fast-equals CHANGELOG
 
+## 1.0.5
+* Replace `isStrictlyEqual` with `isSameValueZero` to ensure that `shallowEqual` accounts for `NaN` equality
+
 ## 1.0.4
 * Only check values when comparing `Set` objects (improves performance of `Set` check by ~12%)
 

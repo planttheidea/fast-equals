@@ -1,8 +1,10 @@
 // utils
-import {areIterablesEqual} from './utils';
+import {areIterablesEqual, createIsSameValueZero} from './utils';
 
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
+
+const isSameValueZero = createIsSameValueZero();
 
 const createComparator = (createIsEqual) => {
   const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line
@@ -18,7 +20,7 @@ const createComparator = (createIsEqual) => {
    * @returns {boolean} are objectA and objectB equivalent in value
    */
   function comparator(objectA, objectB) {
-    if (objectA === objectB) {
+    if (isSameValueZero(objectA, objectB)) {
       return true;
     }
 
@@ -105,7 +107,7 @@ const createComparator = (createIsEqual) => {
       return true;
     }
 
-    return objectA !== objectA && objectB !== objectB;
+    return false;
   }
 
   return comparator;
