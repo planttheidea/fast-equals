@@ -7,6 +7,7 @@
 Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.1Kb when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
+
 * `NaN`
 * `Date` objects
 * `RegExp` objects
@@ -15,6 +16,7 @@ Unlike most equality validation libraries, the following types are handled out-o
 You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
 ## Table of contents
+
 * [Usage](#usage)
 * [Available methods](#available-methods)
   * [deepEqual](#deepequal)
@@ -112,6 +114,7 @@ console.log(isDeepEqualCircular(objectA, objectB)); // true
 ## Benchmarks
 
 All benchmarks are based on averages of running comparisons based on the following data types:
+
 * Primitives (`String`, `Number`, `null`, `undefined`)
 * `Function`s
 * `Object`s
@@ -133,19 +136,21 @@ All benchmarks are based on averages of running comparisons based on the followi
 | assert.deepStrictEqual | 441                 | 1.39%                    |
 
 Caveats that impact the benchmark:
-* `fast-deep-equal` does not support `NaN`
-* `nano-equal` does not strictly compare object property structure, array length, or object type
-* `shallow-equal-fuzzy` does not strictly compare object type or regexp values
-* `underscore.isEqual` does not support `SameValueZero` equality for primitives
-* `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values
-* `deep-eql` does not support `SameValueZero` equality for primitives
-* `assert.deepStrictEqual` does not support `NaN`
+
+* `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
+* `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero` equality for dates
+* `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
+* `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
+* `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
+* `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
+* `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 
 All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison.
 
-### Development
+## Development
 
 Standard practice, clone the repo and `npm i` to get the dependencies. The following npm scripts are available:
+
 * benchmark => run benchmark tests against other equality libraries
 * build => build unminified dist version with source map and NODE_ENV=development via webpack
 * build:minified => build minified dist version with NODE_ENV=production via webpack
