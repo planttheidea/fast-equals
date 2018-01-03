@@ -54,7 +54,7 @@ const createComparator = (createIsEqual) => {
       const dateB = objectB instanceof Date;
 
       if (dateA || dateB) {
-        return dateA === dateB && objectA.getTime() === objectB.getTime();
+        return dateA === dateB && isSameValueZero(objectA.getTime(), objectB.getTime());
       }
 
       const regexpA = objectA instanceof RegExp;

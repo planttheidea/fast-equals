@@ -334,6 +334,13 @@ module.exports = [
         value2: {},
         deepEqual: false,
         shallowEqual: false
+      },
+      {
+        description: 'invalid dates are equal',
+        value1: new Date('foo'),
+        value2: new Date('bar'),
+        deepEqual: true,
+        shallowEqual: true
       }
     ]
   },
