@@ -3,5 +3,5 @@
 coverage
 dist
 node_modules
-lib/*.js
+lib
 es
