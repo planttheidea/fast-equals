@@ -60,6 +60,7 @@
   ],
   "license": "MIT",
   "main": "lib/index.js",
+  "types": "index.d.ts",
   "module": "es/index.js",
   "name": "fast-equals",
   "repository": {
