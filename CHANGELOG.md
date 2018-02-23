@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.1.0
+
+* Add TypeScript typings (thanks [@josh-sachs](https://github.com/josh-sachs))
+
 ## 1.0.6
 
 * Support invalid date equality via `isSameValueZero`
