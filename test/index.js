@@ -5,7 +5,7 @@ import testSuites from 'test/helpers/testSuites';
 // src
 import * as index from 'src/index';
 
-const EXPORTED_METHODS = ['createCustom', 'deep', 'shallow'];
+const EXPORTED_METHODS = ['createCustom', 'deep', 'sameValueZero', 'shallow'];
 
 test('if the default export has the correct properties', (t) => {
   const defaultExportKeys = Object.keys(index.default);

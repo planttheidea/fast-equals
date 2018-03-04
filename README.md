@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.1Kb when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -21,6 +21,7 @@ You can also create a custom nested comparator, for specific scenarios ([see bel
 * [Available methods](#available-methods)
   * [deepEqual](#deepequal)
   * [shallowEqual](#shallowequal)
+  * [sameValueZeroEqual](#samevaluezeroequal)
   * [createCustomEqual](#createcustomequal)
 * [Benchmarks](#benchmarks)
 * [Development](#development)
@@ -30,32 +31,32 @@ You can also create a custom nested comparator, for specific scenarios ([see bel
 You can either import the full object:
 
 ```javascript
-import fe from 'fast-equals';
+import fe from "fast-equals";
 
-console.log(fe.deep({foo: 'bar'}, {foo: 'bar'})); // true
+console.log(fe.deep({ foo: "bar" }, { foo: "bar" })); // true
 ```
 
 Or the individual imports desired:
 
 ```javascript
-import {deepEqual} from 'fast-equals';
+import { deepEqual } from "fast-equals";
 
-console.log(deepEqual({foo: 'bar'}, {foo: 'bar'})); // true
+console.log(deepEqual({ foo: "bar" }, { foo: "bar" })); // true
 ```
 
 ## Available methods
 
 #### deepEqual
 
-*Aliased on the default export as `fe.deep`*
+_Aliased on the default export as `fe.deep`_
 
 Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
 ```javascript
-import {deepEqual} from 'fast-equals';
+import { deepEqual } from "fast-equals";
 
-const objectA = {foo: {bar: 'baz'}};
-const objectB = {foo: {bar: 'baz'}};
+const objectA = { foo: { bar: "baz" } };
+const objectB = { foo: { bar: "baz" } };
 
 console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
@@ -63,37 +64,57 @@ console.log(deepEqual(objectA, objectB)); // true
 
 #### shallowEqual
 
-*Aliased on the default export as `fe.shallow`*
+_Aliased on the default export as `fe.shallow`_
 
 Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
 ```javascript
-import {shallowEqual} from 'fast-equals';
+import { shallowEqual } from "fast-equals";
 
-const nestedObject = {bar: 'baz'};
+const nestedObject = { bar: "baz" };
 
-const objectA = {foo: nestedObject};
-const objectB = {foo: nestedObject};
-const objectC = {foo: {bar: 'baz'}};
+const objectA = { foo: nestedObject };
+const objectB = { foo: nestedObject };
+const objectC = { foo: { bar: "baz" } };
 
 console.log(objectA === objectB); // false
 console.log(shallowEqual(objectA, objectB)); // true
 console.log(shallowEqual(objectA, objectC)); // false
 ```
 
+#### sameValueZeroEqual
+
+_Aliased on the default export as `fe.sameValueZero`_
+
+Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means either strictly equal or both `NaN`.
+
+```javascript
+import { sameValueZeroEqual } from "fast-equals";
+
+const mainObject = { foo: NaN, bar: "baz" };
+
+const objectA = "baz";
+const objectB = NaN;
+const objectC = { foo: NaN, bar: "baz" };
+
+console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
+console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
+console.log(sameValueZeroEqual(mainObject, objectC)); // false
+```
+
 #### createCustomEqual
 
-*Aliased on the default export as `fe.createCustom`*
+_Aliased on the default export as `fe.createCustom`_
 
 Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a partial-application function that will receive the internal comparator and should return a function that compares two objects.
 
 A common use case for this is to handle circular objects (which `fast-equals` does not handle by default). Example:
 
 ```javascript
-import {createCustomEqual} from 'fast-equals';
-import decircularize from 'decircularize';
+import { createCustomEqual } from "fast-equals";
+import decircularize from "decircularize";
 
-const isDeepEqualCircular = createCustomEqual((comparator) => {
+const isDeepEqualCircular = createCustomEqual(comparator => {
   return (objectA, objectB) => {
     return comparator(decircularize(objectA), decircularize(objectB));
   };
@@ -124,7 +145,7 @@ All benchmarks are based on averages of running comparisons based on the followi
 * A mixed object with a combination of all the above types
 
 |                        | Operations / second | Relative margin of error |
-|------------------------|---------------------|--------------------------|
+| ---------------------- | ------------------- | ------------------------ |
 | **fast-equals**        | **197,615**         | **0.53%**                |
 | nano-equal             | 121.843             | 0.49%                    |
 | fast-deep-equal        | 102,257             | 0.41%                    |
