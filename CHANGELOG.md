@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.2.0
+
+* Surface `isSameValueZero` as [`sameValueZeroEqual`](#samevaluezeroequal) option
+
 ## 1.1.0
 
 * Add TypeScript typings (thanks [@josh-sachs](https://github.com/josh-sachs))
