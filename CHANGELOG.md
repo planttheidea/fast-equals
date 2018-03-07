@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.2.1
+
+* Fix errors from TypeScript typings in strict mode (thanks [@HitoriSensei](https://github.com/HitoriSensei))
+
 ## 1.2.0
 
 * Surface `isSameValueZero` as [`sameValueZeroEqual`](#samevaluezeroequal) option
