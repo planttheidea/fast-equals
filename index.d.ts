@@ -1,13 +1,15 @@
-declare type Comparator = (objectA, objectB) => boolean;
+declare type Comparator = (objectA: any, objectB: any) => boolean;
 
 export declare function createCustomEqual(createIsEqual?: Comparator): Comparator;
-export declare function deepEqual(objectA, objectB): boolean;
-export declare function sameValueZeroEqual(objectA, objectB): boolean;
-export declare function shallowEqual(objectA, objectB): boolean;
+export declare function deepEqual(objectA: any, objectB: any): boolean;
+export declare function shallowEqual(objectA: any, objectB: any): boolean;
+export declare function sameValueZeroEqual(objectA: any, objectB: any): boolean;
 
-export default {
-  createCustom: createCustomEqual,
-  deep: deepEqual,
-  sameValueZero: sameValueZeroEqual,
-  shallow: shallowEqual
+type module = {
+    createCustom: typeof createCustomEqual,
+    deep: typeof deepEqual,
+    shallow: typeof shallowEqual,
+    sameValueZero: typeof sameValueZeroEqual,
 };
+
+export default module;
