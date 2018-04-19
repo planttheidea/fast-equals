@@ -1,4 +1,4 @@
-export const createIsSameValueZero = () => {
+export const createIsSameValueZero = () =>
   /**
    * @function isSameValueZero
    *
@@ -9,10 +9,18 @@ export const createIsSameValueZero = () => {
    * @param {*} objectB the object to test
    * @returns {boolean} are the objects equal by the SameValueZero principle
    */
-  return (objectA, objectB) => {
-    return objectA === objectB || (objectA !== objectA && objectB !== objectB);
-  };
-};
+  (objectA, objectB) => objectA === objectB || (objectA !== objectA && objectB !== objectB);
+
+/**
+ * @function isReactElement
+ *
+ * @description
+ * is the object passed a react element
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a react element
+ */
+export const isReactElement = (object) => !!(object.$$typeof && object._store);
 
 /**
  * @function toPairs

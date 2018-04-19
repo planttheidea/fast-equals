@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~960 bytes when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~985 bytes when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -148,16 +148,16 @@ All benchmarks are based on averages of running comparisons based on the followi
 
 |                        | Operations / second | Relative margin of error |
 | ---------------------- | ------------------- | ------------------------ |
-| **fast-equals**        | **152,517**         | **0.92%**                |
-| nano-equal             | 108,649             | 1.06%                    |
-| shallow-equal-fuzzy    | 97,115              | 0.85%                    |
-| fast-deep-equal        | 94,622              | 0.91%                    |
-| react-fast-compare     | 94,120              | 0.96%                    |
-| underscore.isEqual     | 62,251              | 0.77%                    |
-| deep-equal             | 29,571              | 0.49%                    |
-| lodash.isEqual         | 25,990              | 0.63%                    |
-| deep-eql               | 16,432              | 0.56%                    |
-| assert.deepStrictEqual | 1,614               | 0.91%                    |
+| **fast-equals**        | **158,904**         | **0.50%**                |
+| nano-equal             | 107,118             | 1.33%                    |
+| fast-deep-equal        | 101,115             | 0.59%                    |
+| shallow-equal-fuzzy    | 100,383             | 0.60%                    |
+| react-fast-compare     | 99,924              | 0.85%                    |
+| underscore.isEqual     | 63,524              | 0.68%                    |
+| deep-equal             | 30,703              | 0.50%                    |
+| lodash.isEqual         | 25,678              | 0.65%                    |
+| deep-eql               | 16,646              | 0.54%                    |
+| assert.deepStrictEqual | 1,583               | 1.04%                    |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 

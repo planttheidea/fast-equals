@@ -1,5 +1,5 @@
 // utils
-import {areIterablesEqual, createIsSameValueZero} from './utils';
+import {areIterablesEqual, createIsSameValueZero, isReactElement} from './utils';
 
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
@@ -99,12 +99,16 @@ const createComparator = (createIsEqual) => {
       for (index = 0; index < keysA.length; index++) {
         key = keysA[index];
 
+        if (!Object.prototype.hasOwnProperty.call(objectB, key)) {
+          return false;
+        }
+
         // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
-        if (key === '_owner' && objectA.$$typeof && objectA._store) {
+        if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
           continue;
         }
 
-        if (!Object.prototype.hasOwnProperty.call(objectB, key) || !isEqual(objectA[key], objectB[key])) {
+        if (!isEqual(objectA[key], objectB[key])) {
           return false;
         }
       }
