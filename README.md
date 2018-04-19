@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2Kb when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~960 bytes when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -12,6 +12,7 @@ Unlike most equality validation libraries, the following types are handled out-o
 * `Date` objects
 * `RegExp` objects
 * `Map` / `Set` iterables
+* `react` elements
 
 You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
@@ -142,31 +143,34 @@ All benchmarks are based on averages of running comparisons based on the followi
 * `Array`s
 * `Date`s
 * `RegExp`s
+* `react` elements
 * A mixed object with a combination of all the above types
 
 |                        | Operations / second | Relative margin of error |
 | ---------------------- | ------------------- | ------------------------ |
-| **fast-equals**        | **197,615**         | **0.53%**                |
-| nano-equal             | 121.843             | 0.49%                    |
-| fast-deep-equal        | 102,257             | 0.41%                    |
-| shallow-equal-fuzzy    | 80,224              | 0.55%                    |
-| underscore.isEqual     | 51,110              | 0.52%                    |
-| deep-equal             | 32,907              | 0.82%                    |
-| lodash.isEqual         | 26,021              | 0.48%                    |
-| deep-eql               | 14,589              | 0.66%                    |
-| assert.deepStrictEqual | 441                 | 1.39%                    |
+| **fast-equals**        | **152,517**         | **0.92%**                |
+| nano-equal             | 108,649             | 1.06%                    |
+| shallow-equal-fuzzy    | 97,115              | 0.85%                    |
+| fast-deep-equal        | 94,622              | 0.91%                    |
+| react-fast-compare     | 94,120              | 0.96%                    |
+| underscore.isEqual     | 62,251              | 0.77%                    |
+| deep-equal             | 29,571              | 0.49%                    |
+| lodash.isEqual         | 25,990              | 0.63%                    |
+| deep-eql               | 16,432              | 0.56%                    |
+| assert.deepStrictEqual | 1,614               | 0.91%                    |
 
-Caveats that impact the benchmark:
+Caveats that impact the benchmark (and accuracy of comparison):
 
-* `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
 * `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero` equality for dates
 * `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
+* `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
+* `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function` equality
 * `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
 * `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
 * `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
 * `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 
-All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison. The same logic applies to `react` elements (which can be circular objects), but simple elements are non-circular objects so I kept the `react` comparison very basic to allow it to be included.
 
 ## Development
 

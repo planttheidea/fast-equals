@@ -12,6 +12,8 @@ module.exports = {
 
   entry: [path.resolve(statics.ROOT, 'src', 'index.js')],
 
+  mode: 'development',
+
   module: {
     rules: [
       {

@@ -3,15 +3,9 @@
   "ava": {
     "babel": "inherit",
     "failFast": true,
-    "files": [
-      "test/*.js"
-    ],
-    "require": [
-      "babel-register"
-    ],
-    "source": [
-      "src/*.js"
-    ],
+    "files": ["test/*.js"],
+    "require": ["babel-register"],
+    "source": ["src/*.js"],
     "verbose": true
   },
   "bugs": {
@@ -21,8 +15,8 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.3",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
@@ -31,33 +25,33 @@
     "decircularize": "^1.0.0",
     "deep-eql": "^3.0.1",
     "deep-equal": "^1.0.1",
-    "eslint": "^4.18.2",
+    "eslint": "^4.19.1",
     "eslint-config-rapid7": "^2.11.1",
-    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.0.0",
     "fast-deep-equal": "^1.1.0",
-    "html-webpack-plugin": "^2.30.1",
+    "html-webpack-plugin": "^3.2.0",
     "in-publish": "^2.0.0",
     "lodash": "^4.17.5",
     "nano-equal": "^2.0.2",
-    "nyc": "^11.4.1",
+    "nyc": "^11.7.1",
     "optimize-js-plugin": "^0.0.4",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "react-fast-compare": "^1.0.0",
+    "rollup": "^0.58.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-uglify": "^3.0.0",
     "shallow-equal-fuzzy": "^0.0.2",
-    "sinon": "^4.4.2",
-    "underscore": "^1.8.3",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "sinon": "^4.5.0",
+    "underscore": "^1.9.0",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.3"
   },
   "homepage": "https://github.com/planttheidea/fast-equals#readme",
-  "keywords": [
-    "fast",
-    "equal",
-    "equals",
-    "deep-equal",
-    "equivalent"
-  ],
+  "keywords": ["fast", "equal", "equals", "deep-equal", "equivalent"],
   "license": "MIT",
   "main": "lib/index.js",
   "types": "index.d.ts",
@@ -68,25 +62,25 @@
     "url": "git+https://github.com/planttheidea/fast-equals.git"
   },
   "scripts": {
-    "benchmark": "npm run transpile:lib -- --no-comments && node benchmark/index.js",
-    "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
-    "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
+    "benchmark": "NODE_ENV=production BABEL_ENV=test babel src --out-dir lib --no-comments && node benchmark/index.js",
+    "build": "NODE_ENV=production rollup -c",
     "clean": "npm run clean:es && npm run clean:lib && npm run clean:dist",
     "clean:dist": "rimraf dist",
     "clean:es": "rimraf es",
     "clean:lib": "rimraf lib",
     "dev": "NODE_ENV=development webpack-dev-server --colors --progress --config=webpack/webpack.config.dev.js",
-    "dist": "npm run clean:dist && npm run build && npm run build:minified",
-    "lint": "NODE_ENV=test eslint src",
+    "dist": "npm run clean:dist && npm run build",
+    "lint": "NODE_ENV=test eslint src --max-warnings 0",
     "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
-    "prepublish:compile": "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
+    "prepublish:compile":
+      "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
     "start": "npm run dev",
-    "test": "NODE_PATH=. NODE_ENV=production BABEL_ENV=test ava",
+    "test": "NODE_PATH=. BABEL_ENV=test ava",
     "test:coverage": "nyc npm test",
     "test:watch": "npm test -- --watch",
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
-    "transpile:lib": "npm run clean:lib && babel src --out-dir lib"
+    "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib"
   },
   "version": "1.2.1"
 }

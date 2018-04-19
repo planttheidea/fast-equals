@@ -6,7 +6,8 @@
           "env",
           {
             "exclude": ["transform-es2015-typeof-symbol"],
-            "loose": true
+            "loose": true,
+            "modules": false
           }
         ],
         "stage-2"
@@ -25,13 +26,26 @@
         "stage-2"
       ]
     },
-    "production": {
+    "lib": {
       "presets": [
         [
           "env",
           {
             "exclude": ["transform-es2015-typeof-symbol"],
             "loose": true
+          }
+        ],
+        "stage-2"
+      ]
+    },
+    "production": {
+      "presets": [
+        [
+          "env",
+          {
+            "exclude": ["transform-es2015-typeof-symbol"],
+            "loose": true,
+            "modules": false
           }
         ],
         "stage-2"

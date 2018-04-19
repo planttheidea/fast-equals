@@ -164,14 +164,18 @@ const isDeepEqualCircular = fe.createCustom((comparator) => {
   };
 });
 
-const object = {};
-const otherObject = {};
+function Obj() {
+  this.me = this;
+}
 
-object.a = object;
-otherObject.a = object;
+function Nested(y) {
+  this.y = y;
+}
 
-console.log('true', isDeepEqualCircular(object, otherObject));
-console.log('false', isDeepEqualCircular(object, {foo: 'baz'}));
+console.log('false', fe.deep(new Obj(), new Obj()));
+
+console.log('true', isDeepEqualCircular(new Obj(), new Obj()));
+console.log('false', isDeepEqualCircular(new Obj(), {foo: 'baz'}));
 console.groupEnd('circular object');
 
 console.group('circular array');
@@ -183,6 +187,49 @@ array[1] = array;
 console.log('true', isDeepEqualCircular(array, ['foo', array]));
 console.log('false', isDeepEqualCircular(array, [array]));
 console.groupEnd('circular array');
+
+console.log(<div>foo</div>);
+console.log(React.createElement('div', {children: 'foo'}));
+
+console.log(
+  <main>
+    <h1>Title</h1>
+
+    <p>Content</p>
+    <p>Content</p>
+    <p>Content</p>
+    <p>Content</p>
+
+    <div style={{display: 'flex'}}>
+      <div style={{flex: '1 1 auto'}}>Item</div>
+      <div style={{flex: '1 1 0'}}>Item</div>
+    </div>
+  </main>
+);
+console.log(
+  React.createElement('main', {
+    children: [
+      React.createElement('h1', {children: 'Title'}),
+      React.createElement('p', {children: 'Content'}),
+      React.createElement('p', {children: 'Content'}),
+      React.createElement('p', {children: 'Content'}),
+      React.createElement('p', {children: 'Content'}),
+      React.createElement('div', {
+        children: [
+          React.createElement('div', {
+            children: 'Item',
+            style: {flex: '1 1 auto'}
+          }),
+          React.createElement('div', {
+            children: 'Item',
+            style: {flex: '1 1 0'}
+          })
+        ],
+        style: {display: 'flex'}
+      })
+    ]
+  })
+);
 
 class App extends PureComponent {
   element = null;

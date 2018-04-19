@@ -1,5 +1,11 @@
 # fast-equals CHANGELOG
 
+## 1.3.0
+
+* Add support for deep-equal comparisons between `react` elements
+* Add comparison with `react-fast-compare`
+* Use `rollup` for `dist` file builds
+
 ## 1.2.1
 
 * Fix errors from TypeScript typings in strict mode (thanks [@HitoriSensei](https://github.com/HitoriSensei))
