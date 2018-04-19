@@ -99,6 +99,11 @@ const createComparator = (createIsEqual) => {
       for (index = 0; index < keysA.length; index++) {
         key = keysA[index];
 
+        // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
+        if (key === '_owner' && objectA.$$typeof && objectA._store) {
+          continue;
+        }
+
         if (!Object.prototype.hasOwnProperty.call(objectB, key) || !isEqual(objectA[key], objectB[key])) {
           return false;
         }

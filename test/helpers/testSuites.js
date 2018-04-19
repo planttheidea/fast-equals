@@ -1,5 +1,7 @@
 'use strict';
 
+const React = require('react');
+
 const fn = () => {};
 
 module.exports = [
@@ -466,6 +468,25 @@ module.exports = [
         description: 'Set and array are not equal',
         value1: new Set().add('foo'),
         value2: ['foo'],
+        deepEqual: false,
+        shallowEqual: false
+      }
+    ]
+  },
+  {
+    description: 'react',
+    tests: [
+      {
+        description: 'simple react elements are deeply equal',
+        value1: React.createElement('div', {chidren: 'foo'}),
+        value2: React.createElement('div', {chidren: 'foo'}),
+        deepEqual: true,
+        shallowEqual: false
+      },
+      {
+        description: 'simple react elements are not deeply equal',
+        value1: React.createElement('div', {chidren: 'foo'}),
+        value2: React.createElement('div', {chidren: 'bar'}),
         deepEqual: false,
         shallowEqual: false
       }

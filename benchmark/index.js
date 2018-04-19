@@ -22,7 +22,8 @@ const equalPackages = {
     } catch (e) {
       return false;
     }
-  }
+  },
+  'react-fast-compare': require('react-fast-compare')
 };
 
 /*
