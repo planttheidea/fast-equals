@@ -19,9 +19,15 @@ npm manifest:
     "ava": {
       "babel": "inherit",
       "failFast": true,
-      "files": ["test/*.js"],
-      "require": ["babel-register"],
-      "source": ["src/*.js"],
+      "files": [
+        "test/*.js"
+      ],
+      "require": [
+        "babel-register"
+      ],
+      "source": [
+        "src/*.js"
+      ],
       "verbose": true
     },
     "bugs": {
@@ -67,7 +73,13 @@ npm manifest:
       "webpack-dev-server": "^3.1.3"
     },
     "homepage": "https://github.com/planttheidea/fast-equals#readme",
-    "keywords": ["fast", "equal", "equals", "deep-equal", "equivalent"],
+    "keywords": [
+      "fast",
+      "equal",
+      "equals",
+      "deep-equal",
+      "equivalent"
+    ],
     "license": "MIT",
     "main": "lib/index.js",
     "types": "index.d.ts",
@@ -89,8 +101,7 @@ npm manifest:
       "lint": "NODE_ENV=test eslint src --max-warnings 0",
       "lint:fix": "NODE_ENV=test eslint src --fix",
       "prepublish": "if in-publish; then npm run prepublish:compile; fi",
-      "prepublish:compile":
-        "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
+      "prepublish:compile": "npm run lint && npm run test:coverage && npm run transpile:lib && npm run transpile:es && npm run dist",
       "start": "npm run dev",
       "test": "NODE_PATH=. BABEL_ENV=test ava",
       "test:coverage": "nyc npm test",
@@ -98,7 +109,7 @@ npm manifest:
       "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
       "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib"
     },
-    "version": "1.2.1"
+    "version": "1.3.0"
   }
 
 yarn manifest: 

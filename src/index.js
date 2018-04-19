@@ -1,14 +1,14 @@
 // comparator
-import createComparator from './comparator';
+import createCustomEqual from './comparator';
 
 // utils
 import {createIsSameValueZero} from './utils';
 
-export const createCustomEqual = createComparator;
+export {createCustomEqual};
 
-export const deepEqual = createComparator();
+export const deepEqual = createCustomEqual();
 export const sameValueZeroEqual = createIsSameValueZero();
-export const shallowEqual = createComparator(createIsSameValueZero);
+export const shallowEqual = createCustomEqual(createIsSameValueZero);
 
 export default {
   createCustom: createCustomEqual,

@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.3.1
+
+* Make `react` comparison more accurate, and a touch faster
+
 ## 1.3.0
 
 * Add support for deep-equal comparisons between `react` elements
