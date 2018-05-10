@@ -26,12 +26,14 @@ const equalPackages = {
   'react-fast-compare': require('react-fast-compare')
 };
 
+const filteredEquivalentTests = ['maps', 'sets', 'promises'];
+
 /*
  * filter out Map and Set, as those do not pass with anything but lodash and falsely inflate the average ops/sec
  */
-const equivalentTests = tests.filter(({description}) => {
-  return !~description.indexOf('maps') && !~description.indexOf('sets');
-});
+const equivalentTests = tests.filter(({description}) =>
+  filteredEquivalentTests.every((test) => !~description.indexOf(test))
+);
 
 let passingTests = {};
 
@@ -39,9 +41,7 @@ console.log('');
 
 const suite = new Benchmark.Suite();
 
-const getPassedKey = (equalName, {description}) => {
-  return `${equalName} - ${description}`;
-};
+const getPassedKey = (equalName, {description}) => `${equalName} - ${description}`;
 
 for (const equalName in equalPackages) {
   let equalFunc = equalPackages[equalName];

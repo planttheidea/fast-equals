@@ -1,10 +1,8 @@
 // utils
-import {areIterablesEqual, createIsSameValueZero, isReactElement} from './utils';
+import {areIterablesEqual, isPromiseLike, isReactElement, sameValueZeroEqual} from './utils';
 
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
-
-const isSameValueZero = createIsSameValueZero();
 
 const createComparator = (createIsEqual) => {
   const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line
@@ -20,7 +18,7 @@ const createComparator = (createIsEqual) => {
    * @returns {boolean} are objectA and objectB equivalent in value
    */
   function comparator(objectA, objectB) {
-    if (isSameValueZero(objectA, objectB)) {
+    if (sameValueZeroEqual(objectA, objectB)) {
       return true;
     }
 
@@ -54,7 +52,7 @@ const createComparator = (createIsEqual) => {
       const dateB = objectB instanceof Date;
 
       if (dateA || dateB) {
-        return dateA === dateB && isSameValueZero(objectA.getTime(), objectB.getTime());
+        return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
       }
 
       const regexpA = objectA instanceof RegExp;
@@ -68,6 +66,10 @@ const createComparator = (createIsEqual) => {
           objectA.ignoreCase === objectB.ignoreCase &&
           objectA.multiline === objectB.multiline
         );
+      }
+
+      if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
+        return objectA === objectB;
       }
 
       if (HAS_MAP_SUPPORT) {

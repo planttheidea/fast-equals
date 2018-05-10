@@ -3,6 +3,7 @@
 const React = require('react');
 
 const fn = () => {};
+const promise = Promise.resolve('foo');
 
 module.exports = [
   {
@@ -468,6 +469,25 @@ module.exports = [
         description: 'Set and array are not equal',
         value1: new Set().add('foo'),
         value2: ['foo'],
+        deepEqual: false,
+        shallowEqual: false
+      }
+    ]
+  },
+  {
+    description: 'promises',
+    tests: [
+      {
+        description: 'promises are equal when strictly equal',
+        value1: promise,
+        value2: promise,
+        deepEqual: true,
+        shallowEqual: true
+      },
+      {
+        description: 'promises are not equal when not strictly equal',
+        value1: promise,
+        value2: Promise.resolve('foo'),
         deepEqual: false,
         shallowEqual: false
       }

@@ -1,8 +1,17 @@
-import React, {PureComponent} from 'react';
-import {render} from 'react-dom';
 import decircularize from 'decircularize';
 
 import fe, {deepEqual} from '../src';
+
+document.body.style.backgroundColor = '#1d1d1d';
+document.body.style.color = '#d5d5d5';
+document.body.style.margin = 0;
+document.body.style.padding = 0;
+
+const div = document.createElement('div');
+
+div.textContent = 'Check the console for details.';
+
+document.body.appendChild(div);
 
 console.group('string');
 console.log('true', deepEqual('foo', 'foo'));
@@ -55,6 +64,13 @@ console.group('regexp');
 console.log('true', fe.deep(/foo/, /foo/));
 console.log('false', fe.deep(/foo/, /foo/g));
 console.groupEnd('regexp');
+
+console.group('promise');
+const promise = Promise.resolve('foo');
+
+console.log(true, fe.deep({promise}, {promise}));
+console.log(false, fe.deep({promise}, {promise: Promise.resolve('foo')}));
+console.groupEnd('promise');
 
 console.group('map deep');
 console.log(
@@ -138,16 +154,12 @@ const object4 = {
   }
 };
 
-const isNotDeeplyOne = (comparator) => {
-  return (a, b) => {
-    if (typeof a === 'number' || typeof b === 'number') {
-      return a !== 1 && b !== 1;
-    }
+const isNotDeeplyOne = (comparator) => (a, b) => {
+  if (typeof a === 'number' || typeof b === 'number') {
+    return a !== 1 && b !== 1;
+  }
 
-    return Object.keys(a).every((key) => {
-      return comparator(a[key], b[key]);
-    });
-  };
+  return Object.keys(a).every((key) => comparator(a[key], b[key]));
 };
 
 const doesNotEverEqualOne = fe.createCustom(isNotDeeplyOne);
@@ -158,11 +170,7 @@ console.groupEnd('custom');
 
 console.group('circular object');
 
-const isDeepEqualCircular = fe.createCustom((comparator) => {
-  return (a, b) => {
-    return comparator(decircularize(a), decircularize(b));
-  };
-});
+const isDeepEqualCircular = fe.createCustom((comparator) => (a, b) => comparator(decircularize(a), decircularize(b)));
 
 function Obj() {
   this.me = this;
@@ -230,38 +238,3 @@ console.log(
     ]
   })
 );
-
-class App extends PureComponent {
-  element = null;
-
-  render() {
-    return (
-      <div>
-        <h1>App</h1>
-      </div>
-    );
-  }
-}
-
-const renderApp = (container) => {
-  render(<App />, container);
-};
-
-// document.body.style.backgroundColor = '#1d1d1d';
-// document.body.style.color = '#d5d5d5';
-document.body.style.margin = 0;
-document.body.style.padding = 0;
-
-const div = document.createElement('div');
-
-div.id = 'app-container';
-
-div.style.boxSizing = 'border-box';
-div.style.height = '100vh';
-div.style.overflow = 'auto';
-div.style.padding = '15px';
-div.style.width = '100vw';
-
-renderApp(div);
-
-document.body.appendChild(div);
