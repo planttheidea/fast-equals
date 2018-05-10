@@ -54,16 +54,6 @@ test('if areIterablesEqual returns true when objects have the same size and valu
   t.true(utils.areIterablesEqual(objectA, objectB, comparator, false));
 });
 
-test('if createIsSameValueZero will return true when strictly equal or NaN, false otherwise', (t) => {
-  Object.keys(mainValues).forEach((key) => {
-    t.true(utils.createIsSameValueZero()(mainValues[key], mainValues[key]), `${key} - true`);
-
-    if (alternativeValues.hasOwnProperty(key)) {
-      t.false(utils.createIsSameValueZero()(mainValues[key], alternativeValues[key]), `${key} - false`);
-    }
-  });
-});
-
 test('if isCircularReactElement will return true if the appropriate keys are present and truthy', (t) => {
   const div = React.createElement('div', {children: 'foo'});
 
@@ -76,6 +66,32 @@ test('if isCircularReactElement will return false if the appropriate keys are no
   };
 
   t.false(utils.isReactElement(div));
+});
+
+test('if isPromiseLike returns true when there is a then function on the object', (t) => {
+  const object = {
+    then() {}
+  };
+
+  t.true(utils.isPromiseLike(object));
+});
+
+test('if isPromiseLike returns false when there is no then function on the object', (t) => {
+  const object = {
+    then: 'again'
+  };
+
+  t.false(utils.isPromiseLike(object));
+});
+
+test('if sameValueZeroEqual will return true when strictly equal or NaN, false otherwise', (t) => {
+  Object.keys(mainValues).forEach((key) => {
+    t.true(utils.sameValueZeroEqual(mainValues[key], mainValues[key]), `${key} - true`);
+
+    if (alternativeValues.hasOwnProperty(key)) {
+      t.false(utils.sameValueZeroEqual(mainValues[key], alternativeValues[key]), `${key} - false`);
+    }
+  });
 });
 
 test('if toPairs will convert the map into {keys: [], values: []} pairs', (t) => {

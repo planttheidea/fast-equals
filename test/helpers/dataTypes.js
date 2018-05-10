@@ -11,6 +11,7 @@ export const mainValues = {
   nil: null,
   number: 123,
   object: {foo: {bar: 'baz'}},
+  promise: Promise.resolve('foo'),
   react: React.createElement('main', {
     children: [
       React.createElement('h1', {children: 'Title'}),

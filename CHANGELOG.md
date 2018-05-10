@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.4.0
+
+* Add support for comparing promise-like objects (strict equality only)
+
 ## 1.3.1
 
 * Make `react` comparison more accurate, and a touch faster

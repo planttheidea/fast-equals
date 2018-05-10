@@ -1,15 +1,26 @@
-export const createIsSameValueZero = () =>
-  /**
-   * @function isSameValueZero
-   *
-   * @description
-   * are the objects passed strictly equal or both NaN
-   *
-   * @param {*} objectA the object to compare against
-   * @param {*} objectB the object to test
-   * @returns {boolean} are the objects equal by the SameValueZero principle
-   */
-  (objectA, objectB) => objectA === objectB || (objectA !== objectA && objectB !== objectB);
+/**
+ * @function sameValueZeroEqual
+ *
+ * @description
+ * are the objects passed strictly equal or both NaN
+ *
+ * @param {*} objectA the object to compare against
+ * @param {*} objectB the object to test
+ * @returns {boolean} are the objects equal by the SameValueZero principle
+ */
+export const sameValueZeroEqual = (objectA, objectB) =>
+  objectA === objectB || (objectA !== objectA && objectB !== objectB);
+
+/**
+ * @function isPromiseLike
+ *
+ * @description
+ * is the object promise-like (thenable)
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object promise-like
+ */
+export const isPromiseLike = (object) => typeof object.then === 'function';
 
 /**
  * @function isReactElement
