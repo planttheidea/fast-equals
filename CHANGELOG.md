@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.4.1
+
+* Fix issue where `lastIndex` was not being tested on `RegExp` objects
+
 ## 1.4.0
 
 * Add support for comparing promise-like objects (strict equality only)
