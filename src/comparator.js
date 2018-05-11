@@ -64,7 +64,8 @@ const createComparator = (createIsEqual) => {
           objectA.source === objectB.source &&
           objectA.global === objectB.global &&
           objectA.ignoreCase === objectB.ignoreCase &&
-          objectA.multiline === objectB.multiline
+          objectA.multiline === objectB.multiline &&
+          objectA.lastIndex === objectB.lastIndex
         );
       }
 
