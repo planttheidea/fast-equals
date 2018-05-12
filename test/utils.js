@@ -39,49 +39,55 @@ test('if addObjectToCache will add the item to cache if it is an object', (t) =>
 test('if areIterablesEqual returns false when objects are different sizes', (t) => {
   const objectA = new Map();
   const objectB = new Map().set('foo', 'bar');
+  const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
 });
 
 test('if areIterablesEqual returns false when objects have different keys', (t) => {
   const objectA = new Map().set('foo', 'bar');
   const objectB = new Map().set('bar', 'baz');
+  const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
 });
 
 test('if areIterablesEqual returns false when objects have different values', (t) => {
   const objectA = new Map().set('foo', 'bar');
   const objectB = new Map().set('foo', 'baz');
+  const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, true));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
 });
 
 test('if areIterablesEqual returns true when objects have the same size, keys, and values', (t) => {
   const objectA = new Map().set('foo', 'bar');
   const objectB = new Map().set('foo', 'bar');
+  const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.true(utils.areIterablesEqual(objectA, objectB, comparator, true));
+  t.true(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
 });
 
 test('if areIterablesEqual returns false when objects have the same size but different values when they are sets', (t) => {
   const objectA = new Set().add('foo');
   const objectB = new Set().add('bar');
+  const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, false));
+  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, false));
 });
 
 test('if areIterablesEqual returns true when objects have the same size and values when they are sets', (t) => {
   const objectA = new Set().add('bar');
   const objectB = new Set().add('bar');
+  const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.true(utils.areIterablesEqual(objectA, objectB, comparator, false));
+  t.true(utils.areIterablesEqual(objectA, objectB, comparator, cache, false));
 });
 
 test.serial('if createCircularEqual will create the custom comparator that stores the values in cache', (t) => {

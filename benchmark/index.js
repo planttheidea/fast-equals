@@ -7,6 +7,7 @@ const tests = require('../test/helpers/testSuites');
 
 const equalPackages = {
   'fast-equals': require('../lib/index').deepEqual,
+  'fast-equals (circular)': require('../lib/index').circularDeepEqual,
   'fast-deep-equal': true,
   'nano-equal': true,
   'shallow-equal-fuzzy': true,

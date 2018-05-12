@@ -80,9 +80,8 @@ export const getNewCache = () =>
  */
 export const createCircularEqual = (isEqual) => (isDeepEqual) => {
   const comparator = isEqual || isDeepEqual;
-  const cache = getNewCache();
 
-  return (objectA, objectB) => {
+  return (objectA, objectB, cache = getNewCache()) => {
     const cacheHasA = cache.has(objectA);
     const cacheHasB = cache.has(objectB);
 
@@ -93,7 +92,7 @@ export const createCircularEqual = (isEqual) => (isDeepEqual) => {
     addObjectToCache(objectA, cache);
     addObjectToCache(objectB, cache);
 
-    return comparator(objectA, objectB);
+    return comparator(objectA, objectB, cache);
   };
 };
 
@@ -125,10 +124,11 @@ export const toPairs = (iterable) => {
  * @param {Map|Set} objectA the object to test
  * @param {Map|Set} objectB the object to test against
  * @param {function} comparator the comparator to determine deep equality
+ * @param {Object|WeakSet} cache the cache possibly being used
  * @param {boolean} shouldCompareKeys should the keys be tested in the equality comparison
  * @returns {boolean} are the objects equal in value
  */
-export const areIterablesEqual = (objectA, objectB, comparator, shouldCompareKeys) => {
+export const areIterablesEqual = (objectA, objectB, comparator, cache, shouldCompareKeys) => {
   if (objectA.size !== objectB.size) {
     return false;
   }
@@ -137,6 +137,6 @@ export const areIterablesEqual = (objectA, objectB, comparator, shouldCompareKey
   const pairsB = toPairs(objectB);
 
   return shouldCompareKeys
-    ? comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values)
-    : comparator(pairsA.values, pairsB.values);
+    ? comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values, cache)
+    : comparator(pairsA.values, pairsB.values, cache);
 };
