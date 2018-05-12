@@ -1,10 +1,40 @@
 // test
 import test from 'ava';
+import sinon from 'sinon';
 import {alternativeValues, mainValues} from 'test/helpers/dataTypes';
 import React from 'react';
 
 // src
 import * as utils from 'src/utils';
+import * as constants from 'src/constants';
+import {createCircularEqual} from '../src/utils';
+
+test('if addObjectToCache will not add the item to cache if it is null', (t) => {
+  const object = null;
+  const cache = new WeakSet();
+
+  utils.addObjectToCache(object, cache);
+
+  t.false(cache.has(object));
+});
+
+test('if addObjectToCache will not add the item to cache if it is not an object', (t) => {
+  const object = 'foo';
+  const cache = new WeakSet();
+
+  utils.addObjectToCache(object, cache);
+
+  t.false(cache.has(object));
+});
+
+test('if addObjectToCache will add the item to cache if it is an object', (t) => {
+  const object = {foo: 'bar'};
+  const cache = new WeakSet();
+
+  utils.addObjectToCache(object, cache);
+
+  t.true(cache.has(object));
+});
 
 test('if areIterablesEqual returns false when objects are different sizes', (t) => {
   const objectA = new Map();
@@ -52,6 +82,80 @@ test('if areIterablesEqual returns true when objects have the same size and valu
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
   t.true(utils.areIterablesEqual(objectA, objectB, comparator, false));
+});
+
+test.serial('if createCircularEqual will create the custom comparator that stores the values in cache', (t) => {
+  const isEqual = undefined;
+
+  const ws = global.WeakSet;
+
+  const values = [];
+  const add = sinon.stub().callsFake((object) => values.push(object));
+  const has = sinon.stub().callsFake((object) => !!~values.indexOf(object));
+
+  global.WeakSet = function WeakSet() {
+    this._values = values;
+
+    this.add = add;
+    this.has = has;
+  };
+
+  const handler = createCircularEqual(isEqual);
+
+  const isDeepEqual = sinon.stub().returns(true);
+
+  const comparator = handler(isDeepEqual);
+
+  const objectA = {foo: 'bar'};
+  const objectB = {foo: 'bar'};
+
+  const result = comparator(objectA, objectB);
+
+  t.true(has.calledTwice);
+  t.deepEqual(has.args, [[objectA], [objectB]]);
+
+  t.true(add.calledTwice);
+  t.deepEqual(add.args, [[objectA], [objectB]]);
+
+  t.true(result);
+
+  has.resetHistory();
+  add.resetHistory();
+
+  comparator(objectA, objectB);
+
+  t.true(has.calledTwice);
+  t.deepEqual(has.args, [[objectA], [objectB]]);
+
+  t.true(add.notCalled);
+
+  global.WeakSet = ws;
+});
+
+test.serial('if getNewCache will return a new WeakSet when support is present', (t) => {
+  const result = utils.getNewCache();
+
+  t.true(result instanceof WeakSet);
+});
+
+test.serial('if getNewCache will return a new WeakSet-like object when support is not present', (t) => {
+  const support = constants.HAS_WEAKSET_SUPPORT;
+
+  constants.HAS_WEAKSET_SUPPORT = false;
+
+  const result = utils.getNewCache();
+
+  t.false(result instanceof WeakSet);
+  t.deepEqual(result._values, []);
+
+  const value = {foo: 'bar'};
+
+  result.add(value);
+
+  t.deepEqual(result._values, [value]);
+  t.true(result.has(value));
+
+  constants.HAS_WEAKSET_SUPPORT = support;
 });
 
 test('if isCircularReactElement will return true if the appropriate keys are present and truthy', (t) => {

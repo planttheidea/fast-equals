@@ -1,8 +1,8 @@
+// constants
+import {HAS_MAP_SUPPORT, HAS_SET_SUPPORT} from './constants';
+
 // utils
 import {areIterablesEqual, isPromiseLike, isReactElement, sameValueZeroEqual} from './utils';
-
-const HAS_MAP_SUPPORT = typeof Map === 'function';
-const HAS_SET_SUPPORT = typeof Set === 'function';
 
 const createComparator = (createIsEqual) => {
   const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line

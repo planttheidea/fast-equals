@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~995 bytes when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -24,6 +24,8 @@ You can also create a custom nested comparator, for specific scenarios ([see bel
   * [deepEqual](#deepequal)
   * [shallowEqual](#shallowequal)
   * [sameValueZeroEqual](#samevaluezeroequal)
+  * [circularDeepEqual](#circulardeepequal)
+  * [circularShallowEqual](#circularshallowequal)
   * [createCustomEqual](#createcustomequal)
 * [Benchmarks](#benchmarks)
 * [Development](#development)
@@ -102,6 +104,43 @@ const objectC = { foo: NaN, bar: "baz" };
 console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
 console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
 console.log(sameValueZeroEqual(mainObject, objectC)); // false
+```
+
+#### circularDeepEqual
+
+_Aliased on the default export as `fe.circularDeep`_
+
+Performs the same comparison as `deepEqual` but supports circular objects. It is slower than `deepEqual`, so only use if you know circular objects are present.
+
+```javascript
+function Circular(value) {
+  this.me = {
+    deeply: {
+      nested: {
+        reference: this
+      }
+    },
+    value
+  };
+}
+
+console.log(circularDeepEqual(new Circular("foo"), new Circular("foo"))); // true
+console.log(circularDeepEqual(new Circular("foo"), new Circular("bar"))); // false
+```
+
+#### circularShallowEqual
+
+_Aliased on the default export as `fe.circularShallow`_
+
+Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only use if you know circular objects are present.
+
+```javascript
+const array = ["foo"];
+
+array.push(array);
+
+console.log(circularShallowEqual(array, ["foo", array])); // true
+console.log(circularShallowEqual(array, [array])); // false
 ```
 
 #### createCustomEqual

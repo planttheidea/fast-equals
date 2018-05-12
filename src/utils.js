@@ -1,3 +1,18 @@
+// constants
+import {HAS_WEAKSET_SUPPORT} from './constants';
+
+/**
+ * @function addObjectToCache
+ *
+ * @description
+ * add object to cache if it is indeed an object
+ *
+ * @param {any} object the object to potentially add to the cache
+ * @param {Object|WeakSet} cache the cache to add to
+ * @returns {void}
+ */
+export const addObjectToCache = (object, cache) => object && typeof object === 'object' && cache.add(object);
+
 /**
  * @function sameValueZeroEqual
  *
@@ -32,6 +47,55 @@ export const isPromiseLike = (object) => typeof object.then === 'function';
  * @returns {boolean} is the object a react element
  */
 export const isReactElement = (object) => !!(object.$$typeof && object._store);
+
+/**
+ * @function getNewCache
+ *
+ * @description
+ * get a new cache object to prevent circular references
+ *
+ * @returns {Object|Weakset} the new cache object
+ */
+export const getNewCache = () =>
+  HAS_WEAKSET_SUPPORT
+    ? new WeakSet()
+    : Object.create({
+      _values: [],
+      add(value) {
+        this._values.push(value);
+      },
+      has(value) {
+        return !!~this._values.indexOf(value);
+      }
+    });
+
+/**
+ * @function createCircularEqual
+ *
+ * @description
+ * create a custom isEqual handler specific to circular objects
+ *
+ * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
+ * @returns {function(any, any): boolean}
+ */
+export const createCircularEqual = (isEqual) => (isDeepEqual) => {
+  const comparator = isEqual || isDeepEqual;
+  const cache = getNewCache();
+
+  return (objectA, objectB) => {
+    const cacheHasA = cache.has(objectA);
+    const cacheHasB = cache.has(objectB);
+
+    if (cacheHasA || cacheHasB) {
+      return cacheHasA && cacheHasB;
+    }
+
+    addObjectToCache(objectA, cache);
+    addObjectToCache(objectB, cache);
+
+    return comparator(objectA, objectB);
+  };
+};
 
 /**
  * @function toPairs
