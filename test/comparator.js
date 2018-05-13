@@ -40,8 +40,8 @@ test('if comparator will handle when there is no map or set support', (t) => {
   constants.HAS_MAP_SUPPORT = false;
   constants.HAS_SET_SUPPORT = false;
 
-  const objectA = {foo: {bar: 'baz'}};
-  const objectB = {foo: {bar: 'baz'}};
+  const objectA = new Error('boom');
+  const objectB = new Error('boom');
 
   t.true(comparator(objectA, objectB));
 

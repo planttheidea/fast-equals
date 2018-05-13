@@ -36,13 +36,40 @@ test('if addObjectToCache will add the item to cache if it is an object', (t) =>
   t.true(cache.has(object));
 });
 
+test('if areArraysEqual returns false when the arrays are different lengths', (t) => {
+  const arrayA = ['foo', 'bar'];
+  const arrayB = ['foo', 'bar', 'baz'];
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.false(utils.areArraysEqual(arrayA, arrayB, isEqual, cache));
+});
+
+test('if areArraysEqual returns false when the arrays are not equal in value', (t) => {
+  const arrayA = ['foo', 'bar'];
+  const arrayB = ['foo', 'baz'];
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.false(utils.areArraysEqual(arrayA, arrayB, isEqual, cache));
+});
+
+test('if areArraysEqual returns true when the arrays are equal in value', (t) => {
+  const arrayA = ['foo', 'bar'];
+  const arrayB = ['foo', 'bar'];
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.true(utils.areArraysEqual(arrayA, arrayB, isEqual, cache));
+});
+
 test('if areIterablesEqual returns false when objects are different sizes', (t) => {
   const objectA = new Map();
   const objectB = new Map().set('foo', 'bar');
   const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
+  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
 });
 
 test('if areIterablesEqual returns false when objects have different keys', (t) => {
@@ -51,7 +78,7 @@ test('if areIterablesEqual returns false when objects have different keys', (t) 
   const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
+  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
 });
 
 test('if areIterablesEqual returns false when objects have different values', (t) => {
@@ -60,7 +87,7 @@ test('if areIterablesEqual returns false when objects have different values', (t
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
+  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
 });
 
 test('if areIterablesEqual returns true when objects have the same size, keys, and values', (t) => {
@@ -69,7 +96,7 @@ test('if areIterablesEqual returns true when objects have the same size, keys, a
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.true(utils.areIterablesEqual(objectA, objectB, comparator, cache, true));
+  t.true(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
 });
 
 test('if areIterablesEqual returns false when objects have the same size but different values when they are sets', (t) => {
@@ -78,7 +105,7 @@ test('if areIterablesEqual returns false when objects have the same size but dif
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.false(utils.areIterablesEqual(objectA, objectB, comparator, cache, false));
+  t.false(utils.createAreIterablesEqual(false)(objectA, objectB, comparator, cache));
 });
 
 test('if areIterablesEqual returns true when objects have the same size and values when they are sets', (t) => {
@@ -87,7 +114,34 @@ test('if areIterablesEqual returns true when objects have the same size and valu
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.true(utils.areIterablesEqual(objectA, objectB, comparator, cache, false));
+  t.true(utils.createAreIterablesEqual(false)(objectA, objectB, comparator, cache));
+});
+
+test('if areObjectsEqual returns false when the object have different key lengths', (t) => {
+  const objectA = {foo: 'foo', bar: 'bar'};
+  const objectB = {foo: 'foo', bar: 'bar', baz: 'baz'};
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.false(utils.areObjectsEqual(objectA, objectB, isEqual, cache));
+});
+
+test('if areObjectsEqual returns false when the objects are not equal in value', (t) => {
+  const objectA = {foo: 'foo', bar: 'bar'};
+  const objectB = {foo: 'foo', bar: 'baz'};
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.false(utils.areObjectsEqual(objectA, objectB, isEqual, cache));
+});
+
+test('if areObjectsEqual returns true when the objects are equal in value', (t) => {
+  const objectA = {foo: 'foo', bar: 'bar'};
+  const objectB = {foo: 'foo', bar: 'bar'};
+  const isEqual = (a, b) => a === b;
+  const cache = new WeakSet();
+
+  t.true(utils.areObjectsEqual(objectA, objectB, isEqual, cache));
 });
 
 test.serial('if createCircularEqual will create the custom comparator that stores the values in cache', (t) => {
@@ -176,6 +230,18 @@ test('if isCircularReactElement will return false if the appropriate keys are no
   };
 
   t.false(utils.isReactElement(div));
+});
+
+test('if isPlainObject returns false when the object is not a plain object', (t) => {
+  const objects = [true, 'foo', 123];
+
+  objects.forEach((object) => {
+    t.false(utils.isPlainObject(object));
+  });
+});
+
+test('if isPlainObject returns true when the object is a plain object', (t) => {
+  t.true(utils.isPlainObject({}));
 });
 
 test('if isPromiseLike returns true when there is a then function on the object', (t) => {

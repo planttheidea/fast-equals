@@ -3,6 +3,7 @@
 ## 1.5.0
 
 * Add [`circularDeepEqual`](README.md#circulardeepequal) and [`circularShallowEqual`](README.md#circularshallowequal) methods
+* Add `meta` third parameter to `comparator` calls, for use with `createCustomEqual` method
 
 ## 1.4.1
 

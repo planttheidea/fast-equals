@@ -1,6 +1,8 @@
 // constants
 import {HAS_WEAKSET_SUPPORT} from './constants';
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
 /**
  * @function addObjectToCache
  *
@@ -19,12 +21,23 @@ export const addObjectToCache = (object, cache) => object && typeof object === '
  * @description
  * are the objects passed strictly equal or both NaN
  *
- * @param {*} objectA the object to compare against
- * @param {*} objectB the object to test
+ * @param {any} objectA the object to compare against
+ * @param {any} objectB the object to test
  * @returns {boolean} are the objects equal by the SameValueZero principle
  */
 export const sameValueZeroEqual = (objectA, objectB) =>
   objectA === objectB || (objectA !== objectA && objectB !== objectB);
+
+/**
+ * @function isPlainObject
+ *
+ * @description
+ * is the object a plain object
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a plain object
+ */
+export const isPlainObject = (object) => object.constructor === Object;
 
 /**
  * @function isPromiseLike
@@ -116,27 +129,90 @@ export const toPairs = (iterable) => {
 };
 
 /**
- * @function areIterablesEqual
+ * @function areArraysEqual
  *
  * @description
- * determine if the iterables are equivalent in value
+ * are the arrays equal in value
  *
- * @param {Map|Set} objectA the object to test
- * @param {Map|Set} objectB the object to test against
- * @param {function} comparator the comparator to determine deep equality
- * @param {Object|WeakSet} cache the cache possibly being used
- * @param {boolean} shouldCompareKeys should the keys be tested in the equality comparison
- * @returns {boolean} are the objects equal in value
+ * @param {Array<any>} arrayA the array to test
+ * @param {Array<any>} arrayB the array to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the arrays equal
  */
-export const areIterablesEqual = (objectA, objectB, comparator, cache, shouldCompareKeys) => {
-  if (objectA.size !== objectB.size) {
+export const areArraysEqual = (arrayA, arrayB, isEqual, meta) => {
+  if (arrayA.length !== arrayB.length) {
     return false;
   }
 
-  const pairsA = toPairs(objectA);
-  const pairsB = toPairs(objectB);
+  for (let index = 0; index < arrayA.length; index++) {
+    if (!isEqual(arrayA[index], arrayB[index], meta)) {
+      return false;
+    }
+  }
 
-  return shouldCompareKeys
-    ? comparator(pairsA.keys, pairsB.keys) && comparator(pairsA.values, pairsB.values, cache)
-    : comparator(pairsA.values, pairsB.values, cache);
+  return true;
+};
+
+export const createAreIterablesEqual = (shouldCompareKeys) => {
+  /**
+   * @function areIterablesEqual
+   *
+   * @description
+   * determine if the iterables are equivalent in value
+   *
+   * @param {Array<Array<any>>} pairsA the pairs to test
+   * @param {Array<Array<any>>} pairsB the pairs to test against
+   * @param {function} isEqual the comparator to determine equality
+   * @param {any} meta the cache possibly being used
+   * @returns {boolean} are the objects equal in value
+   */
+  const areIterablesEqual = shouldCompareKeys
+    ? (pairsA, pairsB, isEqual, meta) =>
+      isEqual(pairsA.keys, pairsB.keys) && isEqual(pairsA.values, pairsB.values, meta)
+    : (pairsA, pairsB, isEqual, meta) => isEqual(pairsA.values, pairsB.values, meta);
+
+  return (iterableA, iterableB, isEqual, meta) =>
+    iterableA.size === iterableB.size && areIterablesEqual(toPairs(iterableA), toPairs(iterableB), isEqual, meta);
+};
+
+/**
+ * @function areArraysEqual
+ *
+ * @description
+ * are the objects equal in value
+ *
+ * @param {Array<any>} objectA the object to test
+ * @param {Array<any>} objectB the object to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the objects equal
+ */
+export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
+  const keysA = Object.keys(objectA);
+
+  if (keysA.length !== Object.keys(objectB).length) {
+    return false;
+  }
+
+  let key;
+
+  for (let index = 0; index < keysA.length; index++) {
+    key = keysA[index];
+
+    if (!hasOwnProperty.call(objectB, key)) {
+      return false;
+    }
+
+    // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
+    if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
+      continue;
+    }
+
+    if (!isEqual(objectA[key], objectB[key], meta)) {
+      return false;
+    }
+  }
+
+  return true;
 };

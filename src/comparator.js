@@ -2,10 +2,24 @@
 import {HAS_MAP_SUPPORT, HAS_SET_SUPPORT} from './constants';
 
 // utils
-import {areIterablesEqual, isPromiseLike, isReactElement, sameValueZeroEqual} from './utils';
+import {
+  areArraysEqual,
+  areObjectsEqual,
+  createAreIterablesEqual,
+  isPlainObject,
+  isPromiseLike,
+  isReactElement,
+  sameValueZeroEqual
+} from './utils';
+
+const isArray = Array.isArray;
+
+const areMapsEqual = createAreIterablesEqual(true);
+const areSetsEqual = createAreIterablesEqual(false);
 
 const createComparator = (createIsEqual) => {
-  const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator; // eslint-disable-line
+  // eslint-disable-next-line no-use-before-define
+  const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
 
   /**
    * @function comparator
@@ -13,12 +27,12 @@ const createComparator = (createIsEqual) => {
    * @description
    * compare the value of the two objects and return true if they are equivalent in values
    *
-   * @param {*} objectA the object to test against
-   * @param {*} objectB the object to test
-   * @param {Object|WeakSet} [cache] an optional cache to keep objects in
+   * @param {any} objectA the object to test against
+   * @param {any} objectB the object to test
+   * @param {any} [meta] an optional meta object that is passed through to all equality test calls
    * @returns {boolean} are objectA and objectB equivalent in value
    */
-  function comparator(objectA, objectB, cache) {
+  function comparator(objectA, objectB, meta) {
     if (sameValueZeroEqual(objectA, objectB)) {
       return true;
     }
@@ -29,23 +43,15 @@ const createComparator = (createIsEqual) => {
       return false;
     }
 
-    const arrayA = Array.isArray(objectA);
-    const arrayB = Array.isArray(objectB);
+    if (isPlainObject(objectA) && isPlainObject(objectB)) {
+      return areObjectsEqual(objectA, objectB, isEqual, meta);
+    }
 
-    let index;
+    const arrayA = isArray(objectA);
+    const arrayB = isArray(objectB);
 
     if (arrayA || arrayB) {
-      if (arrayA !== arrayB || objectA.length !== objectB.length) {
-        return false;
-      }
-
-      for (index = 0; index < objectA.length; index++) {
-        if (!isEqual(objectA[index], objectB[index], cache)) {
-          return false;
-        }
-      }
-
-      return true;
+      return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
     }
 
     const dateA = objectA instanceof Date;
@@ -78,7 +84,7 @@ const createComparator = (createIsEqual) => {
       const mapB = objectB instanceof Map;
 
       if (mapA || mapB) {
-        return mapA === mapB && areIterablesEqual(objectA, objectB, comparator, cache, true);
+        return mapA === mapB && areMapsEqual(objectA, objectB, comparator, meta);
       }
     }
 
@@ -87,36 +93,11 @@ const createComparator = (createIsEqual) => {
       const setB = objectB instanceof Set;
 
       if (setA || setB) {
-        return setA === setB && areIterablesEqual(objectA, objectB, comparator, cache, false);
+        return setA === setB && areSetsEqual(objectA, objectB, comparator, meta);
       }
     }
 
-    const keysA = Object.keys(objectA);
-
-    if (keysA.length !== Object.keys(objectB).length) {
-      return false;
-    }
-
-    let key;
-
-    for (index = 0; index < keysA.length; index++) {
-      key = keysA[index];
-
-      if (!Object.prototype.hasOwnProperty.call(objectB, key)) {
-        return false;
-      }
-
-      // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
-      if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
-        continue;
-      }
-
-      if (!isEqual(objectA[key], objectB[key], cache)) {
-        return false;
-      }
-    }
-
-    return true;
+    return areObjectsEqual(objectA, objectB, isEqual, meta);
   }
 
   return comparator;

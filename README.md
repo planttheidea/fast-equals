@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.2kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.3kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -15,7 +15,7 @@ Unlike most equality validation libraries, the following types are handled out-o
 * `Promise` objects
 * `react` elements
 
-You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
+Starting with version `1.5.0`, circular objects are supported for both deep and shallow equality (see [`circularDeepEqual`](#circulardeepequal) and [`circularShallowEqual`](#circularshallowequal)). You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
 ## Table of contents
 
@@ -149,33 +149,39 @@ _Aliased on the default export as `fe.createCustom`_
 
 Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a partial-application function that will receive the internal comparator and should return a function that compares two objects.
 
-A common use case for this is to handle circular objects (which `fast-equals` does not handle by default). Example:
+The signature is as follows:
+
+```javascript
+createCustomEqual(deepEqual: function) => (objectA: any, objectB: any, meta: any) => boolean;
+```
+
+The `meta` parameter is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
+
+An example for a custom equality comparison that also checks against values in the meta object:
 
 ```javascript
 import { createCustomEqual } from "fast-equals";
-import decircularize from "decircularize";
 
-const isDeepEqualCircular = createCustomEqual(comparator => {
-  return (objectA, objectB) => {
-    return comparator(decircularize(objectA), decircularize(objectB));
+const isDeepEqualOrFooMatchesMeta = createCustomEqual(deepEqual => {
+  return (objectA, objectB, meta) => {
+    return (
+      objectA.foo === meta ||
+      objectB.foo === meta ||
+      deepEqual(objectA, objectB, meta)
+    );
   };
 });
 
-const objectA = {};
-const objectB = {};
+const objectA = { foo: "bar" };
+const objectB = { foo: "baz" };
+const meta = "bar";
 
-objectA.a = objectA;
-objectA.b = objectB;
-
-objectB.a = objectA;
-objectB.b = objectB;
-
-console.log(isDeepEqualCircular(objectA, objectB)); // true
+console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB)); // true
 ```
 
 ## Benchmarks
 
-All benchmarks are based on averages of running comparisons based on the following object types:
+All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `8.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
 
 * Primitives (`String`, `Number`, `null`, `undefined`)
 * `Function`
@@ -186,18 +192,19 @@ All benchmarks are based on averages of running comparisons based on the followi
 * `react` elements
 * A mixed object with a combination of all the above types
 
-|                        | Operations / second | Relative margin of error |
-| ---------------------- | ------------------- | ------------------------ |
-| **fast-equals**        | **146,995**         | **0.50%**                |
-| nano-equal             | 107,419             | 0.98%                    |
-| fast-deep-equal        | 105,428             | 0.67%                    |
-| shallow-equal-fuzzy    | 104,629             | 1.25%                    |
-| react-fast-compare     | 101,649             | 1.16%                    |
-| underscore.isEqual     | 67,090              | 0.57%                    |
-| deep-equal             | 30,527              | 0.61%                    |
-| lodash.isEqual         | 27,763              | 0.60%                    |
-| deep-eql               | 17,028              | 0.75%                    |
-| assert.deepStrictEqual | 1,593               | 0.89%                    |
+|                            | Operations / second | Relative margin of error |
+| -------------------------- | ------------------- | ------------------------ |
+| **fast-equals**            | **137,723**         | **0.72%**                |
+| nano-equal                 | 105,151             | 0.89%                    |
+| shallow-equal-fuzzy        | 101,882             | 0.88%                    |
+| react-fast-compare         | 98,816              | 0.88%                    |
+| fast-deep-equal            | 92,431              | 0.81%                    |
+| underscore.isEqual         | 61,933              | 0.74%                    |
+| **fast-equals (circular)** | **55,108**          | **0.83%**                |
+| deep-equal                 | 30,677              | 0.49%                    |
+| lodash.isEqual             | 26,706              | 0.63%                    |
+| deep-eql                   | 16,651              | 0.50%                    |
+| assert.deepStrictEqual     | 1,551               | 0.86%                    |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
