@@ -1,3 +1,4 @@
+import React from 'react';
 import decircularize from 'decircularize';
 
 import fe, {deepEqual} from '../src';
@@ -170,20 +171,39 @@ console.groupEnd('custom');
 
 console.group('circular object');
 
-const isDeepEqualCircular = fe.createCustom((comparator) => (a, b) => comparator(decircularize(a), decircularize(b)));
+const cache = new WeakSet();
 
-function Obj() {
-  this.me = this;
+const isDeepEqualCircular = fe.createCustom((comparator) => (a, b) => {
+  if (cache.has(a) || cache.has(b)) {
+    return cache.has(a) && cache.has(b);
+  }
+
+  if (typeof a === 'object') {
+    cache.add(a);
+  }
+
+  if (typeof b === 'object') {
+    cache.add(b);
+  }
+
+  return comparator(a, b);
+});
+
+function Circular(value) {
+  this.me = {
+    deeply: {
+      nested: {
+        reference: this
+      }
+    },
+    value
+  };
 }
 
-function Nested(y) {
-  this.y = y;
-}
+console.log('true', fe.circularDeep(new Circular('foo'), new Circular('foo')));
+console.log('false', fe.circularDeep(new Circular('foo'), new Circular('bar')));
+console.log('false', fe.circularDeep(new Circular('foo'), {foo: 'baz'}));
 
-console.log('false', fe.deep(new Obj(), new Obj()));
-
-console.log('true', isDeepEqualCircular(new Obj(), new Obj()));
-console.log('false', isDeepEqualCircular(new Obj(), {foo: 'baz'}));
 console.groupEnd('circular object');
 
 console.group('circular array');
@@ -192,49 +212,81 @@ const array = ['foo'];
 
 array[1] = array;
 
-console.log('true', isDeepEqualCircular(array, ['foo', array]));
-console.log('false', isDeepEqualCircular(array, [array]));
+console.log('true', fe.circularShallow(array, ['foo', array]));
+console.log('false', fe.circularShallow(array, [array]));
+
 console.groupEnd('circular array');
 
-console.log(<div>foo</div>);
-console.log(React.createElement('div', {children: 'foo'}));
+console.group('react small');
+
+console.log('true', fe.deep(<div>foo</div>, <div>foo</div>));
+console.log('false', fe.deep(<div>foo</div>, <div>bar</div>));
+
+console.groupEnd('react small');
+
+console.group('react large');
 
 console.log(
-  <main>
-    <h1>Title</h1>
+  'true',
+  fe.deep(
+    <main>
+      <h1>Title</h1>
 
-    <p>Content</p>
-    <p>Content</p>
-    <p>Content</p>
-    <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
 
-    <div style={{display: 'flex'}}>
-      <div style={{flex: '1 1 auto'}}>Item</div>
-      <div style={{flex: '1 1 0'}}>Item</div>
-    </div>
-  </main>
+      <div style={{display: 'flex'}}>
+        <div style={{flex: '1 1 auto'}}>Item</div>
+        <div style={{flex: '1 1 0'}}>Item</div>
+      </div>
+    </main>,
+    <main>
+      <h1>Title</h1>
+
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+
+      <div style={{display: 'flex'}}>
+        <div style={{flex: '1 1 auto'}}>Item</div>
+        <div style={{flex: '1 1 0'}}>Item</div>
+      </div>
+    </main>
+  )
 );
 console.log(
-  React.createElement('main', {
-    children: [
-      React.createElement('h1', {children: 'Title'}),
-      React.createElement('p', {children: 'Content'}),
-      React.createElement('p', {children: 'Content'}),
-      React.createElement('p', {children: 'Content'}),
-      React.createElement('p', {children: 'Content'}),
-      React.createElement('div', {
-        children: [
-          React.createElement('div', {
-            children: 'Item',
-            style: {flex: '1 1 auto'}
-          }),
-          React.createElement('div', {
-            children: 'Item',
-            style: {flex: '1 1 0'}
-          })
-        ],
-        style: {display: 'flex'}
-      })
-    ]
-  })
+  'false',
+  fe.deep(
+    <main>
+      <h1>Title</h1>
+
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+
+      <div style={{display: 'flex'}}>
+        <div style={{flex: '1 1 auto'}}>Item</div>
+        <div style={{flex: '1 1 0'}}>Item</div>
+      </div>
+    </main>,
+    <main>
+      <h1>Title</h1>
+
+      <p>Content</p>
+      <p>Content</p>
+      <p>Content</p>
+      <p>Other Content</p>
+
+      <div style={{display: 'flex'}}>
+        <div style={{flex: '1 1 auto'}}>Item</div>
+        <div style={{flex: '1 1 0'}}>Item</div>
+      </div>
+    </main>
+  )
 );
+
+console.groupEnd('react large');

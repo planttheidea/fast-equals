@@ -6,14 +6,6 @@ const Benchmark = require('benchmark');
 const tests = require('../test/helpers/testSuites');
 
 const equalPackages = {
-  'fast-equals': require('../lib/index').deepEqual,
-  'fast-deep-equal': true,
-  'nano-equal': true,
-  'shallow-equal-fuzzy': true,
-  'underscore.isEqual': require('underscore').isEqual,
-  'lodash.isEqual': require('lodash').isEqual,
-  'deep-equal': true,
-  'deep-eql': true,
   'assert.deepStrictEqual': (a, b) => {
     try {
       assertDeepStrictEqual(a, b);
@@ -23,7 +15,16 @@ const equalPackages = {
       return false;
     }
   },
-  'react-fast-compare': require('react-fast-compare')
+  'deep-eql': true,
+  'deep-equal': true,
+  'fast-deep-equal': true,
+  'fast-equals': require('../lib/index').deepEqual,
+  'fast-equals (circular)': require('../lib/index').circularDeepEqual,
+  'lodash.isEqual': require('lodash').isEqual,
+  'nano-equal': true,
+  'react-fast-compare': require('react-fast-compare'),
+  'shallow-equal-fuzzy': true,
+  'underscore.isEqual': require('underscore').isEqual
 };
 
 const filteredEquivalentTests = ['maps', 'sets', 'promises'];
