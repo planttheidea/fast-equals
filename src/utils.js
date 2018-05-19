@@ -216,3 +216,22 @@ export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
 
   return true;
 };
+
+/**
+ * @function areRegExpsEqual
+ *
+ * @description
+ * are the regExps equal in value
+ *
+ * @param {RegExp} regExpA the regExp to test
+ * @param {RegExp} regExpB the regExp to test agains
+ * @returns {boolean} are the regExps equal
+ */
+export const areRegExpsEqual = (regExpA, regExpB) =>
+  regExpA.source === regExpB.source &&
+  regExpA.global === regExpB.global &&
+  regExpA.ignoreCase === regExpB.ignoreCase &&
+  regExpA.multiline === regExpB.multiline &&
+  regExpA.unicode === regExpB.unicode &&
+  regExpA.sticky === regExpB.sticky &&
+  regExpA.lastIndex === regExpB.lastIndex;

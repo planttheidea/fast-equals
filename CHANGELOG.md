@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.5.1
+
+* Add support for `unicode` and `sticky` RegExp flag checks
+
 ## 1.5.0
 
 * Add [`circularDeepEqual`](README.md#circulardeepequal) and [`circularShallowEqual`](README.md#circularshallowequal) methods
