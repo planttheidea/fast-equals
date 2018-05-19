@@ -1,7 +1,7 @@
 // constants
 import {HAS_WEAKSET_SUPPORT} from './constants';
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+const keys = Object.keys;
 
 /**
  * @function addObjectToCache
@@ -14,6 +14,26 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @returns {void}
  */
 export const addObjectToCache = (object, cache) => object && typeof object === 'object' && cache.add(object);
+
+/**
+ * @function hasKey
+ *
+ * @description
+ * does the array of keys include the key passed
+ *
+ * @param {Array<string>} keys the keys to check in
+ * @param {string} key the key to locate
+ * @returns {boolean} does the key exist in the keys
+ */
+export const hasKey = (keys, key) => {
+  for (let index = 0; index < keys.length; index++) {
+    if (keys[index] === key) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 /**
  * @function sameValueZeroEqual
@@ -189,9 +209,10 @@ export const createAreIterablesEqual = (shouldCompareKeys) => {
  * @returns {boolean} are the objects equal
  */
 export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
-  const keysA = Object.keys(objectA);
+  const keysA = keys(objectA);
+  const keysB = keys(objectB);
 
-  if (keysA.length !== Object.keys(objectB).length) {
+  if (keysA.length !== keysB.length) {
     return false;
   }
 
@@ -200,7 +221,7 @@ export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
   for (let index = 0; index < keysA.length; index++) {
     key = keysA[index];
 
-    if (!hasOwnProperty.call(objectB, key)) {
+    if (!hasKey(keysB, key)) {
       return false;
     }
 

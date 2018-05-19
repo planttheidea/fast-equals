@@ -267,6 +267,20 @@ test.serial('if getNewCache will return a new WeakSet-like object when support i
   constants.HAS_WEAKSET_SUPPORT = support;
 });
 
+test('if hasKey returns true if the key does exists in the array', (t) => {
+  const keys = ['foo', 'bar', 'baz'];
+  const key = 'bar';
+
+  t.true(utils.hasKey(keys, key));
+});
+
+test('if hasKey returns false if the key does not exist in the array', (t) => {
+  const keys = ['foo', 'bar', 'baz'];
+  const key = 'quz';
+
+  t.false(utils.hasKey(keys, key));
+});
+
 test('if isCircularReactElement will return true if the appropriate keys are present and truthy', (t) => {
   const div = React.createElement('div', {children: 'foo'});
 

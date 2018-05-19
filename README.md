@@ -194,17 +194,17 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 |                            | Operations / second | Relative margin of error |
 | -------------------------- | ------------------- | ------------------------ |
-| **fast-equals**            | **137,723**         | **0.72%**                |
-| nano-equal                 | 105,151             | 0.89%                    |
-| shallow-equal-fuzzy        | 101,882             | 0.88%                    |
-| react-fast-compare         | 98,816              | 0.88%                    |
-| fast-deep-equal            | 92,431              | 0.81%                    |
-| underscore.isEqual         | 61,933              | 0.74%                    |
-| **fast-equals (circular)** | **55,108**          | **0.83%**                |
-| deep-equal                 | 30,677              | 0.49%                    |
-| lodash.isEqual             | 26,706              | 0.63%                    |
-| deep-eql                   | 16,651              | 0.50%                    |
-| assert.deepStrictEqual     | 1,551               | 0.86%                    |
+| **fast-equals**            | **149,272**         | **0.74%**                |
+| nano-equal                 | 106,185             | 0.81%                    |
+| fast-deep-equal            | 104,921             | 0.88%                    |
+| shallow-equal-fuzzy        | 103,181             | 0.93%                    |
+| react-fast-compare         | 101,807             | 1.06%                    |
+| underscore.isEqual         | 67,655              | 0.63%                    |
+| **fast-equals (circular)** | **58,042**          | **0.85%**                |
+| deep-equal                 | 30,282              | 0.65%                    |
+| lodash.isEqual             | 27,741              | 0.68%                    |
+| deep-eql                   | 16,785              | 1.03%                    |
+| assert.deepStrictEqual     | 1,559               | 0.97%                    |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
