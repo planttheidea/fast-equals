@@ -5,6 +5,7 @@ import {HAS_MAP_SUPPORT, HAS_SET_SUPPORT} from './constants';
 import {
   areArraysEqual,
   areObjectsEqual,
+  areRegExpsEqual,
   createAreIterablesEqual,
   isPlainObject,
   isPromiseLike,
@@ -65,14 +66,7 @@ const createComparator = (createIsEqual) => {
     const regexpB = objectB instanceof RegExp;
 
     if (regexpA || regexpB) {
-      return (
-        regexpA === regexpB &&
-        objectA.source === objectB.source &&
-        objectA.global === objectB.global &&
-        objectA.ignoreCase === objectB.ignoreCase &&
-        objectA.multiline === objectB.multiline &&
-        objectA.lastIndex === objectB.lastIndex
-      );
+      return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
     }
 
     if (isPromiseLike(objectA) || isPromiseLike(objectB)) {

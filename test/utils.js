@@ -144,6 +144,55 @@ test('if areObjectsEqual returns true when the objects are equal in value', (t) 
   t.true(utils.areObjectsEqual(objectA, objectB, isEqual, cache));
 });
 
+test('if areRegExpsEqual returns false if the source values are different', (t) => {
+  const regExpA = new RegExp('foo');
+  const regExpB = new RegExp('bar');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns false if the global flag is different', (t) => {
+  const regExpA = new RegExp('foo', 'g');
+  const regExpB = new RegExp('foo');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns false if the ignoreCase flag is different', (t) => {
+  const regExpA = new RegExp('foo', 'i');
+  const regExpB = new RegExp('foo');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns false if the multiline flag is different', (t) => {
+  const regExpA = new RegExp('foo', 'm');
+  const regExpB = new RegExp('foo');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns false if the unicode flag is different', (t) => {
+  const regExpA = new RegExp('\u{61}', 'u');
+  const regExpB = new RegExp('\u{61}');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns false if the sticky flag is different', (t) => {
+  const regExpA = new RegExp('foo', 'y');
+  const regExpB = new RegExp('foo');
+
+  t.false(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
+test('if areRegExpsEqual returns true if the values and flags are equal', (t) => {
+  const regExpA = new RegExp('foo', 'gi');
+  const regExpB = new RegExp('foo', 'ig');
+
+  t.true(utils.areRegExpsEqual(regExpA, regExpB));
+});
+
 test.serial('if createCircularEqual will create the custom comparator that stores the values in cache', (t) => {
   const isEqual = undefined;
 

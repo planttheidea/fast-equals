@@ -366,15 +366,15 @@ module.exports = [
       },
       {
         description: 'not equal RegExp objects (different flags)',
-        value1: /foo/,
+        value1: /foo/g,
         value2: /foo/i,
         deepEqual: false,
         shallowEqual: false
       },
       {
         description: 'equal RegExp objects (different flags "order")',
-        value1: /foo/gi,
-        value2: /foo/gi,
+        value1: new RegExp('foo', 'gi'),
+        value2: new RegExp('foo', 'ig'),
         deepEqual: true,
         shallowEqual: true
       },
