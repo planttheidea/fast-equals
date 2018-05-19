@@ -1,8 +1,12 @@
 # fast-equals CHANGELOG
 
+## 1.5.2
+
+* Improve speed of object comparison through custom `hasKey` method
+
 ## 1.5.1
 
-* Add support for `unicode` and `sticky` RegExp flag checks
+* Fix lack of support for `unicode` and `sticky` RegExp flag checks
 
 ## 1.5.0
 

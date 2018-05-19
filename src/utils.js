@@ -1,6 +1,8 @@
 // constants
 import {HAS_WEAKSET_SUPPORT} from './constants';
 
+const keys = Object.keys;
+
 /**
  * @function addObjectToCache
  *
@@ -207,8 +209,8 @@ export const createAreIterablesEqual = (shouldCompareKeys) => {
  * @returns {boolean} are the objects equal
  */
 export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
-  const keysA = Object.keys(objectA);
-  const keysB = Object.keys(objectB);
+  const keysA = keys(objectA);
+  const keysB = keys(objectB);
 
   if (keysA.length !== keysB.length) {
     return false;
