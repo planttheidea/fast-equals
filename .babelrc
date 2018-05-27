@@ -10,7 +10,8 @@
             "modules": false
           }
         ],
-        "stage-2"
+        "stage-2",
+        "minify"
       ]
     },
     "es": {
@@ -48,7 +49,8 @@
             "modules": false
           }
         ],
-        "stage-2"
+        "stage-2",
+        "minify"
       ]
     },
     "test": {
