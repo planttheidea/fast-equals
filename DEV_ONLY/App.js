@@ -74,17 +74,18 @@ console.log(false, fe.deep({promise}, {promise: Promise.resolve('foo')}));
 console.groupEnd('promise');
 
 console.group('map deep');
+
 console.log(
   'true',
-  fe.deep(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('foo', 'bar').set('bar', 'baz'))
+  fe.deep(new Map().set('foo', 'bar').set('bar', {baz: 'baz'}), new Map().set('foo', 'bar').set('bar', {baz: 'baz'}))
 );
 console.log(
   'false',
-  fe.deep(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', 'bar'))
+  fe.deep(new Map().set('foo', 'bar').set('bar', {baz: 'baz'}), new Map().set('foo', 'bar').set('bar', {baz: 'quz'}))
 );
 console.log(
   'true',
-  fe.deep(new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'), new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'))
+  fe.deep(new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', {bar: 'baz'}))
 );
 console.groupEnd('map');
 
@@ -95,12 +96,13 @@ console.log(
 );
 console.log(
   'false',
-  fe.shallow(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', 'bar'))
-);
-console.log(
-  'false',
   fe.shallow(new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'), new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'))
 );
+console.log(
+  'true',
+  fe.shallow(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', 'bar'))
+);
+
 console.groupEnd('map shallow');
 
 console.group('set');

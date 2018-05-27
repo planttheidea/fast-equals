@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.5.3
+
+* Fix `Map` / `Set` comparison to not require order to match to be equal
+
 ## 1.5.2
 
 * Improve speed of object comparison through custom `hasKey` method

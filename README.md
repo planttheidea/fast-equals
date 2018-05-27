@@ -194,17 +194,17 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 |                            | Operations / second | Relative margin of error |
 | -------------------------- | ------------------- | ------------------------ |
-| **fast-equals**            | **149,272**         | **0.74%**                |
-| nano-equal                 | 106,185             | 0.81%                    |
-| fast-deep-equal            | 104,921             | 0.88%                    |
-| shallow-equal-fuzzy        | 103,181             | 0.93%                    |
-| react-fast-compare         | 101,807             | 1.06%                    |
-| underscore.isEqual         | 67,655              | 0.63%                    |
-| **fast-equals (circular)** | **58,042**          | **0.85%**                |
-| deep-equal                 | 30,282              | 0.65%                    |
-| lodash.isEqual             | 27,741              | 0.68%                    |
-| deep-eql                   | 16,785              | 1.03%                    |
-| assert.deepStrictEqual     | 1,559               | 0.97%                    |
+| **fast-equals**            | **130,726**         | **0.79%**                |
+| nano-equal                 | 103,950             | 0.85%                    |
+| shallow-equal-fuzzy        | 101,535             | 0.60%                    |
+| react-fast-compare         | 94,724              | 0.82%                    |
+| fast-deep-equal            | 92,172              | 0.85%                    |
+| underscore.isEqual         | 63,431              | 0.88%                    |
+| **fast-equals (circular)** | **53,778**          | **0.85%**                |
+| deep-equal                 | 29,739              | 0.54%                    |
+| lodash.isEqual             | 26,201              | 0.70%                    |
+| deep-eql                   | 16,496              | 0.60%                    |
+| assert.deepStrictEqual     | 1,565               | 1.04%                    |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
@@ -240,5 +240,5 @@ Standard practice, clone the repo and `npm i` to get the dependencies. The follo
 * test => run AVA with NODE_ENV=test on all files in `test` folder
 * test:coverage => run same script as `test` with code coverage calculation via `nyc`
 * test:watch => run same script as `test` but keep persistent watcher
-* transpile:es => run Babel on all files in `src` folder (transpiled to `es` folder without transpilation of ES2015 export syntax)
+* transpile:es => run Babel on all files, in `src` folder (transpiled to `es` folder without transpilation of ES2015 export syntax)
 * transpile:lib => run Babel on all files in `src` folder (transpiled to `lib` folder)
