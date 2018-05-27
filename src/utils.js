@@ -16,23 +16,51 @@ const keys = Object.keys;
 export const addObjectToCache = (object, cache) => object && typeof object === 'object' && cache.add(object);
 
 /**
- * @function hasKey
+ * @function hasItem
  *
  * @description
- * does the array of keys include the key passed
+ * does the array include the item passed
  *
- * @param {Array<string>} keys the keys to check in
- * @param {string} key the key to locate
- * @returns {boolean} does the key exist in the keys
+ * @param {Array<any>} array the array to check in
+ * @param {any} item the item to locate
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} does the item exist in the array
  */
-export const hasKey = (keys, key) => {
-  for (let index = 0; index < keys.length; index++) {
-    if (keys[index] === key) {
+export const hasItem = (array, item, isEqual, meta) => {
+  for (let index = 0; index < array.length; index++) {
+    if (isEqual(array[index], item, meta)) {
       return true;
     }
   }
 
   return false;
+};
+
+/**
+ * @function hasItems
+ *
+ * @description
+ * are the arrays equal in value, despite being in different order
+ *
+ * @param {Array<any>} arrayA the first array to test
+ * @param {Array<any>} arrayB the second array to test
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} are the arrays equal absent order
+ */
+export const hasItems = (arrayA, arrayB, isEqual, meta) => {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+
+  for (let index = 0; index < arrayA.length; index++) {
+    if (!hasItem(arrayB, arrayA[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**
@@ -136,14 +164,9 @@ export const createCircularEqual = (isEqual) => (isDeepEqual) => {
  * @returns {{keys: Array<*>, values: Array<*>}} the [key, value] pairs
  */
 export const toPairs = (iterable) => {
-  const pairs = {keys: new Array(iterable.size), values: new Array(iterable.size)};
+  const pairs = {keys: [], values: []};
 
-  let index = 0;
-
-  iterable.forEach((value, key) => {
-    pairs.keys[index] = key;
-    pairs.values[index++] = value;
-  });
+  iterable.forEach((value, key) => pairs.keys.push(key) && pairs.values.push(value));
 
   return pairs;
 };
@@ -189,11 +212,11 @@ export const createAreIterablesEqual = (shouldCompareKeys) => {
    */
   const areIterablesEqual = shouldCompareKeys
     ? (pairsA, pairsB, isEqual, meta) =>
-      isEqual(pairsA.keys, pairsB.keys) && isEqual(pairsA.values, pairsB.values, meta)
-    : (pairsA, pairsB, isEqual, meta) => isEqual(pairsA.values, pairsB.values, meta);
+      hasItems(pairsA.keys, pairsB.keys, isEqual, meta) && hasItems(pairsA.values, pairsB.values, isEqual, meta)
+    : (pairsA, pairsB, isEqual, meta) => hasItems(pairsA.values, pairsB.values, isEqual, meta);
 
   return (iterableA, iterableB, isEqual, meta) =>
-    iterableA.size === iterableB.size && areIterablesEqual(toPairs(iterableA), toPairs(iterableB), isEqual, meta);
+    areIterablesEqual(toPairs(iterableA), toPairs(iterableB), isEqual, meta);
 };
 
 /**
@@ -221,7 +244,7 @@ export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
   for (let index = 0; index < keysA.length; index++) {
     key = keysA[index];
 
-    if (!hasKey(keysB, key)) {
+    if (!hasItem(keysB, key, sameValueZeroEqual)) {
       return false;
     }
 

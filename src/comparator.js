@@ -78,7 +78,7 @@ const createComparator = (createIsEqual) => {
       const mapB = objectB instanceof Map;
 
       if (mapA || mapB) {
-        return mapA === mapB && areMapsEqual(objectA, objectB, comparator, meta);
+        return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
       }
     }
 
@@ -87,7 +87,7 @@ const createComparator = (createIsEqual) => {
       const setB = objectB instanceof Set;
 
       if (setA || setB) {
-        return setA === setB && areSetsEqual(objectA, objectB, comparator, meta);
+        return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
       }
     }
 
