@@ -1,7 +1,10 @@
 // test
 import test from 'ava';
 import sinon from 'sinon';
-import {alternativeValues, mainValues} from 'test/helpers/dataTypes';
+import {
+  alternativeValues,
+  mainValues
+} from 'test/helpers/dataTypes';
 import React from 'react';
 
 // src
@@ -118,8 +121,15 @@ test('if areIterablesEqual returns true when objects have the same size and valu
 });
 
 test('if areObjectsEqual returns false when the object have different key lengths', (t) => {
-  const objectA = {foo: 'foo', bar: 'bar'};
-  const objectB = {foo: 'foo', bar: 'bar', baz: 'baz'};
+  const objectA = {
+    bar: 'bar',
+    foo: 'foo',
+  };
+  const objectB = {
+    bar: 'bar',
+    baz: 'baz',
+    foo: 'foo',
+  };
   const isEqual = (a, b) => a === b;
   const cache = new WeakSet();
 
@@ -127,8 +137,14 @@ test('if areObjectsEqual returns false when the object have different key length
 });
 
 test('if areObjectsEqual returns false when the objects are not equal in value', (t) => {
-  const objectA = {foo: 'foo', bar: 'bar'};
-  const objectB = {foo: 'foo', bar: 'baz'};
+  const objectA = {
+    bar: 'bar',
+    foo: 'foo',
+  };
+  const objectB = {
+    bar: 'baz',
+    foo: 'foo',
+  };
   const isEqual = (a, b) => a === b;
   const cache = new WeakSet();
 
@@ -136,8 +152,14 @@ test('if areObjectsEqual returns false when the objects are not equal in value',
 });
 
 test('if areObjectsEqual returns true when the objects are equal in value', (t) => {
-  const objectA = {foo: 'foo', bar: 'bar'};
-  const objectB = {foo: 'foo', bar: 'bar'};
+  const objectA = {
+    bar: 'bar',
+    foo: 'foo',
+  };
+  const objectB = {
+    bar: 'bar',
+    foo: 'foo',
+  };
   const isEqual = (a, b) => a === b;
   const cache = new WeakSet();
 
@@ -307,7 +329,7 @@ test('if isCircularReactElement will return true if the appropriate keys are pre
 
 test('if isCircularReactElement will return false if the appropriate keys are not present and truthy', (t) => {
   const div = {
-    foo: 'bar'
+    foo: 'bar',
   };
 
   t.false(utils.isReactElement(div));
@@ -327,7 +349,7 @@ test('if isPlainObject returns true when the object is a plain object', (t) => {
 
 test('if isPromiseLike returns true when there is a then function on the object', (t) => {
   const object = {
-    then() {}
+    then() {},
   };
 
   t.true(utils.isPromiseLike(object));
@@ -335,7 +357,7 @@ test('if isPromiseLike returns true when there is a then function on the object'
 
 test('if isPromiseLike returns false when there is no then function on the object', (t) => {
   const object = {
-    then: 'again'
+    then: 'again',
   };
 
   t.false(utils.isPromiseLike(object));
@@ -358,7 +380,7 @@ test('if toPairs will convert the map into {keys: [], values: []} pairs', (t) =>
 
   t.deepEqual(result, {
     keys: ['foo', 'bar'],
-    values: ['bar', 'baz']
+    values: ['bar', 'baz'],
   });
 });
 
@@ -369,6 +391,6 @@ test('if toPairs will convert the set into {keys: [], values: []} pairs', (t) =>
 
   t.deepEqual(result, {
     keys: ['foo', 'bar'],
-    values: ['foo', 'bar']
+    values: ['foo', 'bar'],
   });
 });

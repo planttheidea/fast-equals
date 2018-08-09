@@ -8,27 +8,28 @@ Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
-* `NaN`
-* `Date` objects
-* `RegExp` objects
-* `Map` / `Set` iterables
-* `Promise` objects
-* `react` elements
+- `NaN`
+- `Date` objects
+- `RegExp` objects
+- `Map` / `Set` iterables
+- `Promise` objects
+- `react` elements
 
 Starting with version `1.5.0`, circular objects are supported for both deep and shallow equality (see [`circularDeepEqual`](#circulardeepequal) and [`circularShallowEqual`](#circularshallowequal)). You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
 
 ## Table of contents
 
-* [Usage](#usage)
-* [Available methods](#available-methods)
-  * [deepEqual](#deepequal)
-  * [shallowEqual](#shallowequal)
-  * [sameValueZeroEqual](#samevaluezeroequal)
-  * [circularDeepEqual](#circulardeepequal)
-  * [circularShallowEqual](#circularshallowequal)
-  * [createCustomEqual](#createcustomequal)
-* [Benchmarks](#benchmarks)
-* [Development](#development)
+- [Usage](#usage)
+- [Importing](#importing)
+- [Available methods](#available-methods)
+  - [deepEqual](#deepequal)
+  - [shallowEqual](#shallowequal)
+  - [sameValueZeroEqual](#samevaluezeroequal)
+  - [circularDeepEqual](#circulardeepequal)
+  - [circularShallowEqual](#circularshallowequal)
+  - [createCustomEqual](#createcustomequal)
+- [Benchmarks](#benchmarks)
+- [Development](#development)
 
 ## Usage
 
@@ -46,6 +47,26 @@ Or the individual imports desired:
 import { deepEqual } from "fast-equals";
 
 console.log(deepEqual({ foo: "bar" }, { foo: "bar" })); // true
+```
+
+## Importing
+
+ESM in browsers:
+
+```javascript
+import fe from "fast-equals";
+```
+
+ESM in NodeJS:
+
+```javascript
+import fe from "fast-equals/mjs";
+```
+
+CommonJS:
+
+```javascript
+const fe = require("fast-equals").default;
 ```
 
 ## Available methods
@@ -183,14 +204,14 @@ console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB)); // true
 
 All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `8.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
 
-* Primitives (`String`, `Number`, `null`, `undefined`)
-* `Function`
-* `Object`
-* `Array`
-* `Date`
-* `RegExp`
-* `react` elements
-* A mixed object with a combination of all the above types
+- Primitives (`String`, `Number`, `null`, `undefined`)
+- `Function`
+- `Object`
+- `Array`
+- `Date`
+- `RegExp`
+- `react` elements
+- A mixed object with a combination of all the above types
 
 |                            | Operations / second | Relative margin of error |
 | -------------------------- | ------------------- | ------------------------ |
@@ -208,14 +229,14 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
-* `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero` equality for dates
-* `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
-* `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
-* `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function` equality
-* `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
-* `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
-* `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
-* `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
+- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero` equality for dates
+- `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
+- `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
+- `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function` equality
+- `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
+- `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
+- `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
+- `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 
 All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `lodash` supported their comparison. The same logic applies to `react` elements (which can be circular objects), but simple elements are non-circular objects so I kept the `react` comparison very basic to allow it to be included.
 
@@ -223,22 +244,22 @@ All of these have the potential of inflating the respective library's numbers in
 
 Standard practice, clone the repo and `npm i` to get the dependencies. The following npm scripts are available:
 
-* benchmark => run benchmark tests against other equality libraries
-* build => build unminified dist version with source map and NODE_ENV=development via webpack
-* build:minified => build minified dist version with NODE_ENV=production via webpack
-* clean => run `clean:dist`, `clean:es`, and `clean:lib` scripts
-* clean:dist => run `rimraf` on the `dist` folder
-* clean:es => run `rimraf` on the `es` folder
-* clean:lib => run `rimraf` on the `lib` folder
-* dev => start webpack playground App
-* dist => run `build` and `build:minified` scripts
-* lint => run ESLint on all files in `src` folder (also runs on `dev` script)
-* lint:fix => run `lint` script, but with auto-fixer
-* prepublish =>
-* prepublish:compile => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `dist` scripts
-* start => run `dev`
-* test => run AVA with NODE_ENV=test on all files in `test` folder
-* test:coverage => run same script as `test` with code coverage calculation via `nyc`
-* test:watch => run same script as `test` but keep persistent watcher
-* transpile:es => run Babel on all files, in `src` folder (transpiled to `es` folder without transpilation of ES2015 export syntax)
-* transpile:lib => run Babel on all files in `src` folder (transpiled to `lib` folder)
+- benchmark => run benchmark tests against other equality libraries
+- build => build unminified dist version with source map and NODE_ENV=development via webpack
+- build:minified => build minified dist version with NODE_ENV=production via webpack
+- clean => run `clean:dist`, `clean:es`, and `clean:lib` scripts
+- clean:dist => run `rimraf` on the `dist` folder
+- clean:es => run `rimraf` on the `es` folder
+- clean:lib => run `rimraf` on the `lib` folder
+- dev => start webpack playground App
+- dist => run `build` and `build:minified` scripts
+- lint => run ESLint on all files in `src` folder (also runs on `dev` script)
+- lint:fix => run `lint` script, but with auto-fixer
+- prepublish =>
+- prepublish:compile => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `dist` scripts
+- start => run `dev`
+- test => run AVA with NODE_ENV=test on all files in `test` folder
+- test:coverage => run same script as `test` with code coverage calculation via `nyc`
+- test:watch => run same script as `test` but keep persistent watcher
+- transpile:es => run Babel on all files, in `src` folder (transpiled to `es` folder without transpilation of ES2015 export syntax)
+- transpile:lib => run Babel on all files in `src` folder (transpiled to `lib` folder)

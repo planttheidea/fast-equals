@@ -127,7 +127,7 @@ export const getNewCache = () =>
       },
       has(value) {
         return !!~this._values.indexOf(value);
-      }
+      },
     });
 
 /**
@@ -164,7 +164,10 @@ export const createCircularEqual = (isEqual) => (isDeepEqual) => {
  * @returns {{keys: Array<*>, values: Array<*>}} the [key, value] pairs
  */
 export const toPairs = (iterable) => {
-  const pairs = {keys: [], values: []};
+  const pairs = {
+    keys: [],
+    values: [],
+  };
 
   iterable.forEach((value, key) => pairs.keys.push(key) && pairs.values.push(value));
 
@@ -272,10 +275,10 @@ export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
  * @returns {boolean} are the regExps equal
  */
 export const areRegExpsEqual = (regExpA, regExpB) =>
-  regExpA.source === regExpB.source &&
-  regExpA.global === regExpB.global &&
-  regExpA.ignoreCase === regExpB.ignoreCase &&
-  regExpA.multiline === regExpB.multiline &&
-  regExpA.unicode === regExpB.unicode &&
-  regExpA.sticky === regExpB.sticky &&
-  regExpA.lastIndex === regExpB.lastIndex;
+  regExpA.source === regExpB.source
+  && regExpA.global === regExpB.global
+  && regExpA.ignoreCase === regExpB.ignoreCase
+  && regExpA.multiline === regExpB.multiline
+  && regExpA.unicode === regExpB.unicode
+  && regExpA.sticky === regExpB.sticky
+  && regExpA.lastIndex === regExpB.lastIndex;

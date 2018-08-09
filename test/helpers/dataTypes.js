@@ -23,21 +23,21 @@ export const mainValues = {
         children: [
           React.createElement('div', {
             children: 'Item',
-            style: {flex: '1 1 auto'}
+            style: {flex: '1 1 auto'},
           }),
           React.createElement('div', {
             children: 'Item',
-            style: {flex: '1 1 0'}
-          })
+            style: {flex: '1 1 0'},
+          }),
         ],
-        style: {display: 'flex'}
-      })
-    ]
+        style: {display: 'flex'},
+      }),
+    ],
   }),
   regexp: /foo/,
   set: new Set().add('foo').add({bar: 'baz'}),
   string: 'foo',
-  undef: undefined
+  undef: undefined,
 };
 
 export const alternativeValues = {
@@ -52,5 +52,5 @@ export const alternativeValues = {
   react: React.createElement('div', {children: 'foo'}),
   regexp: /bar/gi,
   set: new Set().add({bar: 'baz'}, 'foo'),
-  string: 'bar'
+  string: 'bar',
 };

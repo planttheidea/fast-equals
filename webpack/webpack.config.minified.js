@@ -11,16 +11,16 @@ module.exports = Object.assign({}, defaultConfig, {
   mode: 'production',
 
   output: Object.assign({}, defaultConfig.output, {
-    filename: 'fast-equals.min.js'
+    filename: 'fast-equals.min.js',
   }),
 
   plugins: defaultConfig.plugins.concat([
     new webpack.LoaderOptionsPlugin({
       debug: false,
-      minimize: true
+      minimize: true,
     }),
     new OptimizeJsPlugin({
-      sourceMap: false
-    })
-  ])
+      sourceMap: false,
+    }),
+  ]),
 });

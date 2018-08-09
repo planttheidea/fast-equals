@@ -7,38 +7,38 @@ export default [
     input: 'src/index.js',
     output: {
       exports: 'named',
-      name: 'fe',
       file: 'dist/fast-equals.js',
       format: 'umd',
-      sourcemap: true
+      name: 'fe',
+      sourcemap: true,
     },
     plugins: [
       resolve({
+        main: true,
         module: true,
-        main: true
       }),
       babel({
-        exclude: 'node_modules/**'
-      })
-    ]
+        exclude: 'node_modules/**',
+      }),
+    ],
   },
   {
     input: 'src/index.js',
     output: {
       exports: 'named',
-      name: 'fe',
       file: 'dist/fast-equals.min.js',
-      format: 'umd'
+      format: 'umd',
+      name: 'fe',
     },
     plugins: [
       resolve({
+        main: true,
         module: true,
-        main: true
       }),
       babel({
-        exclude: 'node_modules/**'
+        exclude: 'node_modules/**',
       }),
-      uglify()
-    ]
-  }
+      uglify(),
+    ],
+  },
 ];
