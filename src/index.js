@@ -2,9 +2,14 @@
 import createCustomEqual from './comparator';
 
 // utils
-import {createCircularEqual, sameValueZeroEqual} from './utils';
+import {
+  createCircularEqual,
+  sameValueZeroEqual
+} from './utils';
 
-export {createCustomEqual, sameValueZeroEqual};
+export {
+  createCustomEqual, sameValueZeroEqual
+};
 
 export const circularDeepEqual = createCustomEqual(createCircularEqual());
 export const circularShallowEqual = createCustomEqual(createCircularEqual(sameValueZeroEqual));
@@ -17,5 +22,5 @@ export default {
   createCustom: createCustomEqual,
   deep: deepEqual,
   sameValueZero: sameValueZeroEqual,
-  shallow: shallowEqual
+  shallow: shallowEqual,
 };

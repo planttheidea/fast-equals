@@ -55,10 +55,10 @@ test('if circularDeepEqual handles deeply nested circular objects', (t) => {
     this.me = {
       deeply: {
         nested: {
-          reference: this
-        }
+          reference: this,
+        },
       },
-      value
+      value,
     };
   }
 

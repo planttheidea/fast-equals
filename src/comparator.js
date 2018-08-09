@@ -1,5 +1,8 @@
 // constants
-import {HAS_MAP_SUPPORT, HAS_SET_SUPPORT} from './constants';
+import {
+  HAS_MAP_SUPPORT,
+  HAS_SET_SUPPORT
+} from './constants';
 
 // utils
 import {

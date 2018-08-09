@@ -25,16 +25,16 @@ module.exports = {
           failOnError: true,
           failOnWarning: false,
           fix: true,
-          formatter: require('eslint-friendly-formatter')
+          formatter: require('eslint-friendly-formatter'),
         },
-        test: /\.js$/
+        test: /\.js$/,
       },
       {
         include: [path.resolve(statics.ROOT, 'DEV_ONLY'), path.resolve(statics.ROOT, 'src')],
+        loader: 'babel-loader',
         test: /\.js$/,
-        loader: 'babel-loader'
-      }
-    ]
+      },
+    ],
   },
 
   output: {
@@ -42,8 +42,8 @@ module.exports = {
     library: 'fe',
     libraryTarget: 'umd',
     path: path.resolve(statics.ROOT, 'dist'),
-    umdNamedDefine: true
+    umdNamedDefine: true,
   },
 
-  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV'])]
+  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV'])],
 };

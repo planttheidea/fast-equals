@@ -15,12 +15,12 @@ module.exports = Object.assign({}, defaultConfig, {
     inline: true,
     lazy: false,
     noInfo: false,
-    quiet: false,
     port: PORT,
+    quiet: false,
     stats: {
       colors: true,
-      progress: true
-    }
+      progress: true,
+    },
   },
 
   entry: [path.resolve(statics.ROOT, 'DEV_ONLY', 'App.js')],
@@ -32,26 +32,26 @@ module.exports = Object.assign({}, defaultConfig, {
           include: rule.include.concat([path.resolve(statics.ROOT, 'DEV_ONLY')]),
           options: {
             cacheDirectory: true,
-            presets: ['react']
-          }
+            presets: ['react'],
+          },
         });
       }
 
       if (rule.loader === 'eslint-loader') {
         return Object.assign({}, rule, {
           options: Object.assign({}, rule.options, {
-            failOnWarning: false
-          })
+            failOnWarning: false,
+          }),
         });
       }
 
       return rule;
-    })
+    }),
   }),
 
   output: Object.assign({}, defaultConfig.output, {
-    publicPath: `http://localhost:${PORT}/`
+    publicPath: `http://localhost:${PORT}/`,
   }),
 
-  plugins: defaultConfig.plugins.concat([new HtmlWebpackPlugin()])
+  plugins: defaultConfig.plugins.concat([new HtmlWebpackPlugin()]),
 });
