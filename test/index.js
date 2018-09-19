@@ -30,21 +30,21 @@ test('if there are named exports for each equality method', (t) => {
   });
 });
 
-testSuites.forEach(({description: suiteDescription, tests}) => {
-  tests.forEach(({deepEqual, description, shallowEqual, value1, value2}) => {
-    test(`if deepEqual returns the correct value for "${suiteDescription} - ${description}"`, (t) => {
+testSuites.forEach(({description: suiteDescription, tests}, testSuiteIndex) => {
+  tests.forEach(({deepEqual, description, shallowEqual, value1, value2}, testIndex) => {
+    test(`if deepEqual returns the correct value for "${suiteDescription} - ${description}" (Suite ${testSuiteIndex}, test ${testIndex})`, (t) => {
       t[deepEqual](index.deepEqual(value1, value2));
     });
 
-    test(`if circularDeepEqual returns the correct deepEqual  value for "${suiteDescription} - ${description}"`, (t) => {
+    test(`if circularDeepEqual returns the correct deepEqual  value for "${suiteDescription} - ${description}" (Suite ${testSuiteIndex}, test ${testIndex})`, (t) => {
       t[deepEqual](index.circularDeepEqual(value1, value2));
     });
 
-    test(`if shallowEqual returns the correct value for "${suiteDescription} - ${description}"`, (t) => {
+    test(`if shallowEqual returns the correct value for "${suiteDescription} - ${description}" (Suite ${testSuiteIndex}, test ${testIndex})`, (t) => {
       t[shallowEqual](index.shallowEqual(value1, value2));
     });
 
-    test(`if circularShallowEqual returns the correct shallowEqual  value for "${suiteDescription} - ${description}"`, (t) => {
+    test(`if circularShallowEqual returns the correct shallowEqual  value for "${suiteDescription} - ${description}" (Suite ${testSuiteIndex}, test ${testIndex})`, (t) => {
       t[shallowEqual](index.circularShallowEqual(value1, value2));
     });
   });

@@ -32,7 +32,7 @@ module.exports = Object.assign({}, defaultConfig, {
           include: rule.include.concat([path.resolve(statics.ROOT, 'DEV_ONLY')]),
           options: {
             cacheDirectory: true,
-            presets: ['react'],
+            presets: ['@babel/react'],
           },
         });
       }

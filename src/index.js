@@ -4,11 +4,11 @@ import createCustomEqual from './comparator';
 // utils
 import {
   createCircularEqual,
-  sameValueZeroEqual
+  sameValueZeroEqual,
 } from './utils';
 
 export {
-  createCustomEqual, sameValueZeroEqual
+  createCustomEqual, sameValueZeroEqual,
 };
 
 export const circularDeepEqual = createCustomEqual(createCircularEqual());
