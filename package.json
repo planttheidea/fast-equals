@@ -1,15 +1,14 @@
 {
   "author": "tony_quetano@planttheidea.com",
   "ava": {
-    "babel": "inherit",
     "failFast": true,
     "files": [
       "test/*.js"
     ],
     "require": [
-      "babel-register"
+      "@babel/register"
     ],
-    "source": [
+    "sources": [
       "src/*.js"
     ],
     "verbose": true
@@ -19,44 +18,43 @@
   },
   "description": "A blazing fast equality comparison, either shallow or deep",
   "devDependencies": {
-    "ava": "^0.25.0",
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.6",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "^0.4.3",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "ava": "^1.0.0-beta.8",
+    "babel-eslint": "^9.0.0",
+    "babel-loader": "^8.0.0",
     "benchmark": "^2.1.4",
     "decircularize": "^1.0.0",
     "deep-eql": "^3.0.1",
     "deep-equal": "^1.0.1",
-    "eslint": "^5.3.0",
-    "eslint-config-rapid7": "^3.0.4",
+    "eslint": "^5.6.0",
+    "eslint-config-rapid7": "^3.1.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.1.0",
     "fast-deep-equal": "^2.0.1",
     "fs-extra": "^7.0.0",
     "html-webpack-plugin": "^3.2.0",
     "in-publish": "^2.0.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "nano-equal": "^2.0.2",
-    "nyc": "^12.0.2",
+    "nyc": "^13.0.1",
     "optimize-js-plugin": "^0.0.4",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "react-fast-compare": "^2.0.1",
-    "rollup": "^0.64.1",
-    "rollup-plugin-babel": "^3.0.7",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-uglify": "^4.0.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-fast-compare": "^2.0.2",
+    "rollup": "^0.66.0",
+    "rollup-plugin-babel": "^4.0.1",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-uglify": "^6.0.0",
     "shallow-equal-fuzzy": "^0.0.2",
-    "sinon": "^6.1.5",
+    "sinon": "^6.3.4",
     "underscore": "^1.9.1",
-    "webpack": "^4.16.5",
+    "webpack": "^4.19.1",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "webpack-dev-server": "^3.1.8"
   },
   "homepage": "https://github.com/planttheidea/fast-equals#readme",
   "keywords": [
@@ -97,5 +95,6 @@
     "transpile:es": "npm run clean:es && BABEL_ENV=es babel src --out-dir es",
     "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib"
   },
+  "sideEffects": false,
   "version": "1.6.0"
 }

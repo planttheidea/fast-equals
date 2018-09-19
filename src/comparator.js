@@ -1,7 +1,7 @@
 // constants
 import {
   HAS_MAP_SUPPORT,
-  HAS_SET_SUPPORT
+  HAS_SET_SUPPORT,
 } from './constants';
 
 // utils
@@ -12,8 +12,7 @@ import {
   createAreIterablesEqual,
   isPlainObject,
   isPromiseLike,
-  isReactElement,
-  sameValueZeroEqual
+  sameValueZeroEqual,
 } from './utils';
 
 const isArray = Array.isArray;
