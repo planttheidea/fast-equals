@@ -96,5 +96,5 @@
     "transpile:lib": "npm run clean:lib && BABEL_ENV=lib babel src --out-dir lib"
   },
   "sideEffects": false,
-  "version": "1.6.0"
+  "version": "1.6.1"
 }
