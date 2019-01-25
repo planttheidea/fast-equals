@@ -1,5 +1,12 @@
 # fast-equals CHANGELOG
 
+## 1.6.2
+
+- Fix [#23](https://github.com/planttheidea/fast-equals/issues/23) - false positives for map
+- Replace `uglify` with `terser`
+- Use `rollup` to build all the distributables (`main`, `module`, and `browser`)
+  - Maintain `lib` and `es` transpilations in case consumers were deep-linking
+
 ## 1.6.1
 
 - Upgrade to `babel@7`

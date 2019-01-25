@@ -16,20 +16,20 @@ const keys = Object.keys;
 export const addObjectToCache = (object, cache) => object && typeof object === 'object' && cache.add(object);
 
 /**
- * @function hasItem
  *
- * @description
- * does the array include the item passed
- *
- * @param {Array<any>} array the array to check in
- * @param {any} item the item to locate
+ * @param {Array<Array<any>>} pairs the pairs to check in
+ * @param {Array<any>} pairToMatch the pair to check if exists
  * @param {function} isEqual the equality comparator
  * @param {any} meta the meta item to pass through
- * @returns {boolean} does the item exist in the array
+ * @returns {boolean} does the pair exist in the pairs
  */
-export const hasItem = (array, item, isEqual, meta) => {
-  for (let index = 0; index < array.length; index++) {
-    if (isEqual(array[index], item, meta)) {
+export const hasPair = (pairs, pairToMatch, isEqual, meta) => {
+  let pair;
+
+  for (let index = 0; index < pairs.length; index++) {
+    pair = pairs[index];
+
+    if (isEqual(pair[0], pairToMatch[0], meta) && isEqual(pair[1], pairToMatch[1], meta)) {
       return true;
     }
   }
@@ -38,29 +38,25 @@ export const hasItem = (array, item, isEqual, meta) => {
 };
 
 /**
- * @function hasItems
+ * @function hasValue
  *
  * @description
- * are the arrays equal in value, despite being in different order
+ * does the values include the vakye passed
  *
- * @param {Array<any>} arrayA the first array to test
- * @param {Array<any>} arrayB the second array to test
+ * @param {Array<any>} values the values to check in
+ * @param {any} item the value to locate
  * @param {function} isEqual the equality comparator
  * @param {any} meta the meta item to pass through
- * @returns {boolean} are the arrays equal absent order
+ * @returns {boolean} does the value exist in the values
  */
-export const hasItems = (arrayA, arrayB, isEqual, meta) => {
-  if (arrayA.length !== arrayB.length) {
-    return false;
-  }
-
-  for (let index = 0; index < arrayA.length; index++) {
-    if (!hasItem(arrayB, arrayA[index], isEqual, meta)) {
-      return false;
+export const hasValue = (values, item, isEqual, meta) => {
+  for (let index = 0; index < values.length; index++) {
+    if (isEqual(values[index], item, meta)) {
+      return true;
     }
   }
 
-  return true;
+  return false;
 };
 
 /**
@@ -160,18 +156,29 @@ export const createCircularEqual = (isEqual) => (isDeepEqual) => {
 /**
  * @function toPairs
  *
- * @param {Map|Set} iterable the iterable to convert to [key, value] pairs (entries)
- * @returns {{keys: Array<*>, values: Array<*>}} the [key, value] pairs
+ * @param {Map} map the map to convert to [key, value] pairs (entries)
+ * @returns {Array<Array<*>>} the [key, value] pairs
  */
-export const toPairs = (iterable) => {
-  const pairs = {
-    keys: [],
-    values: [],
-  };
+export const toPairs = (map) => {
+  const pairs = [];
 
-  iterable.forEach((value, key) => pairs.keys.push(key) && pairs.values.push(value));
+  map.forEach((value, key) => pairs.push([key, value]));
 
   return pairs;
+};
+
+/**
+ * @function toValues
+ *
+ * @param {Set} set the set to convert to values
+ * @returns {Array<*>} the values
+ */
+export const toValues = (set) => {
+  const values = [];
+
+  set.forEach((value) => values.push(value));
+
+  return values;
 };
 
 /**
@@ -200,36 +207,43 @@ export const areArraysEqual = (arrayA, arrayB, isEqual, meta) => {
   return true;
 };
 
-export const createAreIterablesEqual = (shouldCompareKeys) => {
-  /**
-   * @function areIterablesEqual
-   *
-   * @description
-   * determine if the iterables are equivalent in value
-   *
-   * @param {Array<Array<any>>} pairsA the pairs to test
-   * @param {Array<Array<any>>} pairsB the pairs to test against
-   * @param {function} isEqual the comparator to determine equality
-   * @param {any} meta the cache possibly being used
-   * @returns {boolean} are the objects equal in value
-   */
-  const areIterablesEqual = shouldCompareKeys
-    ? (pairsA, pairsB, isEqual, meta) =>
-      hasItems(pairsA.keys, pairsB.keys, isEqual, meta) && hasItems(pairsA.values, pairsB.values, isEqual, meta)
-    : (pairsA, pairsB, isEqual, meta) => hasItems(pairsA.values, pairsB.values, isEqual, meta);
+/**
+ * @function areMapsEqual
+ *
+ * @description
+ * are the maps equal in value
+ *
+ * @param {Map} mapA the map to test
+ * @param {Map} mapB the map to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta map to pass through
+ * @returns {boolean} are the maps equal
+ */
+export const areMapsEqual = (mapA, mapB, isEqual, meta) => {
+  const pairsA = toPairs(mapA);
+  const pairsB = toPairs(mapB);
 
-  return (iterableA, iterableB, isEqual, meta) =>
-    areIterablesEqual(toPairs(iterableA), toPairs(iterableB), isEqual, meta);
+  if (pairsA.length !== pairsB.length) {
+    return false;
+  }
+
+  for (let index = 0; index < pairsA.length; index++) {
+    if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**
- * @function areArraysEqual
+ * @function areObjectsEqual
  *
  * @description
  * are the objects equal in value
  *
- * @param {Array<any>} objectA the object to test
- * @param {Array<any>} objectB the object to test against
+ * @param {Object} objectA the object to test
+ * @param {Object} objectB the object to test against
  * @param {function} isEqual the comparator to determine equality
  * @param {any} meta the meta object to pass through
  * @returns {boolean} are the objects equal
@@ -247,7 +261,7 @@ export const areObjectsEqual = (objectA, objectB, isEqual, meta) => {
   for (let index = 0; index < keysA.length; index++) {
     key = keysA[index];
 
-    if (!hasItem(keysB, key, sameValueZeroEqual)) {
+    if (!hasValue(keysB, key, sameValueZeroEqual)) {
       return false;
     }
 
@@ -282,3 +296,32 @@ export const areRegExpsEqual = (regExpA, regExpB) =>
   && regExpA.unicode === regExpB.unicode
   && regExpA.sticky === regExpB.sticky
   && regExpA.lastIndex === regExpB.lastIndex;
+
+/**
+ * @function areSetsEqual
+ *
+ * @description
+ * are the sets equal in value
+ *
+ * @param {Set} setA the set to test
+ * @param {Set} setB the set to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta set to pass through
+ * @returns {boolean} are the sets equal
+ */
+export const areSetsEqual = (setA, setB, isEqual, meta) => {
+  const valuesA = toValues(setA);
+  const valuesB = toValues(setB);
+
+  if (valuesA.length !== valuesB.length) {
+    return false;
+  }
+
+  for (let index = 0; index < valuesA.length; index++) {
+    if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};

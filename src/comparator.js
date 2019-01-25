@@ -7,18 +7,16 @@ import {
 // utils
 import {
   areArraysEqual,
+  areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
-  createAreIterablesEqual,
+  areSetsEqual,
   isPlainObject,
   isPromiseLike,
   sameValueZeroEqual,
 } from './utils';
 
 const isArray = Array.isArray;
-
-const areMapsEqual = createAreIterablesEqual(true);
-const areSetsEqual = createAreIterablesEqual(false);
 
 const createComparator = (createIsEqual) => {
   // eslint-disable-next-line no-use-before-define

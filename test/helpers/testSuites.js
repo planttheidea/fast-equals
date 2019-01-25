@@ -458,6 +458,13 @@ module.exports = [
         value2: new Map().set('baz', 'bar'),
       },
       {
+        deepEqual: false,
+        description: 'not equal Map objects (same keys / values, different pairings)',
+        shallowEqual: false,
+        value1: new Map().set('foo', 'bar'),
+        value2: new Map().set('bar', 'foo'),
+      },
+      {
         deepEqual: true,
         description: 'deep equal Map objects',
         shallowEqual: false,
