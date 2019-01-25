@@ -202,7 +202,7 @@ console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB)); // true
 
 ## Benchmarks
 
-All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `8.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `10.15.0`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -213,19 +213,19 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 - `react` elements
 - A mixed object with a combination of all the above types
 
-|                            | Operations / second | Relative margin of error |
-| -------------------------- | ------------------- | ------------------------ |
-| **fast-equals**            | **130,726**         | **0.79%**                |
-| nano-equal                 | 103,950             | 0.85%                    |
-| shallow-equal-fuzzy        | 101,535             | 0.60%                    |
-| react-fast-compare         | 94,724              | 0.82%                    |
-| fast-deep-equal            | 92,172              | 0.85%                    |
-| underscore.isEqual         | 63,431              | 0.88%                    |
-| **fast-equals (circular)** | **53,778**          | **0.85%**                |
-| deep-equal                 | 29,739              | 0.54%                    |
-| lodash.isEqual             | 26,201              | 0.70%                    |
-| deep-eql                   | 16,496              | 0.60%                    |
-| assert.deepStrictEqual     | 1,565               | 1.04%                    |
+|                            | Operations / second |
+| -------------------------- | ------------------- |
+| **fast-equals**            | **148,083**         |
+| nano-equal                 | 114,146             |
+| shallow-equal-fuzzy        | 99,097              |
+| fast-deep-equal            | 98,452              |
+| react-fast-compare         | 96,650              |
+| **fast-equals (circular)** | **80,575**          |
+| underscore.isEqual         | 62,572              |
+| deep-equal                 | 47,260              |
+| lodash.isEqual             | 24,315              |
+| deep-eql                   | 23,962              |
+| assert.deepStrictEqual     | 1,370               |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
@@ -245,17 +245,17 @@ All of these have the potential of inflating the respective library's numbers in
 Standard practice, clone the repo and `npm i` to get the dependencies. The following npm scripts are available:
 
 - benchmark => run benchmark tests against other equality libraries
-- build => build unminified dist version with source map and NODE_ENV=development via webpack
-- build:minified => build minified dist version with NODE_ENV=production via webpack
-- clean => run `clean:dist`, `clean:es`, and `clean:lib` scripts
+- build => build `main`, `module`, and `browser` distributables with `rollup`
+- clean => run `clean:dist`, `clean:es`, `clean:mjs`, and `clean:lib` scripts
 - clean:dist => run `rimraf` on the `dist` folder
 - clean:es => run `rimraf` on the `es` folder
 - clean:lib => run `rimraf` on the `lib` folder
+- clean:mjs => run `rimraf` on the `mjs` folder
+- copy:mjs => copy all files from `es` folder to `mjs` folder (for node ESM consumption)
 - dev => start webpack playground App
-- dist => run `build` and `build:minified` scripts
+- dist => run `build`
 - lint => run ESLint on all files in `src` folder (also runs on `dev` script)
 - lint:fix => run `lint` script, but with auto-fixer
-- prepublish =>
 - prepublish:compile => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `dist` scripts
 - start => run `dev`
 - test => run AVA with NODE_ENV=test on all files in `test` folder
