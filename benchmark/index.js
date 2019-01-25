@@ -1,7 +1,11 @@
+/* eslint-disable import/no-commonjs */
+
 'use strict';
 
 const assertDeepStrictEqual = require('assert').deepStrictEqual;
-const Benchmark = require('benchmark');
+
+const {createSuite} = require('benchee');
+const Table = require('cli-table2');
 
 const tests = require('../test/helpers/testSuites');
 
@@ -18,13 +22,13 @@ const equalPackages = {
   'deep-eql': true,
   'deep-equal': true,
   'fast-deep-equal': true,
-  'fast-equals': require('../lib/index').deepEqual,
+  'fast-equals': require('../dist/fast-equals.cjs').deepEqual,
   'fast-equals (circular)': require('../lib/index').circularDeepEqual,
   'lodash.isEqual': require('lodash').isEqual,
   'nano-equal': true,
   'react-fast-compare': require('react-fast-compare'),
   'shallow-equal-fuzzy': true,
-  'underscore.isEqual': require('underscore').isEqual
+  'underscore.isEqual': require('underscore').isEqual,
 };
 
 const filteredEquivalentTests = ['maps', 'sets', 'promises'];
@@ -40,9 +44,90 @@ let passingTests = {};
 
 console.log('');
 
-const suite = new Benchmark.Suite();
-
 const getPassedKey = (equalName, {description}) => `${equalName} - ${description}`;
+
+const getResults = (results) => {
+  const table = new Table({
+    head: ['Name', 'Ops / sec'],
+  });
+
+  results.forEach(({name, stats}) => {
+    if (!~name.indexOf('passing: false')) {
+      table.push([name.replace(' (passing: true)', ''), stats.ops.toLocaleString()]);
+    }
+  });
+
+  return table.toString();
+};
+
+const suite = createSuite({
+  minTime: 3000,
+  onComplete(results) {
+    const combinedResults = Object.keys(results)
+      .reduce((combined, group) => {
+        const groupResults = results[group];
+
+        return groupResults.map(({name, stats}) => {
+          const existingRowIndex = combined.findIndex(({name: rowName}) => name === rowName);
+
+          return ~existingRowIndex
+            ? {
+              ...combined[existingRowIndex],
+              stats: {
+                elapsed: (combined[existingRowIndex].stats.elapsed += stats.elapsed),
+                iterations: (combined[existingRowIndex].stats.iterations += stats.iterations),
+              },
+            }
+            : {
+              name,
+              stats: {
+                elapsed: stats.elapsed,
+                iterations: stats.iterations,
+              },
+            };
+        });
+      }, [])
+      .map(({name, stats}) => ({
+        name,
+        stats: {
+          ...stats,
+          ops: stats.iterations / stats.elapsed,
+        },
+      }))
+      .sort((a, b) => {
+        if (a.stats.ops > b.stats.ops) {
+          return -1;
+        }
+
+        if (a.stats.ops < b.stats.ops) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+    console.log('');
+    console.log('Benchmark results complete, overall averages:');
+    console.log('');
+    console.log(getResults(combinedResults));
+    console.log('');
+  },
+  onGroupComplete({group, results}) {
+    console.log('');
+    console.log(`...finished group ${group}.`);
+    console.log('');
+    console.log(getResults(results));
+    console.log('');
+  },
+  onGroupStart(group) {
+    console.log('');
+    console.log(`Starting benchmarks for group ${group}...`);
+    console.log('');
+  },
+  onResult({name, stats}) {
+    console.log(`Benchmark completed for ${name}: ${stats.ops.toLocaleString()} ops/sec`);
+  },
+});
 
 for (const equalName in equalPackages) {
   let equalFunc = equalPackages[equalName];
@@ -73,7 +158,7 @@ for (const equalName in equalPackages) {
 
   console.log('');
 
-  suite.add(equalName, () => {
+  suite.add(equalName, 'mixed types', () => {
     for (const testSuite of equivalentTests) {
       for (const test of testSuite.tests) {
         if (test.description !== 'pseudo array and equivalent array are not equal') {
@@ -84,18 +169,17 @@ for (const equalName in equalPackages) {
   });
 }
 
-const typeSuite = new Benchmark.Suite();
+for (const testSuite of tests) {
+  for (const equalName in equalPackages) {
+    let equalFunc = equalPackages[equalName];
 
-for (const equalName in equalPackages) {
-  let equalFunc = equalPackages[equalName];
+    if (equalFunc === true) {
+      equalFunc = require(equalName);
+    }
 
-  if (equalFunc === true) {
-    equalFunc = require(equalName);
-  }
-
-  for (const testSuite of tests) {
-    typeSuite.add(
-      `${equalName} - ${testSuite.description} (passing: ${passingTests[getPassedKey(equalName, testSuite)]})`,
+    suite.add(
+      `${equalName} (passing: ${passingTests[getPassedKey(equalName, testSuite)]})`,
+      testSuite.description,
       () => {
         for (const test of testSuite.tests) {
           if (test.description !== 'pseudo array and equivalent array are not equal') {
@@ -107,52 +191,4 @@ for (const equalName in equalPackages) {
   }
 }
 
-const runMainSuite = () => {
-  console.log('Running average performance comparison...');
-  console.log('');
-
-  return new Promise((resolve) => {
-    suite
-      .on('cycle', (event) => {
-        const result = event.target.toString();
-
-        return console.log(result);
-      })
-      .on('complete', function() {
-        console.log('');
-        console.log(`...complete, the fastest is ${this.filter('fastest').map('name')}.`);
-
-        resolve();
-      })
-      .run({async: true});
-  });
-};
-
-const runTypeSuite = () => {
-  console.log('');
-  console.log('Running type-specific performance comparison...');
-  console.log('');
-
-  return new Promise((resolve) => {
-    typeSuite
-      .on('cycle', (event) => {
-        const result = event.target.toString();
-
-        const isPassing = /passing: true/.test(result);
-        const cleanResult = isPassing ? result : result.replace(/x (.*) ops/, 'x 0 ops');
-
-        return console.log(cleanResult);
-      })
-      .on('complete', () => {
-        console.log('');
-        console.log('...complete.');
-
-        resolve();
-      })
-      .run({async: true});
-  });
-};
-
-// runMainSuite();
-// runTypeSuite();
-runMainSuite().then(runTypeSuite);
+suite.run();

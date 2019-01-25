@@ -87,9 +87,11 @@ console.log(
   'true',
   fe.deep(new Map().set('foo', {bar: 'baz'}).set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', {bar: 'baz'}))
 );
-console.groupEnd('map');
+console.log('false', fe.deep(new Map([['key1', 'foo'], ['key2', 'bar']]), new Map([['key1', 'bar'], ['key2', 'foo']])));
 
-console.group('map shallow deep');
+console.groupEnd();
+
+console.group('map shallow');
 console.log(
   'true',
   fe.shallow(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('foo', 'bar').set('bar', 'baz'))
@@ -102,13 +104,19 @@ console.log(
   'true',
   fe.shallow(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', 'bar'))
 );
+console.log(
+  'false',
+  fe.shallow(new Map([['key1', 'foo'], ['key2', 'bar']]), new Map([['key1', 'bar'], ['key2', 'foo']]))
+);
 
-console.groupEnd('map shallow');
+console.groupEnd();
 
 console.group('set');
+
 console.log('true', fe.deep(new Set().add('bar'), new Set().add('bar')));
 console.log('false', fe.deep(new Set().add('bar'), new Set().add('baz')));
-console.groupEnd('set');
+
+console.groupEnd();
 
 console.group('object');
 console.log('true', fe.deep({some: {deeply: {nested: 'value'}}}, {some: {deeply: {nested: 'value'}}}));
@@ -118,43 +126,43 @@ console.groupEnd('object');
 console.group('custom');
 
 const object1 = {
-  zero: 0,
   deep: {
-    two: 2,
     deeper: {
-      three: 3
-    }
-  }
+      three: 3,
+    },
+    two: 2,
+  },
+  zero: 0,
 };
 
 const object2 = {
-  zero: 0,
   deep: {
-    two: 2,
     deeper: {
-      three: 3
-    }
-  }
+      three: 3,
+    },
+    two: 2,
+  },
+  zero: 0,
 };
 
 const object3 = {
-  zero: 0,
   deep: {
-    two: 2,
     deeper: {
-      one: 1
-    }
-  }
+      one: 1,
+    },
+    two: 2,
+  },
+  zero: 0,
 };
 
 const object4 = {
-  zero: 0,
   deep: {
-    two: 2,
     deeper: {
-      three: 3
-    }
-  }
+      three: 3,
+    },
+    two: 2,
+  },
+  zero: 0,
 };
 
 const isNotDeeplyOne = (comparator) => (a, b) => {
@@ -195,10 +203,10 @@ function Circular(value) {
   this.me = {
     deeply: {
       nested: {
-        reference: this
-      }
+        reference: this,
+      },
     },
-    value
+    value,
   };
 }
 

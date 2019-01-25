@@ -3,7 +3,7 @@ import test from 'ava';
 import sinon from 'sinon';
 import {
   alternativeValues,
-  mainValues
+  mainValues,
 } from 'test/helpers/dataTypes';
 import React from 'react';
 
@@ -66,58 +66,40 @@ test('if areArraysEqual returns true when the arrays are equal in value', (t) =>
   t.true(utils.areArraysEqual(arrayA, arrayB, isEqual, cache));
 });
 
-test('if areIterablesEqual returns false when objects are different sizes', (t) => {
-  const objectA = new Map();
-  const objectB = new Map().set('foo', 'bar');
+test('if areMapsEqual returns false when maps are different sizes', (t) => {
+  const mapA = new Map();
+  const mapB = new Map().set('foo', 'bar');
   const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
+  t.false(utils.areMapsEqual(mapA, mapB, comparator, cache));
 });
 
-test('if areIterablesEqual returns false when objects have different keys', (t) => {
-  const objectA = new Map().set('foo', 'bar');
-  const objectB = new Map().set('bar', 'baz');
+test('if areMapsEqual returns false when maps have different keys', (t) => {
+  const mapA = new Map().set('foo', 'bar');
+  const mapB = new Map().set('bar', 'baz');
   const cache = new WeakSet();
   const comparator = (a, b) => a === b;
 
-  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
+  t.false(utils.areMapsEqual(mapA, mapB, comparator, cache));
 });
 
-test('if areIterablesEqual returns false when objects have different values', (t) => {
-  const objectA = new Map().set(['foo'], ['bar']);
-  const objectB = new Map().set(['foo'], ['baz']);
+test('if areMapsEqual returns false when maps have different values', (t) => {
+  const mapA = new Map().set(['foo'], ['bar']);
+  const mapB = new Map().set(['foo'], ['baz']);
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.false(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
+  t.false(utils.areMapsEqual(mapA, mapB, comparator, cache));
 });
 
-test('if areIterablesEqual returns true when objects have the same size, keys, and values', (t) => {
-  const objectA = new Map().set(['foo'], ['bar']);
-  const objectB = new Map().set(['foo'], ['bar']);
+test('if areMapsEqual returns true when maps have the same size, keys, and values', (t) => {
+  const mapA = new Map().set(['foo'], ['bar']);
+  const mapB = new Map().set(['foo'], ['bar']);
   const cache = new WeakSet();
   const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
 
-  t.true(utils.createAreIterablesEqual(true)(objectA, objectB, comparator, cache));
-});
-
-test('if areIterablesEqual returns false when objects have the same size but different values when they are sets', (t) => {
-  const objectA = new Set().add(['foo']);
-  const objectB = new Set().add(['bar']);
-  const cache = new WeakSet();
-  const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
-
-  t.false(utils.createAreIterablesEqual(false)(objectA, objectB, comparator, cache));
-});
-
-test('if areIterablesEqual returns true when objects have the same size and values when they are sets', (t) => {
-  const objectA = new Set().add(['foo']);
-  const objectB = new Set().add(['foo']);
-  const cache = new WeakSet();
-  const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
-
-  t.true(utils.createAreIterablesEqual(false)(objectA, objectB, comparator, cache));
+  t.true(utils.areMapsEqual(mapA, mapB, comparator, cache));
 });
 
 test('if areObjectsEqual returns false when the object have different key lengths', (t) => {
@@ -215,6 +197,33 @@ test('if areRegExpsEqual returns true if the values and flags are equal', (t) =>
   t.true(utils.areRegExpsEqual(regExpA, regExpB));
 });
 
+test('if areSetsEqual returns false when objects have different sizes', (t) => {
+  const setA = new Set().add(['foo']).add(['bar']);
+  const setB = new Set().add(['bar']);
+  const cache = new WeakSet();
+  const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
+
+  t.false(utils.areSetsEqual(setA, setB, comparator, cache));
+});
+
+test('if areSetsEqual returns false when objects have the same size but different values', (t) => {
+  const setA = new Set().add(['foo']);
+  const setB = new Set().add(['bar']);
+  const cache = new WeakSet();
+  const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
+
+  t.false(utils.areSetsEqual(setA, setB, comparator, cache));
+});
+
+test('if areIterablesEqual returns true when objects have the same size and values when they are sets', (t) => {
+  const setA = new Set().add(['foo']);
+  const setB = new Set().add(['foo']);
+  const cache = new WeakSet();
+  const comparator = (a, b) => a.length === b.length && a.every((value, index) => b[index] === value);
+
+  t.true(utils.areSetsEqual(setA, setB, comparator, cache));
+});
+
 test.serial('if createCircularEqual will create the custom comparator that stores the values in cache', (t) => {
   const isEqual = undefined;
 
@@ -289,36 +298,20 @@ test.serial('if getNewCache will return a new WeakSet-like object when support i
   constants.HAS_WEAKSET_SUPPORT = support;
 });
 
-test('if hasItem returns true if the key does exists in the array', (t) => {
+test('if hasValue returns true if the key does exists in the array', (t) => {
   const keys = ['foo', 'bar', 'baz'];
   const key = 'bar';
   const isEqual = (a, b) => a === b;
 
-  t.true(utils.hasItem(keys, key, isEqual));
+  t.true(utils.hasValue(keys, key, isEqual));
 });
 
-test('if hasItem returns false if the key does not exist in the array', (t) => {
+test('if hasValue returns false if the key does not exist in the array', (t) => {
   const keys = ['foo', 'bar', 'baz'];
   const key = 'quz';
   const isEqual = (a, b) => a === b;
 
-  t.false(utils.hasItem(keys, key, isEqual));
-});
-
-test('if hasItems returns true if the arrays are equal in value', (t) => {
-  const arrayA = [{}, 'foo', 123];
-  const arrayB = ['foo', arrayA[0], 123];
-  const isEqual = (a, b) => a === b;
-
-  t.true(utils.hasItems(arrayA, arrayB, isEqual));
-});
-
-test('if hasItems returns false if the arrays are not equal in value', (t) => {
-  const arrayA = [{}, 'foo', 123];
-  const arrayB = ['bar', arrayA[0], 123];
-  const isEqual = (a, b) => a === b;
-
-  t.false(utils.hasItems(arrayA, arrayB, isEqual));
+  t.false(utils.hasValue(keys, key, isEqual));
 });
 
 test('if isCircularReactElement will return true if the appropriate keys are present and truthy', (t) => {
@@ -373,24 +366,18 @@ test('if sameValueZeroEqual will return true when strictly equal or NaN, false o
   });
 });
 
-test('if toPairs will convert the map into {keys: [], values: []} pairs', (t) => {
+test('if toPairs will convert the map into [key, value] pairs', (t) => {
   const map = new Map().set('foo', 'bar').set('bar', 'baz');
 
   const result = utils.toPairs(map);
 
-  t.deepEqual(result, {
-    keys: ['foo', 'bar'],
-    values: ['bar', 'baz'],
-  });
+  t.deepEqual(result, [['foo', 'bar'], ['bar', 'baz']]);
 });
 
-test('if toPairs will convert the set into {keys: [], values: []} pairs', (t) => {
+test('if toValues will convert the set into values array', (t) => {
   const set = new Set().add('foo').add('bar');
 
-  const result = utils.toPairs(set);
+  const result = utils.toValues(set);
 
-  t.deepEqual(result, {
-    keys: ['foo', 'bar'],
-    values: ['foo', 'bar'],
-  });
+  t.deepEqual(result, ['foo', 'bar']);
 });
