@@ -1,12 +1,24 @@
 {
-  "extends": ["rapid7/browser"],
-  "globals": {
-    "__dirname": true,
-    "global": true,
-    "module": true,
-    "process": true,
-    "require": true
+  "extends": ["airbnb"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
   },
-  "parser": "babel-eslint",
-  "rules": {}
+  "rules": {
+    "max-len": 0,
+    "operator-linebreak": 0,
+    "no-plusplus": 0,
+    "no-proto": 0,
+    "no-self-compare": 0,
+    "no-underscore-dangle": 0,
+    "no-unused-vars": 0,
+    "valid-typeof": 0,
+
+    "import/prefer-default-export": 0
+  }
 }

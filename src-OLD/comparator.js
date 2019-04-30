@@ -1,8 +1,5 @@
 // constants
-import {
-  HAS_MAP_SUPPORT,
-  HAS_SET_SUPPORT,
-} from './constants';
+import { HAS_MAP_SUPPORT, HAS_SET_SUPPORT } from './constants';
 
 // utils
 import {
@@ -20,7 +17,10 @@ const isArray = Array.isArray;
 
 const createComparator = (createIsEqual) => {
   // eslint-disable-next-line no-use-before-define
-  const isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
+  const isEqual =
+    typeof createIsEqual === 'function'
+      ? createIsEqual(comparator)
+      : comparator;
 
   /**
    * @function comparator
@@ -40,7 +40,12 @@ const createComparator = (createIsEqual) => {
 
     const typeOfA = typeof objectA;
 
-    if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
+    if (
+      typeOfA !== typeof objectB ||
+      typeOfA !== 'object' ||
+      !objectA ||
+      !objectB
+    ) {
       return false;
     }
 
@@ -52,14 +57,19 @@ const createComparator = (createIsEqual) => {
     const arrayB = isArray(objectB);
 
     if (arrayA || arrayB) {
-      return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
+      return (
+        arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta)
+      );
     }
 
     const dateA = objectA instanceof Date;
     const dateB = objectB instanceof Date;
 
     if (dateA || dateB) {
-      return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
+      return (
+        dateA === dateB &&
+        sameValueZeroEqual(objectA.getTime(), objectB.getTime())
+      );
     }
 
     const regexpA = objectA instanceof RegExp;

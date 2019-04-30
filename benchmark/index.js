@@ -61,7 +61,7 @@ const getResults = (results) => {
 };
 
 const suite = createSuite({
-  minTime: 3000,
+  minTime: 1000,
   onComplete(results) {
     const combinedResults = Object.keys(results)
       .reduce((combined, group) => {

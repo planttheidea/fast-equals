@@ -1,16 +1,28 @@
-'use strict';
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-const statics = require('./webpackStatics');
+const ROOT = path.resolve(__dirname, '..');
 
 module.exports = {
-  cache: true,
+  devServer: {
+    contentBase: './dist',
+    inline: true,
+    port: 3000,
+    stats: {
+      assets: false,
+      chunks: true,
+      chunkModules: false,
+      colors: true,
+      hash: false,
+      timings: true,
+      version: false,
+    },
+  },
 
   devtool: '#source-map',
 
-  entry: [path.resolve(statics.ROOT, 'src', 'index.js')],
+  entry: path.join(ROOT, 'DEV_ONLY', 'index.tsx'),
 
   mode: 'development',
 
@@ -18,32 +30,36 @@ module.exports = {
     rules: [
       {
         enforce: 'pre',
-        include: [path.resolve(statics.ROOT, 'src')],
+        include: [path.resolve(ROOT, 'src')],
         loader: 'eslint-loader',
-        options: {
-          configFile: '.eslintrc',
-          failOnError: true,
-          failOnWarning: false,
-          fix: true,
-          formatter: require('eslint-friendly-formatter'),
-        },
-        test: /\.js$/,
+        test: /\.ts$/,
       },
       {
-        include: [path.resolve(statics.ROOT, 'DEV_ONLY'), path.resolve(statics.ROOT, 'src')],
-        loader: 'babel-loader',
-        test: /\.js$/,
+        include: [path.resolve(ROOT, 'src'), /DEV_ONLY/],
+        loader: 'ts-loader',
+        test: /\.tsx?$/,
       },
     ],
+  },
+
+  node: {
+    fs: 'empty',
   },
 
   output: {
     filename: 'fast-equals.js',
     library: 'fe',
     libraryTarget: 'umd',
-    path: path.resolve(statics.ROOT, 'dist'),
+    path: path.resolve(ROOT, 'dist'),
     umdNamedDefine: true,
   },
 
-  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV'])],
+  plugins: [
+    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new HtmlWebpackPlugin(),
+  ],
+
+  resolve: {
+    extensions: ['.ts', '.js', '.tsx', '.jsx'],
+  },
 };
