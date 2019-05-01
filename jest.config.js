@@ -1,9 +1,11 @@
 module.exports = {
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  roots: ["<rootDir>"],
-  testRegex: "/__tests__/.*\\.(ts|tsx)$",
+  coveragePathIgnorePatterns: ['/__tests__/'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  roots: ['<rootDir>'],
+  testRegex: '/__tests__/.*\\.(ts|tsx)$',
   transform: {
-    "\\.(ts|tsx)$": "ts-jest"
+    '\\.(ts|tsx)$': 'ts-jest',
   },
-  verbose: true
+  testPathIgnorePatterns: ['/__helpers__/'],
+  verbose: true,
 };

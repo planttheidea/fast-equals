@@ -88,27 +88,29 @@ export function isReactElement(value: any) {
   return !!(value && value.$$typeof);
 }
 
-export const getNewCache = ((canUseWeakMap) => {
+export function getNewCacheFallback(): Cache {
+  return Object.create({
+    _values: [],
+
+    add(value: any) {
+      this._values.push(value);
+    },
+
+    has(value: any) {
+      // eslint-disable-next-line no-bitwise
+      return !!~this._values.indexOf(value);
+    },
+  });
+}
+
+export const getNewCache = ((canUseWeakMap: boolean) => {
   if (canUseWeakMap) {
     return function _getNewCache(): Cache {
       return new WeakSet();
     };
   }
 
-  return function _getNewCache(): Cache {
-    return Object.create({
-      _values: [],
-
-      add(value: any) {
-        this._values.push(value);
-      },
-
-      has(value: any) {
-        // eslint-disable-next-line no-bitwise
-        return !!~this._values.indexOf(value);
-      },
-    });
-  };
+  return getNewCacheFallback;
 })(HAS_WEAKSET_SUPPORT);
 
 export function createCircularIsEqual(isEqual?: EqualityComparator) {
@@ -273,10 +275,6 @@ export function areSetsEqual(
   const valuesB = toValues(b);
 
   const { length } = valuesA;
-
-  if (valuesB.length !== length) {
-    return false;
-  }
 
   for (let index = 0; index < length; ++index) {
     if (

@@ -21,7 +21,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.4",
     "@types/lodash": "^4.14.121",
-    "@types/node": "^11.9.3",
+    "@types/node": "^11.13.8",
     "@types/ramda": "^0.25.50",
     "@types/react": "^16.8.3",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
@@ -41,6 +41,7 @@
     "fs-extra": "^7.0.1",
     "html-webpack-plugin": "^3.2.0",
     "in-publish": "^2.0.0",
+    "jest": "^24.7.1",
     "lodash": "^4.17.11",
     "nano-equal": "^2.0.2",
     "nyc": "^13.1.0",
@@ -54,6 +55,7 @@
     "rollup-plugin-typescript2": "^0.19.2",
     "shallow-equal-fuzzy": "^0.0.2",
     "sinon": "^7.2.3",
+    "ts-jest": "^24.0.2",
     "ts-loader": "^5.4.4",
     "typescript": "^3.4.5",
     "underscore": "^1.9.1",
@@ -88,7 +90,7 @@
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
     "prepublish:compile": "npm run lint && npm run test && npm run dist",
     "test": "NODE_PATH=. jest",
-    "test:coverage": "nyc npm test",
+    "test:coverage": "npm test -- --coverage",
     "test:watch": "npm test -- --watch"
   },
   "sideEffects": false,
