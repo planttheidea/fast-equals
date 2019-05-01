@@ -1,33 +1,31 @@
 /* eslint-disable import/no-commonjs */
 
-'use strict';
-
 const assertDeepStrictEqual = require('assert').deepStrictEqual;
 
-const {createSuite} = require('benchee');
+const { createSuite } = require('benchee');
 const Table = require('cli-table2');
 
-const tests = require('../test/helpers/testSuites');
+const tests = require('../__tests__/__helpers__/testSuites');
+
+const fe = require('../dist/fast-equals.cjs');
 
 const equalPackages = {
   'assert.deepStrictEqual': (a, b) => {
     try {
-      assertDeepStrictEqual(a, b);
-
-      return true;
+      return assertDeepStrictEqual(a, b);
     } catch (e) {
       return false;
     }
   },
-  'deep-eql': true,
-  'deep-equal': true,
-  'fast-deep-equal': true,
-  'fast-equals': require('../dist/fast-equals.cjs').deepEqual,
-  'fast-equals (circular)': require('../lib/index').circularDeepEqual,
+  'deep-eql': require('deep-eql'),
+  'deep-equal': require('deep-equal'),
+  'fast-deep-equal': require('fast-deep-equal'),
+  'fast-equals': fe.deepEqual,
+  'fast-equals (circular)': fe.circularDeepEqual,
   'lodash.isEqual': require('lodash').isEqual,
-  'nano-equal': true,
+  'nano-equal': require('nano-equal'),
   'react-fast-compare': require('react-fast-compare'),
-  'shallow-equal-fuzzy': true,
+  'shallow-equal-fuzzy': require('shallow-equal-fuzzy'),
   'underscore.isEqual': require('underscore').isEqual,
 };
 
@@ -36,24 +34,25 @@ const filteredEquivalentTests = ['maps', 'sets', 'promises'];
 /*
  * filter out Map and Set, as those do not pass with anything but lodash and falsely inflate the average ops/sec
  */
-const equivalentTests = tests.filter(({description}) =>
-  filteredEquivalentTests.every((test) => !~description.indexOf(test))
-);
+const equivalentTests = tests.filter(({ description }) => filteredEquivalentTests.every(test => !~description.indexOf(test)));
 
-let passingTests = {};
+const passingTests = {};
 
 console.log('');
 
-const getPassedKey = (equalName, {description}) => `${equalName} - ${description}`;
+const getPassedKey = (equalName, { description }) => `${equalName} - ${description}`;
 
 const getResults = (results) => {
   const table = new Table({
     head: ['Name', 'Ops / sec'],
   });
 
-  results.forEach(({name, stats}) => {
+  results.forEach(({ name, stats }) => {
     if (!~name.indexOf('passing: false')) {
-      table.push([name.replace(' (passing: true)', ''), stats.ops.toLocaleString()]);
+      table.push([
+        name.replace(' (passing: true)', ''),
+        stats.ops.toLocaleString(),
+      ]);
     }
   });
 
@@ -67,15 +66,19 @@ const suite = createSuite({
       .reduce((combined, group) => {
         const groupResults = results[group];
 
-        return groupResults.map(({name, stats}) => {
-          const existingRowIndex = combined.findIndex(({name: rowName}) => name === rowName);
+        return groupResults.map(({ name, stats }) => {
+          const existingRowIndex = combined.findIndex(
+            ({ name: rowName }) => name === rowName,
+          );
 
           return ~existingRowIndex
             ? {
               ...combined[existingRowIndex],
               stats: {
-                elapsed: (combined[existingRowIndex].stats.elapsed += stats.elapsed),
-                iterations: (combined[existingRowIndex].stats.iterations += stats.iterations),
+                elapsed: (combined[existingRowIndex].stats.elapsed +=
+                    stats.elapsed),
+                iterations: (combined[existingRowIndex].stats.iterations +=
+                    stats.iterations),
               },
             }
             : {
@@ -87,7 +90,7 @@ const suite = createSuite({
             };
         });
       }, [])
-      .map(({name, stats}) => ({
+      .map(({ name, stats }) => ({
         name,
         stats: {
           ...stats,
@@ -112,7 +115,7 @@ const suite = createSuite({
     console.log(getResults(combinedResults));
     console.log('');
   },
-  onGroupComplete({group, results}) {
+  onGroupComplete({ group, results }) {
     console.log('');
     console.log(`...finished group ${group}.`);
     console.log('');
@@ -124,17 +127,15 @@ const suite = createSuite({
     console.log(`Starting benchmarks for group ${group}...`);
     console.log('');
   },
-  onResult({name, stats}) {
-    console.log(`Benchmark completed for ${name}: ${stats.ops.toLocaleString()} ops/sec`);
+  onResult({ name, stats }) {
+    console.log(
+      `Benchmark completed for ${name}: ${stats.ops.toLocaleString()} ops/sec`,
+    );
   },
 });
 
 for (const equalName in equalPackages) {
-  let equalFunc = equalPackages[equalName];
-
-  if (equalFunc === true) {
-    equalFunc = require(equalName);
-  }
+  const equalFunc = equalPackages[equalName];
 
   for (const testSuite of tests) {
     let passed = true;
@@ -142,7 +143,12 @@ for (const equalName in equalPackages) {
     for (const test of testSuite.tests) {
       try {
         if (equalFunc(test.value1, test.value2) !== test.deepEqual) {
-          console.error('different result', equalName, testSuite.description, test.description);
+          console.error(
+            'different result',
+            equalName,
+            testSuite.description,
+            test.description,
+          );
 
           passed = false;
         }
@@ -161,7 +167,9 @@ for (const equalName in equalPackages) {
   suite.add(equalName, 'mixed types', () => {
     for (const testSuite of equivalentTests) {
       for (const test of testSuite.tests) {
-        if (test.description !== 'pseudo array and equivalent array are not equal') {
+        if (
+          test.description !== 'pseudo array and equivalent array are not equal'
+        ) {
           equalFunc(test.value1, test.value2);
         }
       }
@@ -178,15 +186,20 @@ for (const testSuite of tests) {
     }
 
     suite.add(
-      `${equalName} (passing: ${passingTests[getPassedKey(equalName, testSuite)]})`,
+      `${equalName} (passing: ${
+        passingTests[getPassedKey(equalName, testSuite)]
+      })`,
       testSuite.description,
       () => {
         for (const test of testSuite.tests) {
-          if (test.description !== 'pseudo array and equivalent array are not equal') {
+          if (
+            test.description !==
+            'pseudo array and equivalent array are not equal'
+          ) {
             equalFunc(test.value1, test.value2);
           }
         }
-      }
+      },
     );
   }
 }

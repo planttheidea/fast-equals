@@ -400,21 +400,16 @@ describe('isPlainObject', () => {
     expect(isPlainObject(a)).toBe(true);
   });
 
-  it('should return false when a custom object', () => {
+  it('should return false when not a standard object', () => {
+    expect(isPlainObject([])).toBe(false);
+    expect(isPlainObject(new Map())).toBe(false);
+    expect(isPlainObject(new Set())).toBe(false);
+  });
+
+  it('should return true when an object made via Object.create()', () => {
     const a = Object.create({ foo: 'bar' });
 
-    expect(isPlainObject(a)).toBe(false);
-  });
-
-  it('should return false when null', () => {
-    expect(isPlainObject(null)).toBe(false);
-  });
-
-  it('should return false when not an object', () => {
-    expect(isPlainObject([])).toBe(false);
-    expect(isPlainObject(123)).toBe(false);
-    expect(isPlainObject('foo')).toBe(false);
-    expect(isPlainObject(undefined)).toBe(false);
+    expect(isPlainObject(a)).toBe(true);
   });
 });
 

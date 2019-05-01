@@ -12,15 +12,6 @@ import {
   shallowEqual,
 } from '../src/index';
 
-const EXPORTED_METHODS = [
-  circularDeepEqual,
-  circularShallowEqual,
-  createCustomEqual,
-  deepEqual,
-  sameValueZeroEqual,
-  shallowEqual,
-];
-
 describe('exports', () => {
   [
     circularDeepEqual,

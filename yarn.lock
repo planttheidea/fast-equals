@@ -1018,7 +1018,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-benchee@^1.0.3:
+benchee@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/benchee/-/benchee-1.1.0.tgz#b32d64e425f8dd5bfe3e983560e8cf85a385d37c"
   integrity sha512-7sW2KJPD+e5HgsuHXbpDwfI1kThRmXsuFbCk0eNWX6tstW/fJWryTL7v9+b24VnyqNwLN4SspckMxNGzEguLBw==

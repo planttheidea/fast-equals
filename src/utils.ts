@@ -25,7 +25,7 @@ export function hasPair(
 
   let pair: any;
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     pair = pairs[index];
 
     if (
@@ -47,7 +47,7 @@ export function hasValue(
 ) {
   const { length } = values;
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     if (isEqual(values[index], item, meta)) {
       return true;
     }
@@ -60,24 +60,8 @@ export function sameValueZeroEqual(a: any, b: any) {
   return a === b || (a !== a && b !== b);
 }
 
-const { getPrototypeOf } = Object;
-
 export function isPlainObject(value: any) {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  if (value.__proto__ == null) {
-    return true;
-  }
-
-  let proto = value;
-
-  while (proto.__proto__ != null) {
-    proto = proto.__proto__;
-  }
-
-  return getPrototypeOf(value) === proto;
+  return value.constructor === Object || value.constructor == null;
 }
 
 export function isPromiseLike(value: any) {
@@ -169,7 +153,7 @@ export function areArraysEqual(
     return false;
   }
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     if (!isEqual(a[index], b[index], meta)) {
       return false;
     }
@@ -193,7 +177,7 @@ export function areMapsEqual(
 
   const { length } = pairsA;
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     if (
       !hasPair(pairsB, pairsA[index], isEqual, meta) ||
       !hasPair(pairsA, pairsB[index], isEqual, meta)
@@ -229,7 +213,7 @@ export function areObjectsEqual(
 
   let key: any;
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     key = keysA[index];
 
     if (!hasValue(keysB, key, sameValueZeroEqual, meta)) {
@@ -276,7 +260,7 @@ export function areSetsEqual(
 
   const { length } = valuesA;
 
-  for (let index = 0; index < length; ++index) {
+  for (let index = 0; index < length; index++) {
     if (
       !hasValue(valuesB, valuesA[index], isEqual, meta) ||
       !hasValue(valuesA, valuesB[index], isEqual, meta)
@@ -287,8 +271,3 @@ export function areSetsEqual(
 
   return true;
 }
-
-export const toString = Function.prototype.bind.call(
-  Function.prototype.call,
-  Object.prototype.toString,
-);

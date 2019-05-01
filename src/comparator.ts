@@ -8,15 +8,14 @@ import {
   isPlainObject,
   isPromiseLike,
   sameValueZeroEqual,
-  toString,
 } from './utils';
 
 const { isArray } = Array;
 
-const DATE_CLASS = '[object Date]';
-const MAP_CLASS = '[object Map]';
-const REG_EXP_CLASS = '[object RegExp]';
-const SET_CLASS = '[object Set]';
+const HAS_MAP_SUPPORT = typeof Map === 'function';
+const HAS_SET_SUPPORT = typeof Set === 'function';
+
+const OBJECT_TYPEOF = 'object';
 
 type EqualityComparatorCreator = (fn: EqualityComparator) => EqualityComparator;
 
@@ -33,47 +32,58 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
       return true;
     }
 
-    const typeofA = typeof a;
+    if (a && b && typeof a === OBJECT_TYPEOF && typeof b === OBJECT_TYPEOF) {
+      if (isPlainObject(a) && isPlainObject(b)) {
+        return areObjectsEqual(a, b, isEqual, meta);
+      }
 
-    if (typeofA !== typeof b || typeofA !== 'object' || !a || !b) {
-      return false;
-    }
+      const arrayA = isArray(a);
+      const arrayB = isArray(b);
 
-    if (isPlainObject(a) && isPlainObject(b)) {
+      if (arrayA || arrayB) {
+        return arrayA === arrayB && areArraysEqual(a, b, isEqual, meta);
+      }
+
+      const aDate = a instanceof Date;
+      const bDate = b instanceof Date;
+
+      if (aDate || bDate) {
+        return aDate === bDate && sameValueZeroEqual(a.getTime(), b.getTime());
+      }
+
+      const aRegExp = a instanceof RegExp;
+      const bRegExp = b instanceof RegExp;
+
+      if (aRegExp || bRegExp) {
+        return aRegExp === bRegExp && areRegExpsEqual(a, b);
+      }
+
+      if (isPromiseLike(a) || isPromiseLike(b)) {
+        return a === b;
+      }
+
+      if (HAS_MAP_SUPPORT) {
+        const aMap = a instanceof Map;
+        const bMap = b instanceof Map;
+
+        if (aMap || bMap) {
+          return aMap === bMap && areMapsEqual(a, b, isEqual, meta);
+        }
+      }
+
+      if (HAS_SET_SUPPORT) {
+        const aSet = a instanceof Set;
+        const bSet = b instanceof Set;
+
+        if (aSet || bSet) {
+          return aSet === bSet && areSetsEqual(a, b, isEqual, meta);
+        }
+      }
+
       return areObjectsEqual(a, b, isEqual, meta);
     }
 
-    const arrayA = isArray(a);
-    const arrayB = isArray(b);
-
-    if (arrayA || arrayB) {
-      return arrayA === arrayB && areArraysEqual(a, b, isEqual, meta);
-    }
-
-    const aClass = toString(a);
-    const bClass = toString(b);
-
-    if (aClass === DATE_CLASS || bClass === DATE_CLASS) {
-      return aClass === bClass && sameValueZeroEqual(a.getTime(), b.getTime());
-    }
-
-    if (aClass === REG_EXP_CLASS || bClass === REG_EXP_CLASS) {
-      return aClass === bClass && areRegExpsEqual(a, b);
-    }
-
-    if (isPromiseLike(a) || isPromiseLike(b)) {
-      return a === b;
-    }
-
-    if (aClass === MAP_CLASS || bClass === MAP_CLASS) {
-      return aClass === bClass && areMapsEqual(a, b, isEqual, meta);
-    }
-
-    if (aClass === SET_CLASS || bClass === SET_CLASS) {
-      return aClass === bClass && areSetsEqual(a, b, isEqual, meta);
-    }
-
-    return areObjectsEqual(a, b, isEqual, meta);
+    return false;
   }
 
   return comparator;
