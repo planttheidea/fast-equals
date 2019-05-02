@@ -97,11 +97,15 @@ export const getNewCache = ((canUseWeakMap: boolean) => {
   return getNewCacheFallback;
 })(HAS_WEAKSET_SUPPORT);
 
-export function createCircularIsEqual(isEqual?: EqualityComparator) {
-  return function circularIsEqual(isDeepEqual: EqualityComparator) {
-    const comparator = isEqual || isDeepEqual;
+export function createCircularIsEqualCreator(isEqual?: EqualityComparator) {
+  return function createCircularIsEqual(comparator: EqualityComparator) {
+    const _comparator = isEqual || comparator;
 
-    return function _isEqual(a: any, b: any, cache: Cache = getNewCache()) {
+    return function circularIsEqual(
+      a: any,
+      b: any,
+      cache: Cache = getNewCache(),
+    ) {
       const hasA = cache.has(a);
       const hasB = cache.has(b);
 
@@ -112,7 +116,7 @@ export function createCircularIsEqual(isEqual?: EqualityComparator) {
       addToCache(a, cache);
       addToCache(b, cache);
 
-      return comparator(a, b, cache);
+      return _comparator(a, b, cache);
     };
   };
 }
@@ -196,6 +200,11 @@ type Dictionary<Type> = {
 
 const OWNER = '_owner';
 
+const hasOwnProperty = Function.prototype.bind.call(
+  Function.prototype.call,
+  Object.prototype.hasOwnProperty,
+);
+
 export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
@@ -203,11 +212,10 @@ export function areObjectsEqual(
   meta: any,
 ) {
   const keysA = keys(a);
-  const keysB = keys(b);
 
   const { length } = keysA;
 
-  if (keysB.length !== length) {
+  if (keys(b).length !== length) {
     return false;
   }
 
@@ -216,11 +224,15 @@ export function areObjectsEqual(
   for (let index = 0; index < length; index++) {
     key = keysA[index];
 
-    if (!hasValue(keysB, key, sameValueZeroEqual, meta)) {
+    if (!hasOwnProperty(b, key)) {
       return false;
     }
 
-    if (key === OWNER && isReactElement(a) && isReactElement(b)) {
+    if (key === OWNER && isReactElement(a)) {
+      if (!isReactElement(b)) {
+        return false;
+      }
+
       // eslint-disable-next-line no-continue
       continue;
     }

@@ -9,7 +9,7 @@ import {
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-  createCircularIsEqual,
+  createCircularIsEqualCreator,
   getNewCache,
   getNewCacheFallback,
   hasPair,
@@ -244,7 +244,7 @@ describe('areSetsEqual', () => {
   });
 });
 
-describe('createCircularIsEqual', () => {
+describe('createCircularIsEqualCreator', () => {
   it('should create the custom comparator that stores the values in cache', () => {
     const ws = global.WeakSet;
 
@@ -263,7 +263,7 @@ describe('createCircularIsEqual', () => {
       this.has = has;
     };
 
-    const handler = createCircularIsEqual(undefined);
+    const handler = createCircularIsEqualCreator(undefined);
 
     const isDeepEqual = jest.fn().mockReturnValue(true);
 
