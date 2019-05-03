@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 1.6.3
+
+- Check the size of the iterable before converting to arrays
+
 ## 1.6.2
 
 - Fix [#23](https://github.com/planttheidea/fast-equals/issues/23) - false positives for map
