@@ -1,7 +1,6 @@
 /* globals document */
 
-import React from 'react';
-import decircularize from 'decircularize';
+import * as React from 'react';
 
 import {
   createCustomEqual,

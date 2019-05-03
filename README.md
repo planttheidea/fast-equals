@@ -20,7 +20,7 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 ## Table of contents
 
 - [Usage](#usage)
-- [Importing](#importing)
+  - [Specific builds](#specific-builds)
 - [Available methods](#available-methods)
   - [deepEqual](#deepequal)
   - [shallowEqual](#shallowequal)
@@ -48,6 +48,18 @@ import * as fe from 'fast-equals';
 
 console.log(fe.deep({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
+
+#### Specific builds
+
+There are three builds, an ESM build for modern build systems / runtimes, a CommonJS build for traditional NodeJS environments, and a UMD build for legacy implementations. The ideal one will likely be chosen for you automatically, however if you want to use a specific build you can always import it directly:
+
+- ESM => `fast-equals/dist/fast-equals.esm.js`
+- CommonJS => `fast-equals/dist/fast-equals.cjs.js`
+- UMD => `fast-equals/dist/fast-equals.js`
+
+There is also a pre-minified version of the UMD build available:
+
+- Minified UMD => `fast-equals/dist/fast-equals.min.js`
 
 ## Available methods
 

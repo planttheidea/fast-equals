@@ -33,7 +33,7 @@
     "nano-equal": "^2.0.2",
     "nyc": "^13.1.0",
     "optimize-js-plugin": "^0.0.4",
-    "react": "^16.7.0",
+    "react": "^16.8.6",
     "react-dom": "^16.7.0",
     "react-fast-compare": "^2.0.4",
     "rollup": "^1.1.2",
