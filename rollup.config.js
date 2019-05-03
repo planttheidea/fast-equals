@@ -46,6 +46,11 @@ const FORMATTED_CONFIG = {
       file: pkg.module,
       format: 'es',
     },
+    {
+      ...UMD_CONFIG.output,
+      file: pkg.browser.replace('.js', '.mjs'),
+      format: 'es',
+    },
   ],
 };
 

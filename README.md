@@ -54,6 +54,7 @@ console.log(fe.deep({ foo: 'bar' }, { foo: 'bar' })); // true
 There are three builds, an ESM build for modern build systems / runtimes, a CommonJS build for traditional NodeJS environments, and a UMD build for legacy implementations. The ideal one will likely be chosen for you automatically, however if you want to use a specific build you can always import it directly:
 
 - ESM => `fast-equals/dist/fast-equals.esm.js`
+  - For older `nodejs` versions that do not allow ESM with file extensions other than `.mjs` => `fast-equals/dist/fast-equals.mjs`
 - CommonJS => `fast-equals/dist/fast-equals.cjs.js`
 - UMD => `fast-equals/dist/fast-equals.js`
 
