@@ -16,8 +16,8 @@ export function addToCache(value: any, cache: Cache) {
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 export function hasPair(
-  pairs: any[][],
-  pairToMatch: any[],
+  pairs: [any, any][],
+  pairToMatch: [any, any],
   isEqual: EqualityComparator,
   meta: any,
 ) {
@@ -121,7 +121,7 @@ export function createCircularIsEqualCreator(isEqual?: EqualityComparator) {
   };
 }
 
-export function toPairs(map: Map<any, any>) {
+export function toPairs(map: Map<any, any>): [any, any][] {
   const pairs = new Array(map.size);
 
   let index = 0;

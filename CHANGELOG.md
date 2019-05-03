@@ -21,6 +21,7 @@
 #### Fixes
 
 - Consider pure objects (`Object.create(null)`) to be plain objects
+- Fix typings for `createCustomEqual`
 
 ## 1.6.3
 

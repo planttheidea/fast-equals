@@ -331,7 +331,11 @@ describe('getNewCache', () => {
 
 describe('hasPair', () => {
   it('should return true if the pair exists in the array', () => {
-    const pairs = [['foo', 'bar'], ['bar', 'baz'], ['baz', 'quz']];
+    const pairs: [string, string][] = [
+      ['foo', 'bar'],
+      ['bar', 'baz'],
+      ['baz', 'quz'],
+    ];
     const pair = pairs[1];
     const meta: void = undefined;
 
@@ -339,16 +343,24 @@ describe('hasPair', () => {
   });
 
   it('should return false if the pair does not exist in the array due to key', () => {
-    const pairs = [['foo', 'bar'], ['rab', 'baz'], ['baz', 'quz']];
-    const pair = ['bar', 'baz'];
+    const pairs: [string, string][] = [
+      ['foo', 'bar'],
+      ['rab', 'baz'],
+      ['baz', 'quz'],
+    ];
+    const pair: [string, string] = ['bar', 'baz'];
     const meta: void = undefined;
 
     expect(hasPair(pairs, pair, sameValueZeroEqual, meta)).toBe(false);
   });
 
   it('should return false if the pair does not exist in the array due to value', () => {
-    const pairs = [['foo', 'bar'], ['bar', 'zab'], ['baz', 'quz']];
-    const pair = ['bar', 'baz'];
+    const pairs: [string, string][] = [
+      ['foo', 'bar'],
+      ['bar', 'zab'],
+      ['baz', 'quz'],
+    ];
+    const pair: [string, string] = ['bar', 'baz'];
     const meta: void = undefined;
 
     expect(hasPair(pairs, pair, sameValueZeroEqual, meta)).toBe(false);

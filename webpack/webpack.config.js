@@ -37,6 +37,9 @@ module.exports = {
       {
         include: [path.resolve(ROOT, 'src'), /DEV_ONLY/],
         loader: 'ts-loader',
+        options: {
+          reportFiles: ['src/*.{ts|tsx}'],
+        },
         test: /\.tsx?$/,
       },
     ],
