@@ -76,11 +76,13 @@
     "start": "npm run dev",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
     "prepublish:compile": "npm run lint && npm run test && npm run dist",
+    "release": "release-it",
+    "release:beta": "release-it --config=.release-it.beta.json",
     "test": "NODE_PATH=. jest",
     "test:coverage": "npm test -- --coverage",
     "test:watch": "npm test -- --watch"
   },
   "sideEffects": false,
   "types": "index.d.ts",
-  "version": "1.6.2"
+  "version": "1.6.3"
 }
