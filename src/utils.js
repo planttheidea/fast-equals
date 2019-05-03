@@ -220,12 +220,12 @@ export const areArraysEqual = (arrayA, arrayB, isEqual, meta) => {
  * @returns {boolean} are the maps equal
  */
 export const areMapsEqual = (mapA, mapB, isEqual, meta) => {
-  const pairsA = toPairs(mapA);
-  const pairsB = toPairs(mapB);
-
-  if (pairsA.length !== pairsB.length) {
+  if (mapA.size !== mapB.size) {
     return false;
   }
+
+  const pairsA = toPairs(mapA);
+  const pairsB = toPairs(mapB);
 
   for (let index = 0; index < pairsA.length; index++) {
     if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
@@ -310,12 +310,12 @@ export const areRegExpsEqual = (regExpA, regExpB) =>
  * @returns {boolean} are the sets equal
  */
 export const areSetsEqual = (setA, setB, isEqual, meta) => {
-  const valuesA = toValues(setA);
-  const valuesB = toValues(setB);
-
-  if (valuesA.length !== valuesB.length) {
+  if (setA.size !== setB.size) {
     return false;
   }
+
+  const valuesA = toValues(setA);
+  const valuesB = toValues(setB);
 
   for (let index = 0; index < valuesA.length; index++) {
     if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
