@@ -23,7 +23,7 @@ export function hasPair(
 ) {
   const { length } = pairs;
 
-  let pair: any;
+  let pair: [any, any];
 
   for (let index = 0; index < length; index++) {
     pair = pairs[index];
@@ -81,8 +81,7 @@ export function getNewCacheFallback(): Cache {
     },
 
     has(value: any) {
-      // eslint-disable-next-line no-bitwise
-      return !!~this._values.indexOf(value);
+      return this._values.indexOf(value) !== -1;
     },
   });
 }
@@ -219,7 +218,7 @@ export function areObjectsEqual(
     return false;
   }
 
-  let key: any;
+  let key: string;
 
   for (let index = 0; index < length; index++) {
     key = keysA[index];
@@ -232,12 +231,7 @@ export function areObjectsEqual(
       if (!isReactElement(b)) {
         return false;
       }
-
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    if (!isEqual(a[key], b[key], meta)) {
+    } else if (!isEqual(a[key], b[key], meta)) {
       return false;
     }
   }
