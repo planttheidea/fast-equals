@@ -27,6 +27,17 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
       : comparator;
   /* eslint-enable */
 
+  /**
+   * @function comparator
+   *
+   * @description
+   * compare the value of the two objects and return true if they are equivalent in values
+   *
+   * @param a the value to test against
+   * @param b the value to test
+   * @param [meta] an optional meta object that is passed through to all equality test calls
+   * @returns are a and b equivalent in value
+   */
   function comparator(a: any, b: any, meta?: any) {
     if (sameValueZeroEqual(a, b)) {
       return true;
