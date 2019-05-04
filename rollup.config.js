@@ -1,25 +1,34 @@
-import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
-import {terser} from 'rollup-plugin-terser';
+import { terser } from 'rollup-plugin-terser';
+import typescript from 'rollup-plugin-typescript2';
 
 import pkg from './package.json';
 
+const EXTERNALS = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+];
+
 const UMD_CONFIG = {
-  input: 'src/index.js',
+  external: EXTERNALS,
+  input: 'src/index.ts',
   output: {
-    exports: 'named',
     file: pkg.browser,
     format: 'umd',
+    globals: EXTERNALS.reduce((globals, name) => {
+      globals[name] = name;
+
+      return globals;
+    }, {}),
     name: pkg.name,
     sourcemap: true,
   },
   plugins: [
     resolve({
-      main: true,
-      module: true,
+      mainFields: ['module', 'jsnext:main', 'main'],
     }),
-    babel({
-      exclude: 'node_modules/**',
+    typescript({
+      typescript: require('typescript'),
     }),
   ],
 };
@@ -37,19 +46,22 @@ const FORMATTED_CONFIG = {
       file: pkg.module,
       format: 'es',
     },
+    {
+      ...UMD_CONFIG.output,
+      file: pkg.browser.replace('.js', '.mjs'),
+      format: 'es',
+    },
   ],
 };
 
-export default [
-  UMD_CONFIG,
-  FORMATTED_CONFIG,
-  {
-    ...UMD_CONFIG,
-    output: {
-      ...UMD_CONFIG.output,
-      file: pkg.browser.replace('.js', '.min.js'),
-      sourcemap: false,
-    },
-    plugins: [...UMD_CONFIG.plugins, terser()],
+const MINIFIED_CONFIG = {
+  ...UMD_CONFIG,
+  output: {
+    ...UMD_CONFIG.output,
+    file: pkg.browser.replace('.js', '.min.js'),
+    sourcemap: false,
   },
-];
+  plugins: [...UMD_CONFIG.plugins, terser()],
+};
+
+export default [UMD_CONFIG, FORMATTED_CONFIG, MINIFIED_CONFIG];

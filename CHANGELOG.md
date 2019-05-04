@@ -1,5 +1,28 @@
 # fast-equals CHANGELOG
 
+## 2.0.0
+
+#### Breaking changes
+
+- There are longer `fast-equals/es`, `fast-equals/lib`, `fast-equals/mjs` locations
+  - Instead, there are 3 builds in `dist` for different consumption types:
+    - `fast-equals.js` (UMD / `browser`)
+    - `fast-equals.esm.js` (ESM / `module`)
+    - `fast-equals.cjs.js` (CommonJS / `main`)
+- There is no default export anymore, only the previously-existing named exports
+  - To get all into a namespace, use `import * as fe from 'fast-equals`
+
+#### Updates
+
+- Rewritten completely in TypeScript
+- Improve speed of `Map` / `Set` comparisons
+- Improve speed of React element comparisons
+
+#### Fixes
+
+- Consider pure objects (`Object.create(null)`) to be plain objects
+- Fix typings for `createCustomEqual`
+
 ## 1.6.3
 
 - Check the size of the iterable before converting to arrays
