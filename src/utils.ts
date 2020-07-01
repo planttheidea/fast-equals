@@ -1,4 +1,28 @@
+const HAS_REGEXP_FLAGS_SUPPORT = (() => {
+  try {
+    const regexp = /test/gi;
+
+    return regexp.flags === 'gi';
+  } catch {
+    return false;
+  }
+})();
 const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+
+const REACT_ELEMENT =
+  typeof Symbol !== 'undefined' && Symbol.for
+    ? Symbol.for('react.element')
+    : 0xeac7;
+
+const REACT_PORTAL =
+  typeof Symbol !== 'undefined' && Symbol.for
+    ? Symbol.for('react.portal')
+    : 0xeaca;
+
+const VALID_$$TYPEOF_TYPES = {
+  [REACT_ELEMENT]: true,
+  [REACT_PORTAL]: true,
+};
 
 const { keys } = Object;
 
@@ -6,20 +30,6 @@ type Cache = {
   add: (value: any) => void;
   has: (value: any) => boolean;
 };
-
-/**
- * @function addToCache
- *
- * add object to cache if an object
- *
- * @param value the value to potentially add to cache
- * @param cache the cache to add to
- */
-export function addToCache(value: any, cache: Cache) {
-  if (value && typeof value === 'object') {
-    cache.add(value);
-  }
-}
 
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
@@ -140,7 +150,7 @@ export function isPromiseLike(value: any) {
  * @returns is the value a react element
  */
 export function isReactElement(value: any) {
-  return !!(value && value.$$typeof);
+  return !!(value && VALID_$$TYPEOF_TYPES[value.$$typeof]);
 }
 
 /**
@@ -202,15 +212,22 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
       b: any,
       cache: Cache = getNewCache(),
     ) {
-      const hasA = cache.has(a);
-      const hasB = cache.has(b);
+      const isACacheable = a && typeof a === 'object';
+      const isBCacheable = b && typeof b === 'object';
+      const hasA = isACacheable && cache.has(a);
+      const hasB = isBCacheable && cache.has(b);
 
       if (hasA || hasB) {
         return hasA && hasB;
       }
 
-      addToCache(a, cache);
-      addToCache(b, cache);
+      if (isACacheable) {
+        cache.add(a);
+      }
+
+      if (isBCacheable) {
+        cache.add(b);
+      }
 
       return _comparator(a, b, cache);
     };
@@ -370,6 +387,8 @@ export function areObjectsEqual(
   }
 
   let key: string;
+  let isAReactElement: boolean;
+  let isBReactElement: boolean;
 
   for (let index = 0; index < length; index++) {
     key = keysA[index];
@@ -378,11 +397,22 @@ export function areObjectsEqual(
       return false;
     }
 
-    if (key === OWNER && isReactElement(a)) {
-      if (!isReactElement(b)) {
-        return false;
+    if (key === OWNER) {
+      isAReactElement = isReactElement(a);
+      isBReactElement = isReactElement(b);
+
+      if (isAReactElement || isBReactElement) {
+        if (isAReactElement !== isBReactElement) {
+          return false;
+        }
+
+        // We ignore React owner comparisons, as they are not necessary for equality comparisons.
+        // eslint-disable-next-line no-continue
+        continue;
       }
-    } else if (!isEqual(a[key], b[key], meta)) {
+    }
+
+    if (!isEqual(a[key], b[key], meta)) {
       return false;
     }
   }
@@ -400,17 +430,21 @@ export function areObjectsEqual(
  * @param b the regExp to test agains
  * @returns are the regExps equal
  */
-export function areRegExpsEqual(a: RegExp, b: RegExp) {
-  return (
-    a.source === b.source &&
-    a.global === b.global &&
-    a.ignoreCase === b.ignoreCase &&
-    a.multiline === b.multiline &&
-    a.unicode === b.unicode &&
-    a.sticky === b.sticky &&
-    a.lastIndex === b.lastIndex
-  );
-}
+export const areRegExpsEqual = HAS_REGEXP_FLAGS_SUPPORT
+  ? function (a: RegExp, b: RegExp) {
+    return a.source === b.source && a.flags === b.flags;
+  }
+  : function (a: RegExp, b: RegExp) {
+    return (
+      a.source === b.source &&
+        a.global === b.global &&
+        a.ignoreCase === b.ignoreCase &&
+        a.multiline === b.multiline &&
+        a.unicode === b.unicode &&
+        a.sticky === b.sticky &&
+        a.lastIndex === b.lastIndex
+    );
+  };
 
 /**
  * @function areSetsEqual
