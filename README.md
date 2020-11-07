@@ -171,21 +171,19 @@ An example for a custom equality comparison that also checks against values in t
 ```javascript
 import { createCustomEqual } from 'fast-equals';
 
-const isDeepEqualOrFooMatchesMeta = createCustomEqual(deepEqual => {
-  return (objectA, objectB, meta) => {
-    return (
-      objectA.foo === meta ||
-      objectB.foo === meta ||
-      deepEqual(objectA, objectB, meta)
-    );
-  };
-});
+const isDeepEqualOrFooMatchesMeta = createCustomEqual(
+  (deepEqual) => (objectA, objectB, meta) => (
+    objectA.foo === meta ||
+    objectB.foo === meta ||
+    deepEqual(objectA, objectB, meta)
+  )
+);
 
 const objectA = { foo: 'bar' };
 const objectB = { foo: 'baz' };
 const meta = 'bar';
 
-console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB)); // true
+console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB, meta)); // true
 ```
 
 ## Benchmarks
