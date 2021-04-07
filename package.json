@@ -32,7 +32,6 @@
     "jest": "^26.6.3",
     "lodash": "^4.17.21",
     "nano-equal": "^2.0.2",
-    "optimize-js-plugin": "^0.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-fast-compare": "^3.2.0",
