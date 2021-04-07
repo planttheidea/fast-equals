@@ -2,6 +2,7 @@
 .gitignore
 .idea
 .nyc_output
+.rpt2_cache
 .yarnrc
 __tests__
 benchmark
