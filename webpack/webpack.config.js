@@ -21,7 +21,7 @@ module.exports = {
     },
   },
 
-  devtool: '#source-map',
+  devtool: 'source-map',
 
   entry: path.join(ROOT, 'DEV_ONLY', 'index.tsx'),
 
@@ -38,10 +38,6 @@ module.exports = {
         test: /\.tsx?$/,
       },
     ],
-  },
-
-  node: {
-    fs: 'empty',
   },
 
   output: {
