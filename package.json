@@ -30,7 +30,7 @@
     "html-webpack-plugin": "^5.3.1",
     "in-publish": "^2.0.0",
     "jest": "^26.6.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "nano-equal": "^2.0.2",
     "optimize-js-plugin": "^0.0.4",
     "react": "^17.0.2",
