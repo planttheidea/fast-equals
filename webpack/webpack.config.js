@@ -1,6 +1,9 @@
+const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+
+console.log(ESLintWebpackPlugin);
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -29,12 +32,6 @@ module.exports = {
   module: {
     rules: [
       {
-        enforce: 'pre',
-        include: [path.resolve(ROOT, 'src')],
-        loader: 'eslint-loader',
-        test: /\.ts$/,
-      },
-      {
         include: [path.resolve(ROOT, 'src'), /DEV_ONLY/],
         loader: 'ts-loader',
         options: {
@@ -58,6 +55,7 @@ module.exports = {
   },
 
   plugins: [
+    new ESLintWebpackPlugin(),
     new webpack.EnvironmentPlugin(['NODE_ENV']),
     new HtmlWebpackPlugin(),
   ],
