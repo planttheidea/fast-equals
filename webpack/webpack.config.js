@@ -3,8 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-console.log(ESLintWebpackPlugin);
-
 const ROOT = path.resolve(__dirname, '..');
 
 module.exports = {
