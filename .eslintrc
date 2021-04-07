@@ -19,6 +19,7 @@
     "no-unused-vars": 0,
     "valid-typeof": 0,
 
+    "import/extensions": 0,
     "import/prefer-default-export": 0
   }
 }
