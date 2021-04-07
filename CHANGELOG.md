@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 2.0.1
+
+- Fix [#41](https://github.com/planttheidea/fast-equals/pull/41) - prevent `.rpt2_cache` directory from being published for better CI environment support (thanks [@herberttn](https://github.com/herberttn))
+
 ## 2.0.0
 
 #### Breaking changes
