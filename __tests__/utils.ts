@@ -113,8 +113,8 @@ describe('areMapsEqual', () => {
   });
 
   it('should return true when maps have the same size, keys, and values regardless of order', () => {
-    const b = new Map().set('bar', 'foo').set('foo', 'bar');
-    const a = new Map().set('foo', 'bar').set('bar', 'foo');
+    const a = new Map().set('bar', 'foo').set('foo', 'bar');
+    const b = new Map().set('foo', 'bar').set('bar', 'foo');
     const cache = new WeakSet();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
