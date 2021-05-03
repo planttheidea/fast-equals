@@ -314,21 +314,25 @@ export function areMapsEqual(
     return false;
   }
 
-  const pairsA = toPairs(a);
-  const pairsB = toPairs(b);
+  const tested = new Map<any, any>();
 
-  const { length } = pairsA;
+  let isValueEqual = true;
 
-  for (let index = 0; index < length; index++) {
-    if (
-      !hasPair(pairsB, pairsA[index], isEqual, meta) ||
-      !hasPair(pairsA, pairsB[index], isEqual, meta)
-    ) {
-      return false;
+  a.forEach((aValue, aKey) => {
+    if (isValueEqual) {
+      isValueEqual = false;
+
+      let hasMatch = false;
+
+      b.forEach((bValue, bKey) => {
+        if (!hasMatch && isEqual(aKey, bKey, meta)) {
+          hasMatch = isValueEqual = isEqual(aValue, bValue, meta);
+        }
+      });
     }
-  }
+  });
 
-  return true;
+  return isValueEqual;
 }
 
 type Dictionary<Type> = {
@@ -434,19 +438,21 @@ export function areSetsEqual(
     return false;
   }
 
-  const valuesA = toValues(a);
-  const valuesB = toValues(b);
+  let isValueEqual = true;
 
-  const { length } = valuesA;
+  a.forEach((aValue) => {
+    if (isValueEqual) {
+      isValueEqual = false;
 
-  for (let index = 0; index < length; index++) {
-    if (
-      !hasValue(valuesB, valuesA[index], isEqual, meta) ||
-      !hasValue(valuesA, valuesB[index], isEqual, meta)
-    ) {
-      return false;
+      let hasMatch = false;
+
+      b.forEach((bValue) => {
+        if (!hasMatch) {
+          hasMatch = isValueEqual = isEqual(aValue, bValue, meta);
+        }
+      });
     }
-  }
+  });
 
-  return true;
+  return isValueEqual;
 }

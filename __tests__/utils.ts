@@ -117,8 +117,8 @@ describe('areMapsEqual', () => {
   });
 
   it('should return true when maps have the same size, keys, and values regardless of order', () => {
-    const a = new Map().set('bar', 'foo').set('foo', 'bar');
-    const b = new Map().set('foo', 'bar').set('bar', 'foo');
+    const b = new Map().set('bar', 'foo').set('foo', 'bar');
+    const a = new Map().set('foo', 'bar').set('bar', 'foo');
     const cache = new WeakSet();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
@@ -211,7 +211,7 @@ describe('areRegExpsEqual', () => {
 });
 
 describe('areSetsEqual', () => {
-  it('should return false when the objects have different sizes', () => {
+  it('should return false when the sets have different sizes', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar');
     const cache = new WeakSet();
@@ -219,7 +219,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
 
-  it('should return false when the objects have different values', () => {
+  it('should return false when the sets have different values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('bar');
     const cache = new WeakSet();
@@ -227,7 +227,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
 
-  it('should return true when the objects have the same values', () => {
+  it('should return true when the sets have the same values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('foo');
     const cache = new WeakSet();
@@ -235,7 +235,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
 
-  it('should return true when the objects have the same values regardless of order', () => {
+  it('should return true when the sets have the same values regardless of order', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar').add('foo');
     const cache = new WeakSet();
@@ -250,10 +250,10 @@ describe('createCircularEqualCreator', () => {
 
     const values: any[] = [];
 
-    const add = jest.fn().mockImplementation(object => values.push(object));
+    const add = jest.fn().mockImplementation((object) => values.push(object));
     const has = jest
       .fn()
-      .mockImplementation(object => values.indexOf(object) !== -1);
+      .mockImplementation((object) => values.indexOf(object) !== -1);
 
     // @ts-ignore
     global.WeakSet = function WeakSet() {
@@ -474,7 +474,10 @@ describe('toPairs', () => {
   it('should convert the map into [key, value] pairs', () => {
     const map = new Map().set('foo', 'bar').set('bar', 'baz');
 
-    expect(toPairs(map)).toEqual([['foo', 'bar'], ['bar', 'baz']]);
+    expect(toPairs(map)).toEqual([
+      ['foo', 'bar'],
+      ['bar', 'baz'],
+    ]);
   });
 });
 
