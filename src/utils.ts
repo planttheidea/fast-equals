@@ -24,73 +24,6 @@ export function addToCache(value: any, cache: Cache) {
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 /**
- * @function hasPair
- *
- * @description
- * does the `pairToMatch` exist in the list of `pairs` provided based on the
- * `isEqual` check
- *
- * @param pairs the pairs to compare against
- * @param pairToMatch the pair to match
- * @param isEqual the equality comparator used
- * @param meta the meta provided
- * @returns does the pair exist in the pairs provided
- */
-export function hasPair(
-  pairs: [any, any][],
-  pairToMatch: [any, any],
-  isEqual: EqualityComparator,
-  meta: any,
-) {
-  const { length } = pairs;
-
-  let pair: [any, any];
-
-  for (let index = 0; index < length; index++) {
-    pair = pairs[index];
-
-    if (
-      isEqual(pair[0], pairToMatch[0], meta) &&
-      isEqual(pair[1], pairToMatch[1], meta)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * @function hasValue
- *
- * @description
- * does the `valueToMatch` exist in the list of `values` provided based on the
- * `isEqual` check
- *
- * @param values the values to compare against
- * @param valueToMatch the value to match
- * @param isEqual the equality comparator used
- * @param meta the meta provided
- * @returns does the value exist in the values provided
- */
-export function hasValue(
-  values: any[],
-  valueToMatch: any,
-  isEqual: EqualityComparator,
-  meta: any,
-) {
-  const { length } = values;
-
-  for (let index = 0; index < length; index++) {
-    if (isEqual(values[index], valueToMatch, meta)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
  * @function sameValueZeroEqual
  *
  * @description
@@ -185,9 +118,6 @@ export const getNewCache = ((canUseWeakMap: boolean) => {
 })(HAS_WEAKSET_SUPPORT);
 
 /**
- * @function createCircularEqualCreator
- *
- * @description
  * create a custom isEqual handler specific to circular objects
  *
  * @param [isEqual] the isEqual comparator to use instead of isDeepEqual
@@ -218,51 +148,6 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
 }
 
 /**
- * @function toPairs
- *
- * @description
- * convert the map passed into pairs (meaning an array of [key, value] tuples)
- *
- * @param map the map to convert to [key, value] pairs (entries)
- * @returns the [key, value] pairs
- */
-export function toPairs(map: Map<any, any>): [any, any][] {
-  const pairs = new Array(map.size);
-
-  let index = 0;
-
-  map.forEach((value, key) => {
-    pairs[index++] = [key, value];
-  });
-
-  return pairs;
-}
-
-/**
- * @function toValues
- *
- * @description
- * convert the set passed into values
- *
- * @param set the set to convert to values
- * @returns the values
- */
-export function toValues(set: Set<any>) {
-  const values = new Array(set.size);
-
-  let index = 0;
-
-  set.forEach((value) => {
-    values[index++] = value;
-  });
-
-  return values;
-}
-
-/**
- * @function areArraysEqual
- *
- * @description
  * are the arrays equal in value
  *
  * @param a the array to test
@@ -293,9 +178,6 @@ export function areArraysEqual(
 }
 
 /**
- * @function areMapsEqual
- *
- * @description
  * are the maps equal in value
  *
  * @param a the map to test
