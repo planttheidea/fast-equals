@@ -42,11 +42,10 @@ export function hasPair(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = pairs;
-
+  let index = pairs.length;
   let pair: [any, any];
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     pair = pairs[index];
 
     if (
@@ -79,9 +78,9 @@ export function hasValue(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = values;
+  let index = values.length;
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     if (isEqual(values[index], valueToMatch, meta)) {
       return true;
     }
@@ -277,13 +276,13 @@ export function areArraysEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = a;
+  let index = a.length;
 
-  if (b.length !== length) {
+  if (b.length !== index) {
     return false;
   }
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     if (!isEqual(a[index], b[index], meta)) {
       return false;
     }
@@ -317,9 +316,9 @@ export function areMapsEqual(
   const pairsA = toPairs(a);
   const pairsB = toPairs(b);
 
-  const { length } = pairsA;
+  let index = pairsA.length;
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     if (
       !hasPair(pairsB, pairsA[index], isEqual, meta) ||
       !hasPair(pairsA, pairsB[index], isEqual, meta)
@@ -363,26 +362,27 @@ export function areObjectsEqual(
 ) {
   const keysA = keys(a);
 
-  const { length } = keysA;
+  let index = keysA.length;
 
-  if (keys(b).length !== length) {
+  if (keys(b).length !== index) {
     return false;
   }
 
   let key: string;
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     key = keysA[index];
 
-    if (!hasOwnProperty(b, key)) {
-      return false;
-    }
+    if (key === OWNER) {
+      const reactElementA = isReactElement(a);
+      const reactElementB = isReactElement(b);
 
-    if (key === OWNER && isReactElement(a)) {
-      if (!isReactElement(b)) {
+      if ((reactElementA || reactElementB) && reactElementA !== reactElementB) {
         return false;
       }
-    } else if (!isEqual(a[key], b[key], meta)) {
+    }
+
+    if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
       return false;
     }
   }
@@ -437,9 +437,9 @@ export function areSetsEqual(
   const valuesA = toValues(a);
   const valuesB = toValues(b);
 
-  const { length } = valuesA;
+  let index = valuesA.length;
 
-  for (let index = 0; index < length; ++index) {
+  while (index-- > 0) {
     if (
       !hasValue(valuesB, valuesA[index], isEqual, meta) ||
       !hasValue(valuesA, valuesB[index], isEqual, meta)
