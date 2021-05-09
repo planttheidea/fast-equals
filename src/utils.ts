@@ -305,21 +305,23 @@ export function areMapsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
+  let index = a.size;
+
+  if (b.size !== index) {
     return false;
   }
 
-  const pairsA = toPairs(a);
-  const pairsB = toPairs(b);
+  if (index) {
+    const pairsA = toPairs(a);
+    const pairsB = toPairs(b);
 
-  let index = pairsA.length;
-
-  while (index-- > 0) {
-    if (
-      !hasPair(pairsB, pairsA[index], isEqual, meta) ||
-      !hasPair(pairsA, pairsB[index], isEqual, meta)
-    ) {
-      return false;
+    while (index-- > 0) {
+      if (
+        !hasPair(pairsB, pairsA[index], isEqual, meta) ||
+        !hasPair(pairsA, pairsB[index], isEqual, meta)
+      ) {
+        return false;
+      }
     }
   }
 
@@ -364,22 +366,27 @@ export function areObjectsEqual(
     return false;
   }
 
-  let key: string;
+  if (index) {
+    let key: string;
 
-  while (index-- > 0) {
-    key = keysA[index];
+    while (index-- > 0) {
+      key = keysA[index];
 
-    if (key === OWNER) {
-      const reactElementA = isReactElement(a);
-      const reactElementB = isReactElement(b);
+      if (key === OWNER) {
+        const reactElementA = isReactElement(a);
+        const reactElementB = isReactElement(b);
 
-      if ((reactElementA || reactElementB) && reactElementA !== reactElementB) {
+        if (
+          (reactElementA || reactElementB) &&
+          reactElementA !== reactElementB
+        ) {
+          return false;
+        }
+      }
+
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
         return false;
       }
-    }
-
-    if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
-      return false;
     }
   }
 
@@ -426,21 +433,23 @@ export function areSetsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
+  let index = a.size;
+
+  if (b.size !== index) {
     return false;
   }
 
-  const valuesA = toValues(a);
-  const valuesB = toValues(b);
+  if (index) {
+    const valuesA = toValues(a);
+    const valuesB = toValues(b);
 
-  let index = valuesA.length;
-
-  while (index-- > 0) {
-    if (
-      !hasValue(valuesB, valuesA[index], isEqual, meta) ||
-      !hasValue(valuesA, valuesB[index], isEqual, meta)
-    ) {
-      return false;
+    while (index-- > 0) {
+      if (
+        !hasValue(valuesB, valuesA[index], isEqual, meta) ||
+        !hasValue(valuesA, valuesB[index], isEqual, meta)
+      ) {
+        return false;
+      }
     }
   }
 
