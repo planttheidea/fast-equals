@@ -19,17 +19,19 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 
 ## Table of contents
 
-- [Usage](#usage)
-  - [Specific builds](#specific-builds)
-- [Available methods](#available-methods)
-  - [deepEqual](#deepequal)
-  - [shallowEqual](#shallowequal)
-  - [sameValueZeroEqual](#samevaluezeroequal)
-  - [circularDeepEqual](#circulardeepequal)
-  - [circularShallowEqual](#circularshallowequal)
-  - [createCustomEqual](#createcustomequal)
-- [Benchmarks](#benchmarks)
-- [Development](#development)
+- [fast-equals](#fast-equals)
+  - [Table of contents](#table-of-contents)
+  - [Usage](#usage)
+      - [Specific builds](#specific-builds)
+  - [Available methods](#available-methods)
+      - [deepEqual](#deepequal)
+      - [shallowEqual](#shallowequal)
+      - [sameValueZeroEqual](#samevaluezeroequal)
+      - [circularDeepEqual](#circulardeepequal)
+      - [circularShallowEqual](#circularshallowequal)
+      - [createCustomEqual](#createcustomequal)
+  - [Benchmarks](#benchmarks)
+  - [Development](#development)
 
 ## Usage
 
@@ -172,11 +174,10 @@ An example for a custom equality comparison that also checks against values in t
 import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) => (objectA, objectB, meta) => (
+  (deepEqual) => (objectA, objectB, meta) =>
     objectA.foo === meta ||
     objectB.foo === meta ||
-    deepEqual(objectA, objectB, meta)
-  )
+    deepEqual(objectA, objectB, meta),
 );
 
 const objectA = { foo: 'bar' };
@@ -215,6 +216,7 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
+- `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql` fully supported their comparison
 - `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 - `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
 - `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
@@ -224,7 +226,7 @@ Caveats that impact the benchmark (and accuracy of comparison):
 - `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
 - `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
 
-All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql` fully supported their comparison. The same logic applies to `react` elements (which can be circular objects), but simple elements are non-circular objects so I kept the `react` comparison very basic to allow it to be included.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react` elements can be circular objects, however simple elements are not; I kept the `react` comparison very basic to allow it to be included.
 
 ## Development
 
