@@ -39,7 +39,7 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
    * @returns are a and b equivalent in value
    */
   function comparator(a: any, b: any, meta?: any) {
-    if (sameValueZeroEqual(a, b)) {
+    if (a === b) {
       return true;
     }
 
@@ -94,7 +94,7 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
       return areObjectsEqual(a, b, isEqual, meta);
     }
 
-    return false;
+    return a !== a && b !== b;
   }
 
   return comparator;

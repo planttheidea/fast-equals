@@ -7,20 +7,6 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-/**
- * @function addToCache
- *
- * add object to cache if an object
- *
- * @param value the value to potentially add to cache
- * @param cache the cache to add to
- */
-export function addToCache(value: any, cache: Cache) {
-  if (value && typeof value === 'object') {
-    cache.add(value);
-  }
-}
-
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 /**
@@ -42,11 +28,10 @@ export function hasPair(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = pairs;
-
+  let index = pairs.length;
   let pair: [any, any];
 
-  for (let index = 0; index < length; index++) {
+  while (index-- > 0) {
     pair = pairs[index];
 
     if (
@@ -79,9 +64,9 @@ export function hasValue(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = values;
+  let index = values.length;
 
-  for (let index = 0; index < length; index++) {
+  while (index-- > 0) {
     if (isEqual(values[index], valueToMatch, meta)) {
       return true;
     }
@@ -153,17 +138,17 @@ export function isReactElement(value: any) {
  * @returns the new cache object
  */
 export function getNewCacheFallback(): Cache {
-  return Object.create({
-    _values: [],
+  const values: any[] = [];
 
+  return {
     add(value: any) {
-      this._values.push(value);
+      values.push(value);
     },
 
     has(value: any) {
-      return this._values.indexOf(value) !== -1;
+      return values.indexOf(value) !== -1;
     },
-  });
+  };
 }
 
 /**
@@ -202,15 +187,25 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
       b: any,
       cache: Cache = getNewCache(),
     ) {
-      const hasA = cache.has(a);
-      const hasB = cache.has(b);
+      const isCacheableA = !!a && typeof a === 'object';
+      const isCacheableB = !!b && typeof b === 'object';
 
-      if (hasA || hasB) {
-        return hasA && hasB;
+      if (isCacheableA || isCacheableB) {
+        const hasA = isCacheableA && cache.has(a);
+        const hasB = isCacheableB && cache.has(b);
+
+        if (hasA || hasB) {
+          return hasA && hasB;
+        }
+
+        if (isCacheableA) {
+          cache.add(a);
+        }
+
+        if (isCacheableA) {
+          cache.add(b);
+        }
       }
-
-      addToCache(a, cache);
-      addToCache(b, cache);
 
       return _comparator(a, b, cache);
     };
@@ -277,13 +272,13 @@ export function areArraysEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = a;
+  let index = a.length;
 
-  if (b.length !== length) {
+  if (b.length !== index) {
     return false;
   }
 
-  for (let index = 0; index < length; index++) {
+  while (index-- > 0) {
     if (!isEqual(a[index], b[index], meta)) {
       return false;
     }
@@ -310,21 +305,23 @@ export function areMapsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
+  let index = a.size;
+
+  if (b.size !== index) {
     return false;
   }
 
-  const pairsA = toPairs(a);
-  const pairsB = toPairs(b);
+  if (index) {
+    const pairsA = toPairs(a);
+    const pairsB = toPairs(b);
 
-  const { length } = pairsA;
-
-  for (let index = 0; index < length; index++) {
-    if (
-      !hasPair(pairsB, pairsA[index], isEqual, meta) ||
-      !hasPair(pairsA, pairsB[index], isEqual, meta)
-    ) {
-      return false;
+    while (index-- > 0) {
+      if (
+        !hasPair(pairsB, pairsA[index], isEqual, meta) ||
+        !hasPair(pairsA, pairsB[index], isEqual, meta)
+      ) {
+        return false;
+      }
     }
   }
 
@@ -363,27 +360,33 @@ export function areObjectsEqual(
 ) {
   const keysA = keys(a);
 
-  const { length } = keysA;
+  let index = keysA.length;
 
-  if (keys(b).length !== length) {
+  if (keys(b).length !== index) {
     return false;
   }
 
-  let key: string;
+  if (index) {
+    let key: string;
 
-  for (let index = 0; index < length; index++) {
-    key = keysA[index];
+    while (index-- > 0) {
+      key = keysA[index];
 
-    if (!hasOwnProperty(b, key)) {
-      return false;
-    }
+      if (key === OWNER) {
+        const reactElementA = isReactElement(a);
+        const reactElementB = isReactElement(b);
 
-    if (key === OWNER && isReactElement(a)) {
-      if (!isReactElement(b)) {
+        if (
+          (reactElementA || reactElementB) &&
+          reactElementA !== reactElementB
+        ) {
+          return false;
+        }
+      }
+
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
         return false;
       }
-    } else if (!isEqual(a[key], b[key], meta)) {
-      return false;
     }
   }
 
@@ -430,21 +433,23 @@ export function areSetsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
+  let index = a.size;
+
+  if (b.size !== index) {
     return false;
   }
 
-  const valuesA = toValues(a);
-  const valuesB = toValues(b);
+  if (index) {
+    const valuesA = toValues(a);
+    const valuesB = toValues(b);
 
-  const { length } = valuesA;
-
-  for (let index = 0; index < length; index++) {
-    if (
-      !hasValue(valuesB, valuesA[index], isEqual, meta) ||
-      !hasValue(valuesA, valuesB[index], isEqual, meta)
-    ) {
-      return false;
+    while (index-- > 0) {
+      if (
+        !hasValue(valuesB, valuesA[index], isEqual, meta) ||
+        !hasValue(valuesA, valuesB[index], isEqual, meta)
+      ) {
+        return false;
+      }
     }
   }
 
