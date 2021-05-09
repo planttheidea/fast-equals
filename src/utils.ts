@@ -192,25 +192,21 @@ export function areMapsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
-    return false;
+  let isValueEqual = a.size === b.size;
+
+  if (isValueEqual && a.size) {
+    a.forEach((aValue, aKey) => {
+      if (isValueEqual) {
+        isValueEqual = false;
+
+        b.forEach((bValue, bKey) => {
+          if (!isValueEqual && isEqual(aKey, bKey, meta)) {
+            isValueEqual = isEqual(aValue, bValue, meta);
+          }
+        });
+      }
+    });
   }
-
-  const tested = new Map<any, any>();
-
-  let isValueEqual = true;
-
-  a.forEach((aValue, aKey) => {
-    if (isValueEqual) {
-      isValueEqual = false;
-
-      b.forEach((bValue, bKey) => {
-        if (!isValueEqual && isEqual(aKey, bKey, meta)) {
-          isValueEqual = isEqual(aValue, bValue, meta);
-        }
-      });
-    }
-  });
 
   return isValueEqual;
 }
@@ -314,23 +310,21 @@ export function areSetsEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  if (a.size !== b.size) {
-    return false;
+  let isValueEqual = a.size === b.size;
+
+  if (isValueEqual && a.size) {
+    a.forEach((aValue) => {
+      if (isValueEqual) {
+        isValueEqual = false;
+
+        b.forEach((bValue) => {
+          if (!isValueEqual) {
+            isValueEqual = isEqual(aValue, bValue, meta);
+          }
+        });
+      }
+    });
   }
-
-  let isValueEqual = true;
-
-  a.forEach((aValue) => {
-    if (isValueEqual) {
-      isValueEqual = false;
-
-      b.forEach((bValue) => {
-        if (!isValueEqual) {
-          isValueEqual = isEqual(aValue, bValue, meta);
-        }
-      });
-    }
-  });
 
   return isValueEqual;
 }
