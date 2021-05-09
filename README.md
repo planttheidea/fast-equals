@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.3kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -19,17 +19,19 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 
 ## Table of contents
 
-- [Usage](#usage)
-  - [Specific builds](#specific-builds)
-- [Available methods](#available-methods)
-  - [deepEqual](#deepequal)
-  - [shallowEqual](#shallowequal)
-  - [sameValueZeroEqual](#samevaluezeroequal)
-  - [circularDeepEqual](#circulardeepequal)
-  - [circularShallowEqual](#circularshallowequal)
-  - [createCustomEqual](#createcustomequal)
-- [Benchmarks](#benchmarks)
-- [Development](#development)
+- [fast-equals](#fast-equals)
+  - [Table of contents](#table-of-contents)
+  - [Usage](#usage)
+      - [Specific builds](#specific-builds)
+  - [Available methods](#available-methods)
+      - [deepEqual](#deepequal)
+      - [shallowEqual](#shallowequal)
+      - [sameValueZeroEqual](#samevaluezeroequal)
+      - [circularDeepEqual](#circulardeepequal)
+      - [circularShallowEqual](#circularshallowequal)
+      - [createCustomEqual](#createcustomequal)
+  - [Benchmarks](#benchmarks)
+  - [Development](#development)
 
 ## Usage
 
@@ -172,11 +174,10 @@ An example for a custom equality comparison that also checks against values in t
 import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) => (objectA, objectB, meta) => (
+  (deepEqual) => (objectA, objectB, meta) =>
     objectA.foo === meta ||
     objectB.foo === meta ||
-    deepEqual(objectA, objectB, meta)
-  )
+    deepEqual(objectA, objectB, meta),
 );
 
 const objectA = { foo: 'bar' };
@@ -188,7 +189,7 @@ console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB, meta)); // true
 
 ## Benchmarks
 
-All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `10.15.3`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of memory using NodeJS version `12.19.1`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -201,20 +202,21 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 |                            | Operations / second |
 | -------------------------- | ------------------- |
-| **fast-equals**            | **142,730**         |
-| nano-equal                 | 115,530             |
-| shallow-equal-fuzzy        | 102,633             |
-| fast-deep-equal            | 102,335             |
-| react-fast-compare         | 100,036             |
-| **fast-equals (circular)** | **79,589**          |
-| underscore.isEqual         | 63,390              |
-| deep-equal                 | 48,783              |
-| lodash.isEqual             | 24,456              |
-| deep-eql                   | 24,196              |
-| assert.deepStrictEqual     | 1,382               |
+| **fast-equals**            | **153,880**         |
+| fast-deep-equal            | 144,035             |
+| react-fast-compare         | 130,324             |
+| nano-equal                 | 104,624             |
+| **fast-equals (circular)** | **97,610**          |
+| shallow-equal-fuzzy        | 83,946              |
+| underscore.isEqual         | 47,370              |
+| lodash.isEqual             | 25,053              |
+| deep-eql                   | 22,146              |
+| assert.deepStrictEqual     | 532                 |
+| deep-equal                 | 209                 |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
+- `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql` fully supported their comparison
 - `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 - `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
 - `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
@@ -224,7 +226,7 @@ Caveats that impact the benchmark (and accuracy of comparison):
 - `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
 - `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
 
-All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql` fully supported their comparison. The same logic applies to `react` elements (which can be circular objects), but simple elements are non-circular objects so I kept the `react` comparison very basic to allow it to be included.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react` elements can be circular objects, however simple elements are not; I kept the `react` comparison very basic to allow it to be included.
 
 ## Development
 
