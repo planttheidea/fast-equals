@@ -7,20 +7,6 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-/**
- * @function addToCache
- *
- * add object to cache if an object
- *
- * @param value the value to potentially add to cache
- * @param cache the cache to add to
- */
-export function addToCache(value: any, cache: Cache) {
-  if (value && typeof value === 'object') {
-    cache.add(value);
-  }
-}
-
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 /**
@@ -201,15 +187,25 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
       b: any,
       cache: Cache = getNewCache(),
     ) {
-      const hasA = cache.has(a);
-      const hasB = cache.has(b);
+      const isCacheableA = !!a && typeof a === 'object';
+      const isCacheableB = !!b && typeof b === 'object';
 
-      if (hasA || hasB) {
-        return hasA && hasB;
+      if (isCacheableA || isCacheableB) {
+        const hasA = isCacheableA && cache.has(a);
+        const hasB = isCacheableB && cache.has(b);
+
+        if (hasA || hasB) {
+          return hasA && hasB;
+        }
+
+        if (isCacheableA) {
+          cache.add(a);
+        }
+
+        if (isCacheableA) {
+          cache.add(b);
+        }
       }
-
-      addToCache(a, cache);
-      addToCache(b, cache);
 
       return _comparator(a, b, cache);
     };

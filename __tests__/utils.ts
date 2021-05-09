@@ -3,7 +3,6 @@
 import * as React from 'react';
 
 import {
-  addToCache,
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
@@ -27,35 +26,6 @@ import {
   mainValues,
   primitiveValues,
 } from './__helpers__/dataTypes';
-
-describe('addToCache', () => {
-  it('should not add the item to cache if it is null', () => {
-    const object: null = null;
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object)).toBe(false);
-  });
-
-  it('should not add the item to cache if it is not an object', () => {
-    const object = 'foo';
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object as {})).toBe(false);
-  });
-
-  it('should add the item to cache if it is an object', () => {
-    const object = { foo: 'bar' };
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object)).toBe(true);
-  });
-});
 
 describe('areArraysEqual', () => {
   it('should return false when the arrays are different lengths', () => {
@@ -250,10 +220,10 @@ describe('createCircularEqualCreator', () => {
 
     const values: any[] = [];
 
-    const add = jest.fn().mockImplementation(object => values.push(object));
+    const add = jest.fn().mockImplementation((object) => values.push(object));
     const has = jest
       .fn()
-      .mockImplementation(object => values.indexOf(object) !== -1);
+      .mockImplementation((object) => values.indexOf(object) !== -1);
 
     // @ts-ignore
     global.WeakSet = function WeakSet() {
@@ -474,7 +444,10 @@ describe('toPairs', () => {
   it('should convert the map into [key, value] pairs', () => {
     const map = new Map().set('foo', 'bar').set('bar', 'baz');
 
-    expect(toPairs(map)).toEqual([['foo', 'bar'], ['bar', 'baz']]);
+    expect(toPairs(map)).toEqual([
+      ['foo', 'bar'],
+      ['bar', 'baz'],
+    ]);
   });
 });
 
