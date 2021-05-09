@@ -3,7 +3,6 @@
 import * as React from 'react';
 
 import {
-  addToCache,
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
@@ -23,35 +22,6 @@ import {
   mainValues,
   primitiveValues,
 } from './__helpers__/dataTypes';
-
-describe('addToCache', () => {
-  it('should not add the item to cache if it is null', () => {
-    const object: null = null;
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object)).toBe(false);
-  });
-
-  it('should not add the item to cache if it is not an object', () => {
-    const object = 'foo';
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object as {})).toBe(false);
-  });
-
-  it('should add the item to cache if it is an object', () => {
-    const object = { foo: 'bar' };
-    const cache = new WeakSet();
-
-    addToCache(object, cache);
-
-    expect(cache.has(object)).toBe(true);
-  });
-});
 
 describe('areArraysEqual', () => {
   it('should return false when the arrays are different lengths', () => {
@@ -308,12 +278,6 @@ describe('getNewCache', () => {
 
     expect(cache).not.toBeInstanceOf(WeakSet);
 
-    const proto = Object.getPrototypeOf(cache);
-
-    expect(proto._values).toEqual([]);
-    expect(typeof proto.add).toBe('function');
-    expect(typeof proto.has).toBe('function');
-
     const value = { foo: 'bar' };
 
     expect(cache.has(value)).toBe(false);
@@ -321,7 +285,6 @@ describe('getNewCache', () => {
     cache.add(value);
 
     expect(cache.has(value)).toBe(true);
-    expect(proto._values).toEqual([value]);
   });
 });
 

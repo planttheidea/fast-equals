@@ -7,20 +7,6 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-/**
- * @function addToCache
- *
- * add object to cache if an object
- *
- * @param value the value to potentially add to cache
- * @param cache the cache to add to
- */
-export function addToCache(value: any, cache: Cache) {
-  if (value && typeof value === 'object') {
-    cache.add(value);
-  }
-}
-
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 /**
@@ -86,17 +72,17 @@ export function isReactElement(value: any) {
  * @returns the new cache object
  */
 export function getNewCacheFallback(): Cache {
-  return Object.create({
-    _values: [],
+  const values: any[] = [];
 
+  return {
     add(value: any) {
-      this._values.push(value);
+      values.push(value);
     },
 
     has(value: any) {
-      return this._values.indexOf(value) !== -1;
+      return values.indexOf(value) !== -1;
     },
-  });
+  };
 }
 
 /**
@@ -132,15 +118,25 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
       b: any,
       cache: Cache = getNewCache(),
     ) {
-      const hasA = cache.has(a);
-      const hasB = cache.has(b);
+      const isCacheableA = !!a && typeof a === 'object';
+      const isCacheableB = !!b && typeof b === 'object';
 
-      if (hasA || hasB) {
-        return hasA && hasB;
+      if (isCacheableA || isCacheableB) {
+        const hasA = isCacheableA && cache.has(a);
+        const hasB = isCacheableB && cache.has(b);
+
+        if (hasA || hasB) {
+          return hasA && hasB;
+        }
+
+        if (isCacheableA) {
+          cache.add(a);
+        }
+
+        if (isCacheableA) {
+          cache.add(b);
+        }
       }
-
-      addToCache(a, cache);
-      addToCache(b, cache);
 
       return _comparator(a, b, cache);
     };
@@ -162,13 +158,13 @@ export function areArraysEqual(
   isEqual: EqualityComparator,
   meta: any,
 ) {
-  const { length } = a;
+  let index = a.length;
 
-  if (b.length !== length) {
+  if (b.length !== index) {
     return false;
   }
 
-  for (let index = 0; index < length; index++) {
+  while (index-- > 0) {
     if (!isEqual(a[index], b[index], meta)) {
       return false;
     }
@@ -243,27 +239,33 @@ export function areObjectsEqual(
 ) {
   const keysA = keys(a);
 
-  const { length } = keysA;
+  let index = keysA.length;
 
-  if (keys(b).length !== length) {
+  if (keys(b).length !== index) {
     return false;
   }
 
-  let key: string;
+  if (index) {
+    let key: string;
 
-  for (let index = 0; index < length; index++) {
-    key = keysA[index];
+    while (index-- > 0) {
+      key = keysA[index];
 
-    if (!hasOwnProperty(b, key)) {
-      return false;
-    }
+      if (key === OWNER) {
+        const reactElementA = isReactElement(a);
+        const reactElementB = isReactElement(b);
 
-    if (key === OWNER && isReactElement(a)) {
-      if (!isReactElement(b)) {
+        if (
+          (reactElementA || reactElementB) &&
+          reactElementA !== reactElementB
+        ) {
+          return false;
+        }
+      }
+
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
         return false;
       }
-    } else if (!isEqual(a[key], b[key], meta)) {
-      return false;
     }
   }
 
