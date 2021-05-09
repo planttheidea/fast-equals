@@ -28,9 +28,6 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
   /* eslint-enable */
 
   /**
-   * @function comparator
-   *
-   * @description
    * compare the value of the two objects and return true if they are equivalent in values
    *
    * @param a the value to test against

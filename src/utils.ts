@@ -10,9 +10,6 @@ type Cache = {
 export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
 
 /**
- * @function sameValueZeroEqual
- *
- * @description
  * are the values passed strictly equal or both NaN
  *
  * @param a the value to compare against
@@ -24,9 +21,6 @@ export function sameValueZeroEqual(a: any, b: any) {
 }
 
 /**
- * @function isPlainObject
- *
- * @description
  * is the value a plain object
  *
  * @param value the value to test
@@ -37,9 +31,6 @@ export function isPlainObject(value: any) {
 }
 
 /**
- * @function isPromiseLike
- *
- * @description
  * is the value promise-like (meaning it is thenable)
  *
  * @param value the value to test
@@ -50,9 +41,6 @@ export function isPromiseLike(value: any) {
 }
 
 /**
- * @function isReactElement
- *
- * @description
  * is the value passed a react element
  *
  * @param value the value to test
@@ -63,9 +51,6 @@ export function isReactElement(value: any) {
 }
 
 /**
- * @function getNewCacheFallback
- *
- * @description
  * in cases where WeakSet is not supported, creates a new custom
  * object that mimics the necessary API aspects for cache purposes
  *
@@ -86,9 +71,6 @@ export function getNewCacheFallback(): Cache {
 }
 
 /**
- * @function getNewCache
- *
- * @description
  * get a new cache object to prevent circular references
  *
  * @returns the new cache object
@@ -220,9 +202,6 @@ const hasOwnProperty = Function.prototype.bind.call(
 );
 
 /**
- * @function areObjectsEqual
- *
- * @description
  * are the objects equal in value
  *
  * @param a the object to test
@@ -273,9 +252,6 @@ export function areObjectsEqual(
 }
 
 /**
- * @function areRegExpsEqual
- *
- * @description
  * are the regExps equal in value
  *
  * @param a the regExp to test
@@ -295,9 +271,6 @@ export function areRegExpsEqual(a: RegExp, b: RegExp) {
 }
 
 /**
- * @function areSetsEqual
- *
- * @description
  * are the sets equal in value
  *
  * @param a the set to test
