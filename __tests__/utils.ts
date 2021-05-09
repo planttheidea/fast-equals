@@ -282,12 +282,6 @@ describe('getNewCache', () => {
 
     expect(cache).not.toBeInstanceOf(WeakSet);
 
-    const proto = Object.getPrototypeOf(cache);
-
-    expect(proto._values).toEqual([]);
-    expect(typeof proto.add).toBe('function');
-    expect(typeof proto.has).toBe('function');
-
     const value = { foo: 'bar' };
 
     expect(cache.has(value)).toBe(false);
@@ -295,7 +289,6 @@ describe('getNewCache', () => {
     cache.add(value);
 
     expect(cache.has(value)).toBe(true);
-    expect(proto._values).toEqual([value]);
   });
 });
 

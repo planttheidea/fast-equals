@@ -138,17 +138,17 @@ export function isReactElement(value: any) {
  * @returns the new cache object
  */
 export function getNewCacheFallback(): Cache {
-  return Object.create({
-    _values: [],
+  const values: any[] = [];
 
+  return {
     add(value: any) {
-      this._values.push(value);
+      values.push(value);
     },
 
     has(value: any) {
-      return this._values.indexOf(value) !== -1;
+      return values.indexOf(value) !== -1;
     },
-  });
+  };
 }
 
 /**
