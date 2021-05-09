@@ -204,11 +204,9 @@ export function areMapsEqual(
     if (isValueEqual) {
       isValueEqual = false;
 
-      let hasMatch = false;
-
       b.forEach((bValue, bKey) => {
-        if (!hasMatch && isEqual(aKey, bKey, meta)) {
-          hasMatch = isValueEqual = isEqual(aValue, bValue, meta);
+        if (!isValueEqual && isEqual(aKey, bKey, meta)) {
+          isValueEqual = isEqual(aValue, bValue, meta);
         }
       });
     }
@@ -326,11 +324,9 @@ export function areSetsEqual(
     if (isValueEqual) {
       isValueEqual = false;
 
-      let hasMatch = false;
-
       b.forEach((bValue) => {
-        if (!hasMatch) {
-          hasMatch = isValueEqual = isEqual(aValue, bValue, meta);
+        if (!isValueEqual) {
+          isValueEqual = isEqual(aValue, bValue, meta);
         }
       });
     }
