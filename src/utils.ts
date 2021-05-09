@@ -46,7 +46,7 @@ export function hasPair(
 
   let pair: [any, any];
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     pair = pairs[index];
 
     if (
@@ -81,7 +81,7 @@ export function hasValue(
 ) {
   const { length } = values;
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     if (isEqual(values[index], valueToMatch, meta)) {
       return true;
     }
@@ -283,7 +283,7 @@ export function areArraysEqual(
     return false;
   }
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     if (!isEqual(a[index], b[index], meta)) {
       return false;
     }
@@ -319,7 +319,7 @@ export function areMapsEqual(
 
   const { length } = pairsA;
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     if (
       !hasPair(pairsB, pairsA[index], isEqual, meta) ||
       !hasPair(pairsA, pairsB[index], isEqual, meta)
@@ -371,7 +371,7 @@ export function areObjectsEqual(
 
   let key: string;
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     key = keysA[index];
 
     if (!hasOwnProperty(b, key)) {
@@ -439,7 +439,7 @@ export function areSetsEqual(
 
   const { length } = valuesA;
 
-  for (let index = 0; index < length; index++) {
+  for (let index = 0; index < length; ++index) {
     if (
       !hasValue(valuesB, valuesA[index], isEqual, meta) ||
       !hasValue(valuesA, valuesB[index], isEqual, meta)
