@@ -1,7 +1,4 @@
-// comparator
 import { createComparator } from './comparator';
-
-// utils
 import { createCircularEqualCreator, sameValueZeroEqual } from './utils';
 
 export { createComparator as createCustomEqual, sameValueZeroEqual };

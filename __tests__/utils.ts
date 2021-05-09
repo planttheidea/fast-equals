@@ -11,14 +11,10 @@ import {
   createCircularEqualCreator,
   getNewCache,
   getNewCacheFallback,
-  hasPair,
-  hasValue,
   isPlainObject,
   isPromiseLike,
   isReactElement,
   sameValueZeroEqual,
-  toPairs,
-  toValues,
 } from '../src/utils';
 
 import {
@@ -181,7 +177,7 @@ describe('areRegExpsEqual', () => {
 });
 
 describe('areSetsEqual', () => {
-  it('should return false when the objects have different sizes', () => {
+  it('should return false when the sets have different sizes', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar');
     const cache = new WeakSet();
@@ -189,7 +185,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
 
-  it('should return false when the objects have different values', () => {
+  it('should return false when the sets have different values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('bar');
     const cache = new WeakSet();
@@ -197,7 +193,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
 
-  it('should return true when the objects have the same values', () => {
+  it('should return true when the sets have the same values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('foo');
     const cache = new WeakSet();
@@ -205,7 +201,7 @@ describe('areSetsEqual', () => {
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
 
-  it('should return true when the objects have the same values regardless of order', () => {
+  it('should return true when the sets have the same values regardless of order', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar').add('foo');
     const cache = new WeakSet();
@@ -292,62 +288,6 @@ describe('getNewCache', () => {
   });
 });
 
-describe('hasPair', () => {
-  it('should return true if the pair exists in the array', () => {
-    const pairs: [string, string][] = [
-      ['foo', 'bar'],
-      ['bar', 'baz'],
-      ['baz', 'quz'],
-    ];
-    const pair = pairs[1];
-    const meta: void = undefined;
-
-    expect(hasPair(pairs, pair, sameValueZeroEqual, meta)).toBe(true);
-  });
-
-  it('should return false if the pair does not exist in the array due to key', () => {
-    const pairs: [string, string][] = [
-      ['foo', 'bar'],
-      ['rab', 'baz'],
-      ['baz', 'quz'],
-    ];
-    const pair: [string, string] = ['bar', 'baz'];
-    const meta: void = undefined;
-
-    expect(hasPair(pairs, pair, sameValueZeroEqual, meta)).toBe(false);
-  });
-
-  it('should return false if the pair does not exist in the array due to value', () => {
-    const pairs: [string, string][] = [
-      ['foo', 'bar'],
-      ['bar', 'zab'],
-      ['baz', 'quz'],
-    ];
-    const pair: [string, string] = ['bar', 'baz'];
-    const meta: void = undefined;
-
-    expect(hasPair(pairs, pair, sameValueZeroEqual, meta)).toBe(false);
-  });
-});
-
-describe('hasValue', () => {
-  it('should return true if the key exists in the array', () => {
-    const keys = ['foo', 'bar', 'baz'];
-    const key = keys[1];
-    const meta: void = undefined;
-
-    expect(hasValue(keys, key, sameValueZeroEqual, meta)).toBe(true);
-  });
-
-  it('should return true if the key does not exist in the array', () => {
-    const keys = ['foo', 'bar', 'baz'];
-    const key = 'quz';
-    const meta: void = undefined;
-
-    expect(hasValue(keys, key, sameValueZeroEqual, meta)).toBe(false);
-  });
-});
-
 describe('isReactElement', () => {
   it('should return true if the appropriate keys are present and truthy', () => {
     const div = React.createElement('div', {}, 'foo');
@@ -431,23 +371,4 @@ describe('isSameValueZero', () => {
       }
     },
   );
-});
-
-describe('toPairs', () => {
-  it('should convert the map into [key, value] pairs', () => {
-    const map = new Map().set('foo', 'bar').set('bar', 'baz');
-
-    expect(toPairs(map)).toEqual([
-      ['foo', 'bar'],
-      ['bar', 'baz'],
-    ]);
-  });
-});
-
-describe('toValues', () => {
-  it('should convert the set into values array', () => {
-    const set = new Set().add('foo').add('bar');
-
-    expect(toValues(set)).toEqual(['foo', 'bar']);
-  });
 });
