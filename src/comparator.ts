@@ -10,12 +10,8 @@ import {
   sameValueZeroEqual,
 } from './utils';
 
-const { isArray } = Array;
-
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
-
-const OBJECT_TYPEOF = 'object';
 
 type EqualityComparatorCreator = (fn: EqualityComparator) => EqualityComparator;
 
@@ -40,30 +36,32 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
       return true;
     }
 
-    if (a && b && typeof a === OBJECT_TYPEOF && typeof b === OBJECT_TYPEOF) {
+    if (a && b && typeof a === 'object' && typeof b === 'object') {
       if (isPlainObject(a) && isPlainObject(b)) {
         return areObjectsEqual(a, b, isEqual, meta);
       }
 
-      const arrayA = isArray(a);
-      const arrayB = isArray(b);
+      let aShape = Array.isArray(a);
+      let bShape = Array.isArray(b);
 
-      if (arrayA || arrayB) {
-        return arrayA === arrayB && areArraysEqual(a, b, isEqual, meta);
+      if (aShape || bShape) {
+        return aShape === bShape && areArraysEqual(a, b, isEqual, meta);
       }
 
-      const aDate = a instanceof Date;
-      const bDate = b instanceof Date;
+      aShape = a instanceof Date;
+      bShape = b instanceof Date;
 
-      if (aDate || bDate) {
-        return aDate === bDate && sameValueZeroEqual(a.getTime(), b.getTime());
+      if (aShape || bShape) {
+        return (
+          aShape === bShape && sameValueZeroEqual(a.getTime(), b.getTime())
+        );
       }
 
-      const aRegExp = a instanceof RegExp;
-      const bRegExp = b instanceof RegExp;
+      aShape = a instanceof RegExp;
+      bShape = b instanceof RegExp;
 
-      if (aRegExp || bRegExp) {
-        return aRegExp === bRegExp && areRegExpsEqual(a, b);
+      if (aShape || bShape) {
+        return aShape === bShape && areRegExpsEqual(a, b);
       }
 
       if (isPromiseLike(a) || isPromiseLike(b)) {
@@ -71,20 +69,20 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator) {
       }
 
       if (HAS_MAP_SUPPORT) {
-        const aMap = a instanceof Map;
-        const bMap = b instanceof Map;
+        aShape = a instanceof Map;
+        bShape = b instanceof Map;
 
-        if (aMap || bMap) {
-          return aMap === bMap && areMapsEqual(a, b, isEqual, meta);
+        if (aShape || bShape) {
+          return aShape === bShape && areMapsEqual(a, b, isEqual, meta);
         }
       }
 
       if (HAS_SET_SUPPORT) {
-        const aSet = a instanceof Set;
-        const bSet = b instanceof Set;
+        aShape = a instanceof Set;
+        bShape = b instanceof Set;
 
-        if (aSet || bSet) {
-          return aSet === bSet && areSetsEqual(a, b, isEqual, meta);
+        if (aShape || bShape) {
+          return aShape === bShape && areSetsEqual(a, b, isEqual, meta);
         }
       }
 
