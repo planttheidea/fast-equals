@@ -189,7 +189,7 @@ console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB, meta)); // true
 
 ## Benchmarks
 
-All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of memory using NodeJS version `10.15.3`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of memory using NodeJS version `12.19.1`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -202,17 +202,17 @@ All benchmarks were performed on an i7 8-core Arch Linux laptop with 16GB of mem
 
 |                            | Operations / second |
 | -------------------------- | ------------------- |
-| **fast-equals**            | **142,730**         |
-| nano-equal                 | 115,530             |
-| shallow-equal-fuzzy        | 102,633             |
-| fast-deep-equal            | 102,335             |
-| react-fast-compare         | 100,036             |
-| **fast-equals (circular)** | **79,589**          |
-| underscore.isEqual         | 63,390              |
-| deep-equal                 | 48,783              |
-| lodash.isEqual             | 24,456              |
-| deep-eql                   | 24,196              |
-| assert.deepStrictEqual     | 1,382               |
+| **fast-equals**            | **153,880**         |
+| fast-deep-equal            | 144,035             |
+| react-fast-compare         | 130,324             |
+| nano-equal                 | 104,624             |
+| **fast-equals (circular)** | **97,610**          |
+| shallow-equal-fuzzy        | 83,946              |
+| underscore.isEqual         | 47,370              |
+| lodash.isEqual             | 25,053              |
+| deep-eql                   | 22,146              |
+| assert.deepStrictEqual     | 532                 |
+| deep-equal                 | 209                 |
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
