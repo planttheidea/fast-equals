@@ -115,7 +115,7 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
           cache.add(a);
         }
 
-        if (isCacheableA) {
+        if (isCacheableB) {
           cache.add(b);
         }
       }
