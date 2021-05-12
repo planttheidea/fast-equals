@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 2.0.3
+
+- Fix [#50](https://github.com/planttheidea/fast-equals/pull/50) - copy-pasta in cacheable check
+
 ## 2.0.2
 
 - Optimize iterables comparisons to not double-iterate
