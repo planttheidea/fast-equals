@@ -7,7 +7,14 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-export type EqualityComparator = (a: any, b: any, meta?: any, keyOrIndex?: any) => boolean;
+export type EqualityComparator = (
+  objectA: any,
+  objectB: any,
+  meta?: any,
+  indexOrKey?: any,
+  parentA?: any,
+  parentB?: any,
+) => boolean;
 
 /**
  * are the values passed strictly equal or both NaN
@@ -147,7 +154,7 @@ export function areArraysEqual(
   }
 
   while (index-- > 0) {
-    if (!isEqual(a[index], b[index], meta, index)) {
+    if (!isEqual(a[index], b[index], meta, index, a, b)) {
       return false;
     }
   }
@@ -178,8 +185,8 @@ export function areMapsEqual(
         isValueEqual = false;
 
         b.forEach((bValue, bKey) => {
-          if (!isValueEqual && isEqual(aKey, bKey, meta)) {
-            isValueEqual = isEqual(aValue, bValue, meta, aKey);
+          if (!isValueEqual && isEqual(aKey, bKey, meta, undefined, a, b)) {
+            isValueEqual = isEqual(aValue, bValue, meta, aKey, a, b);
           }
         });
       }
@@ -242,7 +249,7 @@ export function areObjectsEqual(
         }
       }
 
-      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta, key)) {
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta, key, a, b)) {
         return false;
       }
     }
@@ -294,7 +301,7 @@ export function areSetsEqual(
 
         b.forEach((bValue) => {
           if (!isValueEqual) {
-            isValueEqual = isEqual(aValue, bValue, meta);
+            isValueEqual = isEqual(aValue, bValue, meta, undefined, a, b);
           }
         });
       }

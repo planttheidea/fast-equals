@@ -2,6 +2,9 @@ declare type EqualityComparator = (
   objectA: any,
   objectB: any,
   meta?: any,
+  indexOrKey?: any,
+  parentA?: any,
+  parentB?: any,
 ) => boolean;
 declare type EqualityComparatorCreator = (
   comparator: EqualityComparator,
