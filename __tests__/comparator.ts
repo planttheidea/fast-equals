@@ -32,8 +32,9 @@ describe('createComparator', () => {
 
   it('should call the custom comparator with the correct params', () => {
     const customComparatorMock = jest.fn();
-    const createIsEqual: EqualityComparatorCreator = (deepEqual) => (a: any, b: any, meta?: any, indexOrKey?: any, parentA?: any, parentB?: any) => {
-      customComparatorMock(a, b, meta, indexOrKey, parentA, parentB);
+    const createIsEqual: EqualityComparatorCreator = (deepEqual) => (...args: [a: any, b: any, indexOrKey?: any, parentA?: any, parentB?: any, meta?: any]) => {
+      customComparatorMock(...args);
+      const [a, b, , , , meta] = args;
       return deepEqual(a, b, meta);
     };
     const comparator = createComparator(createIsEqual);
@@ -42,15 +43,15 @@ describe('createComparator', () => {
     const b = { foo: { bar: ['1', '2'], baz: new Set().add('x'), oof: new Map().set('y', 'yes') } };
 
     const expectedParams: any = [
-      [a.foo, b.foo, 'META', 'foo', a, b],
-      [a.foo.oof, b.foo.oof, 'META', 'oof', a.foo, b.foo],
-      ['y', 'y', 'META', undefined, a.foo.oof, b.foo.oof], // called with the keys of a Map
-      [a.foo.oof.get('y'), b.foo.oof.get('y'), 'META', 'y', a.foo.oof, b.foo.oof],
-      [a.foo.baz, b.foo.baz, 'META', 'baz', a.foo, b.foo],
-      ['x', 'x', 'META', undefined, a.foo.baz, b.foo.baz],
-      [a.foo.bar, b.foo.bar, 'META', 'bar', a.foo, b.foo],
-      [a.foo.bar[1], b.foo.bar[1], 'META', 1, a.foo.bar, b.foo.bar],
-      [a.foo.bar[0], b.foo.bar[0], 'META', 0, a.foo.bar, b.foo.bar],
+      [a.foo, b.foo, 'foo', a, b, 'META'],
+      [a.foo.oof, b.foo.oof, 'oof', a.foo, b.foo, 'META'],
+      ['y', 'y', undefined, a.foo.oof, b.foo.oof, 'META'], // called with the keys of a Maps
+      [a.foo.oof.get('y'), b.foo.oof.get('y'), 'y', a.foo.oof, b.foo.oof, 'META'],
+      [a.foo.baz, b.foo.baz, 'baz', a.foo, b.foo, 'META'],
+      ['x', 'x', undefined, a.foo.baz, b.foo.baz, 'META'],
+      [a.foo.bar, b.foo.bar, 'bar', a.foo, b.foo, 'META'],
+      [a.foo.bar[1], b.foo.bar[1], 1, a.foo.bar, b.foo.bar, 'META'],
+      [a.foo.bar[0], b.foo.bar[0], 0, a.foo.bar, b.foo.bar, 'META'],
     ];
 
     comparator(a, b, 'META');
