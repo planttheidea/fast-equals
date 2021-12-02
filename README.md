@@ -157,16 +157,17 @@ The signature is as follows:
 
 ```typescript
 type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
+type ExtendedEqualityComparator = (a: any, b: any, indexOrKey?: any, parentA?: any, parentB?: any, meta?: any) => boolean;
 type EqualityComparatorCreator = (
   deepEqual: EqualityComparator,
-) => EqualityComparator;
+) => ExtendedEqualityComparator;
 
 function createCustomEqual(
   createIsEqual?: EqualityComparatorCreator,
 ): EqualityComparator;
 ```
 
-The `meta` parameter in `EqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
+The `meta` parameter in `EqualityComparator` and `ExtendedEqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
 
 An example for a custom equality comparison that also checks against values in the meta object:
 
@@ -174,7 +175,7 @@ An example for a custom equality comparison that also checks against values in t
 import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) => (objectA, objectB, meta) =>
+  (deepEqual) => (objectA, objectB, indexOrKey, parentA, parentB, meta) =>
     objectA.foo === meta ||
     objectB.foo === meta ||
     deepEqual(objectA, objectB, meta),
