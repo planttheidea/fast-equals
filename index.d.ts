@@ -2,13 +2,18 @@ declare type EqualityComparator = (
   objectA: any,
   objectB: any,
   meta?: any,
+) => boolean;
+declare type ExtendedEqualityComparator = (
+  objectA: any,
+  objectB: any,
   indexOrKey?: any,
   parentA?: any,
   parentB?: any,
+  meta?: any,
 ) => boolean;
 declare type EqualityComparatorCreator = (
   comparator: EqualityComparator,
-) => EqualityComparator;
+) => ExtendedEqualityComparator;
 
 export declare function createCustomEqual(
   createIsEqual?: EqualityComparatorCreator,

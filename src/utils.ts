@@ -7,13 +7,19 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-export type EqualityComparator = (
+export type ExtendedEqualityComparator = (
   objectA: any,
   objectB: any,
-  meta?: any,
   indexOrKey?: any,
   parentA?: any,
   parentB?: any,
+  meta?: any,
+) => boolean;
+
+export type EqualityComparator = (
+  objectA: any,
+  objectB: any,
+  meta?: any
 ) => boolean;
 
 /**
@@ -105,6 +111,9 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
     return function circularEqual(
       a: any,
       b: any,
+      indexOrKey: any,
+      parentA: any,
+      parentB: any,
       cache: Cache = getNewCache(),
     ) {
       const isCacheableA = !!a && typeof a === 'object';
@@ -144,7 +153,7 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
 export function areArraysEqual(
   a: any[],
   b: any[],
-  isEqual: EqualityComparator,
+  isEqual: ExtendedEqualityComparator,
   meta: any,
 ) {
   let index = a.length;
@@ -154,7 +163,7 @@ export function areArraysEqual(
   }
 
   while (index-- > 0) {
-    if (!isEqual(a[index], b[index], meta, index, a, b)) {
+    if (!isEqual(a[index], b[index], index, a, b, meta)) {
       return false;
     }
   }
@@ -174,7 +183,7 @@ export function areArraysEqual(
 export function areMapsEqual(
   a: Map<any, any>,
   b: Map<any, any>,
-  isEqual: EqualityComparator,
+  isEqual: ExtendedEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;
@@ -185,8 +194,8 @@ export function areMapsEqual(
         isValueEqual = false;
 
         b.forEach((bValue, bKey) => {
-          if (!isValueEqual && isEqual(aKey, bKey, meta, undefined, a, b)) {
-            isValueEqual = isEqual(aValue, bValue, meta, aKey, a, b);
+          if (!isValueEqual && isEqual(aKey, bKey, undefined, a, b, meta)) {
+            isValueEqual = isEqual(aValue, bValue, aKey, a, b, meta);
           }
         });
       }
@@ -220,7 +229,7 @@ const hasOwnProperty = Function.prototype.bind.call(
 export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
-  isEqual: EqualityComparator,
+  isEqual: ExtendedEqualityComparator,
   meta: any,
 ) {
   const keysA = keys(a);
@@ -249,7 +258,7 @@ export function areObjectsEqual(
         }
       }
 
-      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta, key, a, b)) {
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], key, a, b, meta)) {
         return false;
       }
     }
@@ -289,7 +298,7 @@ export function areRegExpsEqual(a: RegExp, b: RegExp) {
 export function areSetsEqual(
   a: Set<any>,
   b: Set<any>,
-  isEqual: EqualityComparator,
+  isEqual: ExtendedEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;
@@ -301,7 +310,7 @@ export function areSetsEqual(
 
         b.forEach((bValue) => {
           if (!isValueEqual) {
-            isValueEqual = isEqual(aValue, bValue, meta, undefined, a, b);
+            isValueEqual = isEqual(aValue, bValue, undefined, a, b, meta);
           }
         });
       }
