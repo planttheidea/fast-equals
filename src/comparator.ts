@@ -13,7 +13,7 @@ import {
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
 
-type EqualityComparatorCreator = (fn: EqualityComparator) => EqualityComparator;
+export type EqualityComparatorCreator = (fn: EqualityComparator) => EqualityComparator;
 
 export function createComparator(createIsEqual?: EqualityComparatorCreator) {
   const isEqual: EqualityComparator =
