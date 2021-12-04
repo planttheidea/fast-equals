@@ -81,6 +81,21 @@ describe('test suites', () => {
 });
 
 describe('issue 58 - key and value being identical', () => {
+  it('should handle duplicate but equal `Map` entries', () => {
+    const mapA = new Map<any, any>([
+      [{ b: 'c' }, 2],
+      [{ b: 'c' }, 2],
+    ]);
+    const mapB = new Map<any, any>([
+      [{ b: 'c' }, 2],
+      [{ b: 'c' }, 2],
+    ]);
+
+    const result = deepEqual(mapA, mapB);
+
+    expect(result).toBe(true);
+  });
+
   it('should handle the first `Map` entry being unequal', () => {
     const mapA = new Map<any, any>([
       [{ b: 'c' }, 2],
@@ -126,6 +141,15 @@ describe('issue 58 - key and value being identical', () => {
     const result = deepEqual(mapA, mapB);
 
     expect(result).toBe(false);
+  });
+
+  it('should handle duplicate but equal `Set` entries', () => {
+    const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
+    const setB = new Set<any>([{ b: 'c' }, { b: 'c' }]);
+
+    const result = deepEqual(setA, setB);
+
+    expect(result).toBe(true);
   });
 
   it('should handle the first `Set` entry being unequal', () => {

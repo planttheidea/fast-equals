@@ -186,9 +186,11 @@ export function areMapsEqual(
               isEqual(aKey, bKey, meta) && isEqual(aValue, bValue, meta);
 
             if (hasMatch) {
-              matchedIndices[matchIndex++] = true;
+              matchedIndices[matchIndex] = true;
             }
           }
+
+          matchIndex++;
         });
 
         isValueEqual = hasMatch;
@@ -310,9 +312,11 @@ export function areSetsEqual(
             hasMatch = isEqual(aValue, bValue, meta);
 
             if (hasMatch) {
-              matchedIndices[matchIndex++] = true;
+              matchedIndices[matchIndex] = true;
             }
           }
+
+          matchIndex++;
         });
 
         isValueEqual = hasMatch;
