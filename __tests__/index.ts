@@ -80,19 +80,53 @@ describe('test suites', () => {
   );
 });
 
-test('issue 58 - key and value being identical', () => {
-  const mapA = new Map<any, any>([
-    [{ b: 'c' }, 2],
-    [{ b: 'c' }, 2],
-  ]);
-  const mapB = new Map<any, any>([
-    [{ b: 'c' }, 2],
-    ['foo', 'different'],
-  ]);
+describe('issue 58 - key and value being identical', () => {
+  it('should handle the first key being unequal', () => {
+    const mapA = new Map<any, any>([
+      [{ b: 'c' }, 2],
+      [{ b: 'c' }, 2],
+    ]);
+    const mapB = new Map<any, any>([
+      [{ b: 'c' }, 2],
+      ['foo', 'different'],
+    ]);
 
-  const result = deepEqual(mapA, mapB);
+    const result = deepEqual(mapA, mapB);
 
-  expect(result).toBe(false);
+    expect(result).toBe(false);
+  });
+
+  it('should handle the last key being unequal', () => {
+    const mapA = new Map<any, any>([
+      [{ b: 'c' }, 2],
+      [{ b: 'c' }, 2],
+    ]);
+    const mapB = new Map<any, any>([
+      ['foo', 'different'],
+      [{ b: 'c' }, 2],
+    ]);
+
+    const result = deepEqual(mapA, mapB);
+
+    expect(result).toBe(false);
+  });
+
+  it('should handle an intermediary key being unequal', () => {
+    const mapA = new Map<any, any>([
+      ['foo', 'different'],
+      [{ b: 'c' }, 2],
+      [{ b: 'c' }, 2],
+    ]);
+    const mapB = new Map<any, any>([
+      ['foo', 'different'],
+      ['foo', 'different'],
+      [{ b: 'c' }, 2],
+    ]);
+
+    const result = deepEqual(mapA, mapB);
+
+    expect(result).toBe(false);
+  });
 });
 
 describe('circularDeepEqual', () => {
