@@ -81,7 +81,7 @@ describe('test suites', () => {
 });
 
 describe('issue 58 - key and value being identical', () => {
-  it('should handle the first key being unequal', () => {
+  it('should handle the first `Map` entry being unequal', () => {
     const mapA = new Map<any, any>([
       [{ b: 'c' }, 2],
       [{ b: 'c' }, 2],
@@ -96,7 +96,7 @@ describe('issue 58 - key and value being identical', () => {
     expect(result).toBe(false);
   });
 
-  it('should handle the last key being unequal', () => {
+  it('should handle the last `Map` entry being unequal', () => {
     const mapA = new Map<any, any>([
       [{ b: 'c' }, 2],
       [{ b: 'c' }, 2],
@@ -111,7 +111,7 @@ describe('issue 58 - key and value being identical', () => {
     expect(result).toBe(false);
   });
 
-  it('should handle an intermediary key being unequal', () => {
+  it('should handle an intermediary `Map` entry being unequal', () => {
     const mapA = new Map<any, any>([
       ['foo', 'different'],
       [{ b: 'c' }, 2],
@@ -124,6 +124,33 @@ describe('issue 58 - key and value being identical', () => {
     ]);
 
     const result = deepEqual(mapA, mapB);
+
+    expect(result).toBe(false);
+  });
+
+  it('should handle the first `Set` entry being unequal', () => {
+    const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
+    const setB = new Set<any>([{ b: 'c' }, 'foo']);
+
+    const result = deepEqual(setA, setB);
+
+    expect(result).toBe(false);
+  });
+
+  it('should handle the last `Set` entry being unequal', () => {
+    const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
+    const setB = new Set<any>(['foo', { b: 'c' }]);
+
+    const result = deepEqual(setA, setB);
+
+    expect(result).toBe(false);
+  });
+
+  it('should handle an intermediary `Set` entry being unequal', () => {
+    const setA = new Set<any>(['foo', { b: 'c' }, { b: 'c' }]);
+    const setB = new Set<any>(['foo', 'foo', { b: 'c' }]);
+
+    const result = deepEqual(setA, setB);
 
     expect(result).toBe(false);
   });
