@@ -1,4 +1,4 @@
-/* globals afterEach,beforeEach,describe,expect,it,jest */
+/* globals afterEach,beforeEach,describe,expect,it,test,jest */
 
 // @ts-ignore
 import testSuites from './__helpers__/testSuites';
@@ -78,6 +78,21 @@ describe('test suites', () => {
       });
     },
   );
+});
+
+test('issue 58 - key and value being identical', () => {
+  const mapA = new Map<any, any>([
+    [{ b: 'c' }, 2],
+    [{ b: 'c' }, 2],
+  ]);
+  const mapB = new Map<any, any>([
+    [{ b: 'c' }, 2],
+    ['foo', 'different'],
+  ]);
+
+  const result = deepEqual(mapA, mapB);
+
+  expect(result).toBe(false);
 });
 
 describe('circularDeepEqual', () => {

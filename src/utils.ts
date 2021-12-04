@@ -173,15 +173,24 @@ export function areMapsEqual(
   let isValueEqual = a.size === b.size;
 
   if (isValueEqual && a.size) {
+    const matched = new Set();
+
     a.forEach((aValue, aKey) => {
       if (isValueEqual) {
-        isValueEqual = false;
+        let hasMatch = false;
 
         b.forEach((bValue, bKey) => {
-          if (!isValueEqual && isEqual(aKey, bKey, meta)) {
-            isValueEqual = isEqual(aValue, bValue, meta);
+          if (!hasMatch && !matched.has(bKey)) {
+            hasMatch =
+              isEqual(aKey, bKey, meta) && isEqual(aValue, bValue, meta);
+
+            if (hasMatch) {
+              matched.add(bKey);
+            }
           }
         });
+
+        isValueEqual = hasMatch;
       }
     });
   }
