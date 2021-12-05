@@ -1,4 +1,4 @@
-/* globals afterEach,beforeEach,describe,expect,it,test,jest */
+/* globals afterEach,beforeEach,describe,expect,it,jest */
 
 // @ts-ignore
 import testSuites from './__helpers__/testSuites';
