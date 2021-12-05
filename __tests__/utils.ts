@@ -150,9 +150,8 @@ describe('areMapsEqual', () => {
         const mapB = new Map<any, any>(bEntries);
         const cache = new WeakSet();
 
-        const result = areMapsEqual(mapA, mapB, deepEqual, cache);
-
-        expect(result).toBe(expected);
+        expect(areMapsEqual(mapA, mapB, deepEqual, cache)).toBe(expected);
+        expect(areMapsEqual(mapB, mapA, deepEqual, cache)).toBe(expected);
       },
     );
   });
@@ -307,9 +306,8 @@ describe('areSetsEqual', () => {
       const setB = new Set<any>(bEntries);
       const cache = new WeakSet();
 
-      const result = areSetsEqual(setA, setB, deepEqual, cache);
-
-      expect(result).toBe(expected);
+      expect(areSetsEqual(setA, setB, deepEqual, cache)).toBe(expected);
+      expect(areSetsEqual(setB, setA, deepEqual, cache)).toBe(expected);
     });
   });
 });
