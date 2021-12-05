@@ -92,71 +92,69 @@ describe('areMapsEqual', () => {
   });
 
   describe('issue 58 - key and value being identical', () => {
-    it('should handle duplicate but equal `Map` entries', () => {
-      const mapA = new Map<any, any>([
-        [{ b: 'c' }, 2],
-        [{ b: 'c' }, 2],
-      ]);
-      const mapB = new Map<any, any>([
-        [{ b: 'c' }, 2],
-        [{ b: 'c' }, 2],
-      ]);
-      const cache = new WeakSet();
+    it.each([
+      [
+        'being different references but equal',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        true,
+      ],
+      [
+        'being unequal based on first',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          ['foo', 'different'],
+          [{ b: 'c' }, 2],
+        ],
+        false,
+      ],
+      [
+        'being unequal based on last',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          ['foo', 'different'],
+        ],
+        false,
+      ],
+      [
+        'being unequal based on an intermediary entry',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          ['foo', 'different'],
+          [{ b: 'c' }, 2],
+        ],
+        false,
+      ],
+    ])(
+      'should handle `Map` entries %s',
+      (_, aEntries: any[], bEntries: any[], expected) => {
+        const mapA = new Map<any, any>(aEntries);
+        const mapB = new Map<any, any>(bEntries);
+        const cache = new WeakSet();
 
-      const result = areMapsEqual(mapA, mapB, deepEqual, cache);
+        const result = areMapsEqual(mapA, mapB, deepEqual, cache);
 
-      expect(result).toBe(true);
-    });
-
-    it('should handle the first `Map` entry being unequal', () => {
-      const mapA = new Map<any, any>([
-        [{ b: 'c' }, 2],
-        [{ b: 'c' }, 2],
-      ]);
-      const mapB = new Map<any, any>([
-        ['foo', 'different'],
-        [{ b: 'c' }, 2],
-      ]);
-      const cache = new WeakSet();
-
-      const result = areMapsEqual(mapA, mapB, deepEqual, cache);
-
-      expect(result).toBe(false);
-    });
-
-    it('should handle the last `Map` entry being unequal', () => {
-      const mapA = new Map<any, any>([
-        [{ b: 'c' }, 2],
-        [{ b: 'c' }, 2],
-      ]);
-      const mapB = new Map<any, any>([
-        [{ b: 'c' }, 2],
-        ['foo', 'different'],
-      ]);
-      const cache = new WeakSet();
-
-      const result = areMapsEqual(mapA, mapB, deepEqual, cache);
-
-      expect(result).toBe(false);
-    });
-
-    it('should handle an intermediary `Map` entry being unequal', () => {
-      const mapA = new Map<any, any>([
-        ['foo', 'different'],
-        [{ b: 'c' }, 2],
-        [{ b: 'c' }, 2],
-      ]);
-      const mapB = new Map<any, any>([
-        ['foo', 'different'],
-        ['foo', 'different'],
-        [{ b: 'c' }, 2],
-      ]);
-      const cache = new WeakSet();
-
-      const result = areMapsEqual(mapA, mapB, deepEqual, cache);
-
-      expect(result).toBe(false);
-    });
+        expect(result).toBe(expected);
+      },
+    );
   });
 });
 
@@ -279,44 +277,39 @@ describe('areSetsEqual', () => {
   });
 
   describe('issue 58 - key and value being identical', () => {
-    it('should handle duplicate but equal `Set` entries', () => {
-      const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
-      const setB = new Set<any>([{ b: 'c' }, { b: 'c' }]);
+    it.each([
+      [
+        'being different references but equal',
+        [{ b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, { b: 'c' }],
+        true,
+      ],
+      [
+        'being unequal based on first',
+        [{ b: 'c' }, { b: 'c' }],
+        ['foo', { b: 'c' }],
+        false,
+      ],
+      [
+        'being unequal based on last',
+        [{ b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, 'foo'],
+        false,
+      ],
+      [
+        'being unequal based on an intermediary entry',
+        [{ b: 'c' }, { b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, 'foo', { b: 'c' }],
+        false,
+      ],
+    ])('should handle `Set` entries %s', (_, aEntries, bEntries, expected) => {
+      const setA = new Set<any>(aEntries);
+      const setB = new Set<any>(bEntries);
       const cache = new WeakSet();
 
       const result = areSetsEqual(setA, setB, deepEqual, cache);
 
-      expect(result).toBe(true);
-    });
-
-    it('should handle the first `Set` entry being unequal', () => {
-      const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
-      const setB = new Set<any>(['foo', { b: 'c' }]);
-      const cache = new WeakSet();
-
-      const result = areSetsEqual(setA, setB, deepEqual, cache);
-
-      expect(result).toBe(false);
-    });
-
-    it('should handle the last `Set` entry being unequal', () => {
-      const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
-      const setB = new Set<any>([{ b: 'c' }, 'foo']);
-      const cache = new WeakSet();
-
-      const result = areSetsEqual(setA, setB, deepEqual, cache);
-
-      expect(result).toBe(false);
-    });
-
-    it('should handle an intermediary `Set` entry being unequal', () => {
-      const setA = new Set<any>(['foo', { b: 'c' }, { b: 'c' }]);
-      const setB = new Set<any>(['foo', 'foo', { b: 'c' }]);
-      const cache = new WeakSet();
-
-      const result = areSetsEqual(setA, setB, deepEqual, cache);
-
-      expect(result).toBe(false);
+      expect(result).toBe(expected);
     });
   });
 });
