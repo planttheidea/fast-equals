@@ -102,8 +102,8 @@ describe('issue 58 - key and value being identical', () => {
       [{ b: 'c' }, 2],
     ]);
     const mapB = new Map<any, any>([
-      [{ b: 'c' }, 2],
       ['foo', 'different'],
+      [{ b: 'c' }, 2],
     ]);
 
     const result = deepEqual(mapA, mapB);
@@ -117,8 +117,8 @@ describe('issue 58 - key and value being identical', () => {
       [{ b: 'c' }, 2],
     ]);
     const mapB = new Map<any, any>([
-      ['foo', 'different'],
       [{ b: 'c' }, 2],
+      ['foo', 'different'],
     ]);
 
     const result = deepEqual(mapA, mapB);
@@ -154,7 +154,7 @@ describe('issue 58 - key and value being identical', () => {
 
   it('should handle the first `Set` entry being unequal', () => {
     const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
-    const setB = new Set<any>([{ b: 'c' }, 'foo']);
+    const setB = new Set<any>(['foo', { b: 'c' }]);
 
     const result = deepEqual(setA, setB);
 
@@ -163,7 +163,7 @@ describe('issue 58 - key and value being identical', () => {
 
   it('should handle the last `Set` entry being unequal', () => {
     const setA = new Set<any>([{ b: 'c' }, { b: 'c' }]);
-    const setB = new Set<any>(['foo', { b: 'c' }]);
+    const setB = new Set<any>([{ b: 'c' }, 'foo']);
 
     const result = deepEqual(setA, setB);
 
