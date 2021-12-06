@@ -7,7 +7,7 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-export type ExtendedEqualityComparator = (
+export type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
   indexOrKey?: any,
@@ -153,7 +153,7 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
 export function areArraysEqual(
   a: any[],
   b: any[],
-  isEqual: ExtendedEqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let index = a.length;
@@ -183,7 +183,7 @@ export function areArraysEqual(
 export function areMapsEqual(
   a: Map<any, any>,
   b: Map<any, any>,
-  isEqual: ExtendedEqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;
@@ -229,7 +229,7 @@ const hasOwnProperty = Function.prototype.bind.call(
 export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
-  isEqual: ExtendedEqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   const keysA = keys(a);
@@ -298,7 +298,7 @@ export function areRegExpsEqual(a: RegExp, b: RegExp) {
 export function areSetsEqual(
   a: Set<any>,
   b: Set<any>,
-  isEqual: ExtendedEqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;

@@ -1,6 +1,6 @@
 import {
   EqualityComparator,
-  ExtendedEqualityComparator,
+  InternalEqualityComparator,
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
@@ -14,10 +14,10 @@ import {
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
 
-export type EqualityComparatorCreator = (fn: EqualityComparator) => ExtendedEqualityComparator;
+export type EqualityComparatorCreator = (fn: EqualityComparator) => InternalEqualityComparator;
 
 export function createComparator(createIsEqual?: EqualityComparatorCreator): EqualityComparator {
-  const isEqual: ExtendedEqualityComparator =
+  const isEqual: InternalEqualityComparator =
     /* eslint-disable no-use-before-define */
     typeof createIsEqual === 'function'
       ? createIsEqual(comparator)
