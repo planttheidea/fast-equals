@@ -72,12 +72,13 @@
     "lint:fix": "npm run lint -- --fix",
     "start": "npm run dev",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
-    "prepublish:compile": "npm run lint && npm run test && npm run dist",
+    "prepublish:compile": "npm run typecheck && npm run lint && npm run test && npm run dist",
     "release": "release-it",
     "release:beta": "release-it --config=.release-it.beta.json",
     "test": "NODE_PATH=. jest",
     "test:coverage": "npm test -- --coverage",
-    "test:watch": "npm test -- --watch"
+    "test:watch": "npm test -- --watch",
+    "typecheck": "tsc --noEmit"
   },
   "sideEffects": false,
   "types": "index.d.ts",
