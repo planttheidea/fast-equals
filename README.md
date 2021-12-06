@@ -25,6 +25,7 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
       - [Specific builds](#specific-builds)
   - [Available methods](#available-methods)
       - [deepEqual](#deepequal)
+        - [Note](#note)
       - [shallowEqual](#shallowequal)
       - [sameValueZeroEqual](#samevaluezeroequal)
       - [circularDeepEqual](#circulardeepequal)
@@ -79,6 +80,19 @@ const objectB = { foo: { bar: 'baz' } };
 console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
 ```
+
+##### Note
+
+`Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
+
+```javascript
+const mapA = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
+const mapB = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
+
+deepEqual(mapA, mapB);
+```
+
+To support true deep equality of all contents, `fast-equals` will perform a deep equality comparison for key and value parirs. Therefore, the above would be `true`.
 
 #### shallowEqual
 
