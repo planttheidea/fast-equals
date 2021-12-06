@@ -192,11 +192,13 @@ export function areMapsEqual(
     a.forEach((aValue, aKey) => {
       if (isValueEqual) {
         isValueEqual = false;
+        let iterationIndex = 0;
 
         b.forEach((bValue, bKey) => {
-          if (!isValueEqual && isEqual(aKey, bKey, undefined, a, b, meta)) {
+          if (!isValueEqual && isEqual(aKey, bKey, iterationIndex, a, b, meta)) {
             isValueEqual = isEqual(aValue, bValue, aKey, a, b, meta);
           }
+          iterationIndex++;
         });
       }
     });
@@ -307,11 +309,13 @@ export function areSetsEqual(
     a.forEach((aValue) => {
       if (isValueEqual) {
         isValueEqual = false;
+        let iterationIndex = 0;
 
         b.forEach((bValue) => {
           if (!isValueEqual) {
-            isValueEqual = isEqual(aValue, bValue, undefined, a, b, meta);
+            isValueEqual = isEqual(aValue, bValue, iterationIndex, a, b, meta);
           }
+          iterationIndex++;
         });
       }
     });
