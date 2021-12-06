@@ -25,7 +25,7 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
       - [Specific builds](#specific-builds)
   - [Available methods](#available-methods)
       - [deepEqual](#deepequal)
-        - [Note](#note)
+        - [Comparing `Map`s](#comparing-maps)
       - [shallowEqual](#shallowequal)
       - [sameValueZeroEqual](#samevaluezeroequal)
       - [circularDeepEqual](#circulardeepequal)
@@ -81,7 +81,7 @@ console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
 ```
 
-##### Note
+##### Comparing `Map`s
 
 `Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
 
@@ -149,6 +149,8 @@ function Circular(value) {
 console.log(circularDeepEqual(new Circular('foo'), new Circular('foo'))); // true
 console.log(circularDeepEqual(new Circular('foo'), new Circular('bar'))); // false
 ```
+
+Just as with `deepEqual`, [both keys and values are compared for deep equality](#comparing-maps).
 
 #### circularShallowEqual
 
