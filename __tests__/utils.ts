@@ -1,6 +1,7 @@
 /* globals afterEach,beforeEach,describe,expect,it,jest */
 
 import * as React from 'react';
+import { deepEqual } from '../src/index';
 
 import {
   areArraysEqual,
@@ -88,6 +89,71 @@ describe('areMapsEqual', () => {
     const cache = new WeakSet();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
+  });
+
+  describe('issue 58 - key and value being identical', () => {
+    it.each([
+      [
+        'being different references but equal',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        true,
+      ],
+      [
+        'being unequal based on first',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          ['foo', 'different'],
+          [{ b: 'c' }, 2],
+        ],
+        false,
+      ],
+      [
+        'being unequal based on last',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          ['foo', 'different'],
+        ],
+        false,
+      ],
+      [
+        'being unequal based on an intermediary entry',
+        [
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+          [{ b: 'c' }, 2],
+        ],
+        [
+          [{ b: 'c' }, 2],
+          ['foo', 'different'],
+          [{ b: 'c' }, 2],
+        ],
+        false,
+      ],
+    ])(
+      'should handle `Map` entries %s',
+      (_, aEntries: any[], bEntries: any[], expected) => {
+        const mapA = new Map<any, any>(aEntries);
+        const mapB = new Map<any, any>(bEntries);
+        const cache = new WeakSet();
+
+        expect(areMapsEqual(mapA, mapB, deepEqual, cache)).toBe(expected);
+        expect(areMapsEqual(mapB, mapA, deepEqual, cache)).toBe(expected);
+      },
+    );
   });
 });
 
@@ -207,6 +273,42 @@ describe('areSetsEqual', () => {
     const cache = new WeakSet();
 
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
+  });
+
+  describe('issue 58 - key and value being identical', () => {
+    it.each([
+      [
+        'being different references but equal',
+        [{ b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, { b: 'c' }],
+        true,
+      ],
+      [
+        'being unequal based on first',
+        [{ b: 'c' }, { b: 'c' }],
+        ['foo', { b: 'c' }],
+        false,
+      ],
+      [
+        'being unequal based on last',
+        [{ b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, 'foo'],
+        false,
+      ],
+      [
+        'being unequal based on an intermediary entry',
+        [{ b: 'c' }, { b: 'c' }, { b: 'c' }],
+        [{ b: 'c' }, 'foo', { b: 'c' }],
+        false,
+      ],
+    ])('should handle `Set` entries %s', (_, aEntries, bEntries, expected) => {
+      const setA = new Set<any>(aEntries);
+      const setB = new Set<any>(bEntries);
+      const cache = new WeakSet();
+
+      expect(areSetsEqual(setA, setB, deepEqual, cache)).toBe(expected);
+      expect(areSetsEqual(setB, setA, deepEqual, cache)).toBe(expected);
+    });
   });
 });
 

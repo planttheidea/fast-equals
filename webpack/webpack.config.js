@@ -7,18 +7,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 module.exports = {
   devServer: {
-    contentBase: './dist',
-    inline: true,
     port: 3000,
-    stats: {
-      assets: false,
-      chunks: true,
-      chunkModules: false,
-      colors: true,
-      hash: false,
-      timings: true,
-      version: false,
-    },
   },
 
   devtool: 'source-map',

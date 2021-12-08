@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 2.0.4
+
+- Fix [#58](https://github.com/planttheidea/fast-equals/issues/58) - duplicate entries in `Map` / `Set` can create false equality success
+- [#60](https://github.com/planttheidea/fast-equals/issues/60) - Add documentation for key equality of `Map` being a part of `deepEqual`
+
 ## 2.0.3
 
 - Fix [#50](https://github.com/planttheidea/fast-equals/pull/50) - copy-pasta in cacheable check
