@@ -45,10 +45,10 @@ describe('createComparator', () => {
     const expectedParams: any = [
       [a.foo, b.foo, 'foo', a, b, 'META'],
       [a.foo.oof, b.foo.oof, 'oof', a.foo, b.foo, 'META'],
-      ['y', 'y', undefined, a.foo.oof, b.foo.oof, 'META'], // called with the keys of a Maps
+      ['y', 'y', 0, a.foo.oof, b.foo.oof, 'META'], // called with the keys of a Map
       [a.foo.oof.get('y'), b.foo.oof.get('y'), 'y', a.foo.oof, b.foo.oof, 'META'],
       [a.foo.baz, b.foo.baz, 'baz', a.foo, b.foo, 'META'],
-      ['x', 'x', undefined, a.foo.baz, b.foo.baz, 'META'],
+      ['x', 'x', 0, a.foo.baz, b.foo.baz, 'META'],
       [a.foo.bar, b.foo.bar, 'bar', a.foo, b.foo, 'META'],
       [a.foo.bar[1], b.foo.bar[1], 1, a.foo.bar, b.foo.bar, 'META'],
       [a.foo.bar[0], b.foo.bar[0], 0, a.foo.bar, b.foo.bar, 'META'],
