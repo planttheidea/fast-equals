@@ -15,7 +15,7 @@
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "benchee": "^1.1.0",
-    "cli-table2": "^0.2.0",
+    "cli-table3": "^0.6.0",
     "decircularize": "^1.0.0",
     "deep-eql": "^4.0.0",
     "deep-equal": "^2.0.5",

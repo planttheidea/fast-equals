@@ -3,7 +3,7 @@
 const assertDeepStrictEqual = require('assert').deepStrictEqual;
 
 const { createSuite } = require('benchee');
-const Table = require('cli-table2');
+const Table = require('cli-table3');
 
 const tests = require('../__tests__/__helpers__/testSuites');
 
@@ -34,13 +34,16 @@ const filteredEquivalentTests = ['maps', 'sets', 'promises'];
 /*
  * filter out Map and Set, as those do not pass with anything but lodash and falsely inflate the average ops/sec
  */
-const equivalentTests = tests.filter(({ description }) => filteredEquivalentTests.every(test => !~description.indexOf(test)));
+const equivalentTests = tests.filter(({ description }) =>
+  filteredEquivalentTests.every((test) => !~description.indexOf(test)),
+);
 
 const passingTests = {};
 
 console.log('');
 
-const getPassedKey = (equalName, { description }) => `${equalName} - ${description}`;
+const getPassedKey = (equalName, { description }) =>
+  `${equalName} - ${description}`;
 
 const getResults = (results) => {
   const table = new Table({
@@ -73,21 +76,21 @@ const suite = createSuite({
 
           return ~existingRowIndex
             ? {
-              ...combined[existingRowIndex],
-              stats: {
-                elapsed: (combined[existingRowIndex].stats.elapsed +=
+                ...combined[existingRowIndex],
+                stats: {
+                  elapsed: (combined[existingRowIndex].stats.elapsed +=
                     stats.elapsed),
-                iterations: (combined[existingRowIndex].stats.iterations +=
+                  iterations: (combined[existingRowIndex].stats.iterations +=
                     stats.iterations),
-              },
-            }
+                },
+              }
             : {
-              name,
-              stats: {
-                elapsed: stats.elapsed,
-                iterations: stats.iterations,
-              },
-            };
+                name,
+                stats: {
+                  elapsed: stats.elapsed,
+                  iterations: stats.iterations,
+                },
+              };
         });
       }, [])
       .map(({ name, stats }) => ({
