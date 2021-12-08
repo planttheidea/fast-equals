@@ -22,14 +22,15 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 - [fast-equals](#fast-equals)
   - [Table of contents](#table-of-contents)
   - [Usage](#usage)
-      - [Specific builds](#specific-builds)
+    - [Specific builds](#specific-builds)
   - [Available methods](#available-methods)
-      - [deepEqual](#deepequal)
-      - [shallowEqual](#shallowequal)
-      - [sameValueZeroEqual](#samevaluezeroequal)
-      - [circularDeepEqual](#circulardeepequal)
-      - [circularShallowEqual](#circularshallowequal)
-      - [createCustomEqual](#createcustomequal)
+    - [deepEqual](#deepequal)
+      - [Comparing `Map`s](#comparing-maps)
+    - [shallowEqual](#shallowequal)
+    - [sameValueZeroEqual](#samevaluezeroequal)
+    - [circularDeepEqual](#circulardeepequal)
+    - [circularShallowEqual](#circularshallowequal)
+    - [createCustomEqual](#createcustomequal)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
 
@@ -51,7 +52,7 @@ import * as fe from 'fast-equals';
 console.log(fe.deep({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
 
-#### Specific builds
+### Specific builds
 
 There are three builds, an ESM build for modern build systems / runtimes, a CommonJS build for traditional NodeJS environments, and a UMD build for legacy implementations. The ideal one will likely be chosen for you automatically, however if you want to use a specific build you can always import it directly:
 
@@ -66,7 +67,7 @@ There is also a pre-minified version of the UMD build available:
 
 ## Available methods
 
-#### deepEqual
+### deepEqual
 
 Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
@@ -80,7 +81,20 @@ console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
 ```
 
-#### shallowEqual
+#### Comparing `Map`s
+
+`Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
+
+```javascript
+const mapA = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
+const mapB = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
+
+deepEqual(mapA, mapB);
+```
+
+To support true deep equality of all contents, `fast-equals` will perform a deep equality comparison for key and value parirs. Therefore, the above would be `true`.
+
+### shallowEqual
 
 Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
@@ -98,7 +112,7 @@ console.log(shallowEqual(objectA, objectB)); // true
 console.log(shallowEqual(objectA, objectC)); // false
 ```
 
-#### sameValueZeroEqual
+### sameValueZeroEqual
 
 Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means either strictly equal or both `NaN`.
 
@@ -116,7 +130,7 @@ console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
 console.log(sameValueZeroEqual(mainObject, objectC)); // false
 ```
 
-#### circularDeepEqual
+### circularDeepEqual
 
 Performs the same comparison as `deepEqual` but supports circular objects. It is slower than `deepEqual`, so only use if you know circular objects are present.
 
@@ -136,7 +150,9 @@ console.log(circularDeepEqual(new Circular('foo'), new Circular('foo'))); // tru
 console.log(circularDeepEqual(new Circular('foo'), new Circular('bar'))); // false
 ```
 
-#### circularShallowEqual
+Just as with `deepEqual`, [both keys and values are compared for deep equality](#comparing-maps).
+
+### circularShallowEqual
 
 Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only use if you know circular objects are present.
 
@@ -149,7 +165,7 @@ console.log(circularShallowEqual(array, ['foo', array])); // true
 console.log(circularShallowEqual(array, [array])); // false
 ```
 
-#### createCustomEqual
+### createCustomEqual
 
 Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a partial-application function that will receive the internal comparator and should return a function that compares two objects.
 
