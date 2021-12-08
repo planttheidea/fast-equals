@@ -111,9 +111,9 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
     return function circularEqual(
       a: any,
       b: any,
-      indexOrKey: any,
-      parentA: any,
-      parentB: any,
+      indexOrKey?: any,
+      parentA?: any,
+      parentB?: any,
       cache: Cache = getNewCache(),
     ) {
       const isCacheableA = !!a && typeof a === 'object';
