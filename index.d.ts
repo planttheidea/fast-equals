@@ -6,7 +6,8 @@ declare type EqualityComparator = (
 declare type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
-  indexOrKey?: any,
+  indexOrKeyA?: any,
+  indexOrKeyB?: any,
   parentA?: any,
   parentB?: any,
   meta?: any,

@@ -173,7 +173,7 @@ The signature is as follows:
 
 ```typescript
 type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
-type InternalEqualityComparator = (a: any, b: any, indexOrKey?: any, parentA?: any, parentB?: any, meta?: any) => boolean;
+type InternalEqualityComparator = (a: any, b: any, indexOrKeyA?: any, indexOrKeyB?: any, parentA?: any, parentB?: any, meta?: any) => boolean;
 type EqualityComparatorCreator = (
   deepEqual: EqualityComparator,
 ) => InternalEqualityComparator;
@@ -191,7 +191,7 @@ An example for a custom equality comparison that also checks against values in t
 import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) => (objectA, objectB, indexOrKey, parentA, parentB, meta) =>
+  (deepEqual) => (objectA, objectB, indexOrKeyA, indexOrKeyB,  parentA, parentB, meta) =>
     objectA.foo === meta ||
     objectB.foo === meta ||
     deepEqual(objectA, objectB, meta),

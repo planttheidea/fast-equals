@@ -10,7 +10,8 @@ type Cache = {
 export type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
-  indexOrKey?: any,
+  indexOrKeyA?: any,
+  indexOrKeyB?: any,
   parentA?: any,
   parentB?: any,
   meta?: any,
@@ -111,7 +112,8 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
     return function circularEqual(
       a: any,
       b: any,
-      indexOrKey?: any,
+      indexOrKeyA?: any,
+      indexOrKeyB?: any,
       parentA?: any,
       parentB?: any,
       cache: Cache = getNewCache(),
@@ -163,7 +165,7 @@ export function areArraysEqual(
   }
 
   while (index-- > 0) {
-    if (!isEqual(a[index], b[index], index, a, b, meta)) {
+    if (!isEqual(a[index], b[index], index, index, a, b, meta)) {
       return false;
     }
   }
@@ -190,25 +192,27 @@ export function areMapsEqual(
 
   if (isValueEqual && a.size) {
     const matchedIndices: Record<number, true> = {};
+    let indexA = 0;
 
     a.forEach((aValue, aKey) => {
       if (isValueEqual) {
         let hasMatch = false;
-        let matchIndex = 0;
+        let matchIndexB = 0;
 
         b.forEach((bValue, bKey) => {
-          if (!hasMatch && !matchedIndices[matchIndex]) {
+          if (!hasMatch && !matchedIndices[matchIndexB]) {
             hasMatch =
-            isEqual(aKey, bKey, matchIndex, a, b, meta) && isEqual(aValue, bValue, aKey, a, b, meta);
+            isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) && isEqual(aValue, bValue, aKey, bKey, a, b, meta);
 
             if (hasMatch) {
-              matchedIndices[matchIndex] = true;
+              matchedIndices[matchIndexB] = true;
             }
           }
 
-          matchIndex++;
+          matchIndexB++;
         });
 
+        indexA++;
         isValueEqual = hasMatch;
       }
     });
@@ -270,7 +274,7 @@ export function areObjectsEqual(
         }
       }
 
-      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], key, a, b, meta)) {
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], key, key, a, b, meta)) {
         return false;
       }
     }
@@ -318,14 +322,14 @@ export function areSetsEqual(
   if (isValueEqual && a.size) {
     const matchedIndices: Record<number, true> = {};
 
-    a.forEach((aValue) => {
+    a.forEach((aValue, aKey) => {
       if (isValueEqual) {
         let hasMatch = false;
         let matchIndex = 0;
 
-        b.forEach((bValue) => {
+        b.forEach((bValue, bKey) => {
           if (!hasMatch && !matchedIndices[matchIndex]) {
-            hasMatch = isEqual(aValue, bValue, matchIndex, a, b, meta);
+            hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta);
 
             if (hasMatch) {
               matchedIndices[matchIndex] = true;
