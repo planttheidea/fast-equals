@@ -335,12 +335,12 @@ describe('createCircularEqualCreator', () => {
 
     const isDeepEqual = jest.fn().mockReturnValue(true);
 
-    const comparator = handler(isDeepEqual);
+    const internalComparator = handler(isDeepEqual);
 
     const a = { foo: 'bar' };
     const b = { foo: 'bar' };
 
-    const result = comparator(a, a);
+    const result = internalComparator(a, a, undefined, undefined, undefined, undefined, undefined);
 
     expect(has).toHaveBeenCalledTimes(2);
     expect(has).toHaveBeenNthCalledWith(1, a);
@@ -356,7 +356,7 @@ describe('createCircularEqualCreator', () => {
 
     expect(result).toBe(true);
 
-    comparator(a, b);
+    internalComparator(a, b, undefined, undefined, undefined, undefined, undefined);
 
     expect(has).toHaveBeenCalledTimes(2);
     expect(has).toHaveBeenNthCalledWith(1, a);

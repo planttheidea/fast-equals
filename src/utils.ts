@@ -10,11 +10,11 @@ type Cache = {
 export type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
-  indexOrKeyA?: any,
-  indexOrKeyB?: any,
-  parentA?: any,
-  parentB?: any,
-  meta?: any,
+  indexOrKeyA: any,
+  indexOrKeyB: any,
+  parentA: any,
+  parentB: any,
+  meta: any,
 ) => boolean;
 
 export type EqualityComparator = (
@@ -106,16 +106,16 @@ export const getNewCache = ((canUseWeakMap: boolean) => {
  * @returns the method to create the `isEqual` function
  */
 export function createCircularEqualCreator(isEqual?: EqualityComparator) {
-  return function createCircularEqual(comparator: EqualityComparator) {
+  return function createCircularEqual(comparator: EqualityComparator): InternalEqualityComparator {
     const _comparator = isEqual || comparator;
 
     return function circularEqual(
-      a: any,
-      b: any,
-      indexOrKeyA?: any,
-      indexOrKeyB?: any,
-      parentA?: any,
-      parentB?: any,
+      a,
+      b,
+      indexOrKeyA,
+      indexOrKeyB,
+      parentA,
+      parentB,
       cache: Cache = getNewCache(),
     ) {
       const isCacheableA = !!a && typeof a === 'object';

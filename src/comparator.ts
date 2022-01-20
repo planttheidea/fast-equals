@@ -21,7 +21,7 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator): Equ
     /* eslint-disable no-use-before-define */
     typeof createIsEqual === 'function'
       ? createIsEqual(comparator)
-      : (a: any, b: any, indexOrKeyA?: any, indexOrKeyB?: any, parentA?: any, parentB?: any, meta?: any) => comparator(a, b, meta);
+      : (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any) => comparator(a, b, meta);
   /* eslint-enable */
 
   /**

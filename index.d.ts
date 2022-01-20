@@ -6,11 +6,11 @@ declare type EqualityComparator = (
 declare type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
-  indexOrKeyA?: any,
-  indexOrKeyB?: any,
-  parentA?: any,
-  parentB?: any,
-  meta?: any,
+  indexOrKeyA: any,
+  indexOrKeyB: any,
+  parentA: any,
+  parentB: any,
+  meta: any,
 ) => boolean;
 declare type EqualityComparatorCreator = (
   comparator: EqualityComparator,

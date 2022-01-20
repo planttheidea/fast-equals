@@ -173,7 +173,7 @@ The signature is as follows:
 
 ```typescript
 type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
-type InternalEqualityComparator = (a: any, b: any, indexOrKeyA?: any, indexOrKeyB?: any, parentA?: any, parentB?: any, meta?: any) => boolean;
+type InternalEqualityComparator = (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any) => boolean;
 type EqualityComparatorCreator = (
   deepEqual: EqualityComparator,
 ) => InternalEqualityComparator;

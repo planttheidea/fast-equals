@@ -32,7 +32,7 @@ describe('createComparator', () => {
 
   it('should call the custom comparator with the correct params', () => {
     const customComparatorMock = jest.fn();
-    const createIsEqual: EqualityComparatorCreator = (deepEqual) => (...args: [a: any, b: any, indexOrKeyA?: any, indexOrKeyB?: any, parentA?: any, parentB?: any, meta?: any]) => {
+    const createIsEqual: EqualityComparatorCreator = (deepEqual) => (...args: [a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any]) => {
       customComparatorMock(...args);
       const [a, b, , , , , meta] = args;
       return deepEqual(a, b, meta);
@@ -73,11 +73,11 @@ it('should access Maps A and B values with keys', () => {
     (deepEqual) => (
       a: any,
       b: any,
-      indexOrKeyA?: any,
-      indexOrKeyB?: any,
-      parentA?: any,
-      parentB?: any,
-      meta?: any,
+      indexOrKeyA: any,
+      indexOrKeyB: any,
+      parentA: any,
+      parentB: any,
+      meta: any,
     ) => {
       if (typeof a === 'number' && typeof b === 'number') {
         // Ignores key equality comparison
@@ -105,11 +105,11 @@ it('should provide correct iteration index when comparing Map keys', () => {
     (deepEqual) => (
       a: any,
       b: any,
-      indexOrKeyA?: any,
-      indexOrKeyB?: any,
-      parentA?: any,
-      parentB?: any,
-      meta?: any,
+      indexOrKeyA: any,
+      indexOrKeyB: any,
+      parentA: any,
+      parentB: any,
+      meta: any,
     ) => {
       if (typeof indexOrKeyA === 'number' && typeof indexOrKeyB === 'number') {
         // Only check key equality comparison
