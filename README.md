@@ -185,6 +185,8 @@ function createCustomEqual(
 
 The `meta` parameter in `EqualityComparator` and `InternalEqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
 
+_**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
+
 An example for a custom equality comparison that also checks against values in the meta object:
 
 ```javascript
