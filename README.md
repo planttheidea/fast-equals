@@ -173,16 +173,19 @@ The signature is as follows:
 
 ```typescript
 type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
+type InternalEqualityComparator = (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any) => boolean;
 type EqualityComparatorCreator = (
   deepEqual: EqualityComparator,
-) => EqualityComparator;
+) => InternalEqualityComparator;
 
 function createCustomEqual(
   createIsEqual?: EqualityComparatorCreator,
 ): EqualityComparator;
 ```
 
-The `meta` parameter in `EqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
+The `meta` parameter in `EqualityComparator` and `InternalEqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
+
+_**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
 
 An example for a custom equality comparison that also checks against values in the meta object:
 
@@ -190,7 +193,7 @@ An example for a custom equality comparison that also checks against values in t
 import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) => (objectA, objectB, meta) =>
+  (deepEqual) => (objectA, objectB, indexOrKeyA, indexOrKeyB,  parentA, parentB, meta) =>
     objectA.foo === meta ||
     objectB.foo === meta ||
     deepEqual(objectA, objectB, meta),

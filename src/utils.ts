@@ -7,7 +7,21 @@ type Cache = {
   has: (value: any) => boolean;
 };
 
-export type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
+export type InternalEqualityComparator = (
+  objectA: any,
+  objectB: any,
+  indexOrKeyA: any,
+  indexOrKeyB: any,
+  parentA: any,
+  parentB: any,
+  meta: any,
+) => boolean;
+
+export type EqualityComparator = (
+  objectA: any,
+  objectB: any,
+  meta?: any
+) => boolean;
 
 /**
  * are the values passed strictly equal or both NaN
@@ -92,12 +106,16 @@ export const getNewCache = ((canUseWeakMap: boolean) => {
  * @returns the method to create the `isEqual` function
  */
 export function createCircularEqualCreator(isEqual?: EqualityComparator) {
-  return function createCircularEqual(comparator: EqualityComparator) {
+  return function createCircularEqual(comparator: EqualityComparator): InternalEqualityComparator {
     const _comparator = isEqual || comparator;
 
     return function circularEqual(
-      a: any,
-      b: any,
+      a,
+      b,
+      indexOrKeyA,
+      indexOrKeyB,
+      parentA,
+      parentB,
       cache: Cache = getNewCache(),
     ) {
       const isCacheableA = !!a && typeof a === 'object';
@@ -137,7 +155,7 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
 export function areArraysEqual(
   a: any[],
   b: any[],
-  isEqual: EqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let index = a.length;
@@ -147,7 +165,7 @@ export function areArraysEqual(
   }
 
   while (index-- > 0) {
-    if (!isEqual(a[index], b[index], meta)) {
+    if (!isEqual(a[index], b[index], index, index, a, b, meta)) {
       return false;
     }
   }
@@ -167,32 +185,34 @@ export function areArraysEqual(
 export function areMapsEqual(
   a: Map<any, any>,
   b: Map<any, any>,
-  isEqual: EqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;
 
   if (isValueEqual && a.size) {
     const matchedIndices: Record<number, true> = {};
+    let indexA = 0;
 
     a.forEach((aValue, aKey) => {
       if (isValueEqual) {
         let hasMatch = false;
-        let matchIndex = 0;
+        let matchIndexB = 0;
 
         b.forEach((bValue, bKey) => {
-          if (!hasMatch && !matchedIndices[matchIndex]) {
+          if (!hasMatch && !matchedIndices[matchIndexB]) {
             hasMatch =
-              isEqual(aKey, bKey, meta) && isEqual(aValue, bValue, meta);
+            isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) && isEqual(aValue, bValue, aKey, bKey, a, b, meta);
 
             if (hasMatch) {
-              matchedIndices[matchIndex] = true;
+              matchedIndices[matchIndexB] = true;
             }
           }
 
-          matchIndex++;
+          matchIndexB++;
         });
 
+        indexA++;
         isValueEqual = hasMatch;
       }
     });
@@ -225,7 +245,7 @@ const hasOwnProperty = Function.prototype.bind.call(
 export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
-  isEqual: EqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   const keysA = keys(a);
@@ -254,7 +274,7 @@ export function areObjectsEqual(
         }
       }
 
-      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], meta)) {
+      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], key, key, a, b, meta)) {
         return false;
       }
     }
@@ -294,7 +314,7 @@ export function areRegExpsEqual(a: RegExp, b: RegExp) {
 export function areSetsEqual(
   a: Set<any>,
   b: Set<any>,
-  isEqual: EqualityComparator,
+  isEqual: InternalEqualityComparator,
   meta: any,
 ) {
   let isValueEqual = a.size === b.size;
@@ -302,14 +322,14 @@ export function areSetsEqual(
   if (isValueEqual && a.size) {
     const matchedIndices: Record<number, true> = {};
 
-    a.forEach((aValue) => {
+    a.forEach((aValue, aKey) => {
       if (isValueEqual) {
         let hasMatch = false;
         let matchIndex = 0;
 
-        b.forEach((bValue) => {
+        b.forEach((bValue, bKey) => {
           if (!hasMatch && !matchedIndices[matchIndex]) {
-            hasMatch = isEqual(aValue, bValue, meta);
+            hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta);
 
             if (hasMatch) {
               matchedIndices[matchIndex] = true;
