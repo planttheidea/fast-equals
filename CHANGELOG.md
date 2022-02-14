@@ -1,5 +1,31 @@
 # fast-equals CHANGELOG
 
+## 3.0.0
+
+### Breaking changes
+
+When creating a custom equality comparator via `createCustomEqual`, the equality method has an expanded contract:
+
+```ts
+// Before
+type EqualityComparator = (objectA: any, objectB: any, meta: any) => boolean;
+
+// After
+type InternalEqualityComparator = (
+  objectA: any,
+  objectB: any,
+  indexOrKeyA: any,
+  indexOrKeyB: any,
+  parentA: any,
+  parentB: any,
+  meta: any,
+) => boolean;
+```
+
+If you have a custom equality comparator, you can ignore the differences by just passing additional `undefined` parameters, or you can use the parameters to further improve / clarify the logic.
+
+- Add [#57](https://github.com/planttheidea/fast-equals/pull/57) - support additional metadata for custom equality comparators
+
 ## 2.0.4
 
 - Fix [#58](https://github.com/planttheidea/fast-equals/issues/58) - duplicate entries in `Map` / `Set` can create false equality success
@@ -22,7 +48,7 @@
 
 ## 2.0.0
 
-#### Breaking changes
+### Breaking changes
 
 - There are longer `fast-equals/es`, `fast-equals/lib`, `fast-equals/mjs` locations
   - Instead, there are 3 builds in `dist` for different consumption types:
@@ -32,13 +58,13 @@
 - There is no default export anymore, only the previously-existing named exports
   - To get all into a namespace, use `import * as fe from 'fast-equals`
 
-#### Updates
+### Updates
 
 - Rewritten completely in TypeScript
 - Improve speed of `Map` / `Set` comparisons
 - Improve speed of React element comparisons
 
-#### Fixes
+### Fixes
 
 - Consider pure objects (`Object.create(null)`) to be plain objects
 - Fix typings for `createCustomEqual`
@@ -138,3 +164,7 @@
 ## 1.0.0
 
 - Initial release
+
+```
+
+```
