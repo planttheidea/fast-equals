@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 3.0.1
+
+- Fix [#71](https://github.com/planttheidea/fast-equals/pull/71) - use generic types for better type flow-through
+
 ## 3.0.0
 
 ### Breaking changes
