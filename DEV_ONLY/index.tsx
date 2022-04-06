@@ -112,8 +112,14 @@ console.log(
 console.log(
   'false',
   deepEqual(
-    new Map([['key1', 'foo'], ['key2', 'bar']]),
-    new Map([['key1', 'bar'], ['key2', 'foo']]),
+    new Map([
+      ['key1', 'foo'],
+      ['key2', 'bar'],
+    ]),
+    new Map([
+      ['key1', 'bar'],
+      ['key2', 'foo'],
+    ]),
   ),
 );
 
@@ -144,8 +150,14 @@ console.log(
 console.log(
   'false',
   shallowEqual(
-    new Map([['key1', 'foo'], ['key2', 'bar']]),
-    new Map([['key1', 'bar'], ['key2', 'foo']]),
+    new Map([
+      ['key1', 'foo'],
+      ['key2', 'bar'],
+    ]),
+    new Map([
+      ['key1', 'bar'],
+      ['key2', 'foo'],
+    ]),
   ),
 );
 
@@ -217,14 +229,14 @@ const object4 = {
   zero: 0,
 };
 
-type Comparator = (a: any, b: any) => boolean;
+type Comparator = <A, B>(a: A, b: B) => boolean;
 
 const isNotDeeplyOne = (comparator: Comparator) => (a: any, b: any) => {
   if (typeof a === 'number' || typeof b === 'number') {
     return a !== 1 && b !== 1;
   }
 
-  return Object.keys(a).every(key => comparator(a[key], b[key]));
+  return Object.keys(a).every((key) => comparator(a[key], b[key]));
 };
 
 const doesNotEverEqualOne = createCustomEqual(isNotDeeplyOne);
@@ -237,7 +249,7 @@ console.group('circular object');
 
 const cache = new WeakSet();
 
-const isDeepEqualCircular = createCustomEqual(comparator => (a, b) => {
+const isDeepEqualCircular = createCustomEqual((comparator) => (a, b) => {
   if (cache.has(a) || cache.has(b)) {
     return cache.has(a) && cache.has(b);
   }
