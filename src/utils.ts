@@ -17,10 +17,10 @@ export type InternalEqualityComparator = (
   meta: any,
 ) => boolean;
 
-export type EqualityComparator = (
-  objectA: any,
-  objectB: any,
-  meta?: any
+export type EqualityComparator = <A, B, Meta>(
+  objectA: A,
+  objectB: B,
+  meta?: Meta,
 ) => boolean;
 
 /**
@@ -106,7 +106,9 @@ export const getNewCache = ((canUseWeakMap: boolean) => {
  * @returns the method to create the `isEqual` function
  */
 export function createCircularEqualCreator(isEqual?: EqualityComparator) {
-  return function createCircularEqual(comparator: EqualityComparator): InternalEqualityComparator {
+  return function createCircularEqual(
+    comparator: EqualityComparator,
+  ): InternalEqualityComparator {
     const _comparator = isEqual || comparator;
 
     return function circularEqual(
@@ -202,7 +204,8 @@ export function areMapsEqual(
         b.forEach((bValue, bKey) => {
           if (!hasMatch && !matchedIndices[matchIndexB]) {
             hasMatch =
-            isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) && isEqual(aValue, bValue, aKey, bKey, a, b, meta);
+              isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
+              isEqual(aValue, bValue, aKey, bKey, a, b, meta);
 
             if (hasMatch) {
               matchedIndices[matchIndexB] = true;
@@ -274,7 +277,10 @@ export function areObjectsEqual(
         }
       }
 
-      if (!hasOwnProperty(b, key) || !isEqual(a[key], b[key], key, key, a, b, meta)) {
+      if (
+        !hasOwnProperty(b, key) ||
+        !isEqual(a[key], b[key], key, key, a, b, meta)
+      ) {
         return false;
       }
     }
