@@ -19,11 +19,8 @@ declare type EqualityComparatorCreator = (
 export declare function createCustomEqual(
   createIsEqual?: EqualityComparatorCreator,
 ): EqualityComparator;
-export declare function circularDeepEqual(objectA: any, objectB: any): boolean;
-export declare function circularShallowEqual(
-  objectA: any,
-  objectB: any,
-): boolean;
-export declare function deepEqual(objectA: any, objectB: any): boolean;
-export declare function shallowEqual(objectA: any, objectB: any): boolean;
-export declare function sameValueZeroEqual(objectA: any, objectB: any): boolean;
+export declare function circularDeepEqual<A, B>(objectA: A, objectB: B): boolean;
+export declare function circularShallowEqual<A, B>(objectA: A, objectB: B): boolean;
+export declare function deepEqual<A, B>(objectA: A, objectB: B): boolean;
+export declare function shallowEqual<A, B>(objectA: A, objectB: B): boolean;
+export declare function sameValueZeroEqual<A, B>(objectA: A, objectB: B): boolean;
