@@ -1,30 +1,13 @@
 import type {
   EqualityComparator,
-  ExoticEqualityComparator,
   InternalEqualityComparator,
   Primitive,
 } from './types';
 
 const { keys } = Object;
-const { toString } = Object.prototype;
+const { toString, valueOf } = Object.prototype;
 
 const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
-
-const EXOTIC_OBJECT_COMPARATORS: Record<string, ExoticEqualityComparator> = {
-  '[object BigInt]': areNonNumberPrimitiveWrappersEqual,
-  '[object Boolean]': areNonNumberPrimitiveWrappersEqual,
-  '[object Date]': areDatesEqual,
-  '[object Function]': strictEqual,
-  '[object Map]': areMapsEqual,
-  '[object Number]': areNumberWrappersEqual,
-  '[object Promise]': strictEqual,
-  '[object RegExp]': areRegExpsEqual,
-  '[object Set]': areSetsEqual,
-  '[object String]': areNonNumberPrimitiveWrappersEqual,
-  '[object Symbol]': strictEqual,
-  '[object WeakMap]': strictEqual,
-  '[object WeakSet]': strictEqual,
-};
 
 type Cache = {
   add: (value: any) => void;
@@ -185,38 +168,6 @@ export function areArraysEqual(
   }
 
   return true;
-}
-
-export function areDatesEqual(a: Date, b: Date) {
-  return sameValueZeroEqual(a.getTime(), b.getTime());
-}
-
-function areNonNumberPrimitiveWrappersEqual(
-  a: Omit<Primitive, 'number'>,
-  b: Omit<Primitive, 'number'>,
-) {
-  return a.valueOf() === b.valueOf();
-}
-
-function areNumberWrappersEqual(a: number, b: number) {
-  return sameValueZeroEqual(a.valueOf(), b.valueOf());
-}
-
-export function areExoticObjectsEqual(
-  a: any,
-  b: any,
-  isEqual: InternalEqualityComparator,
-  meta: any,
-) {
-  const aType = toString.call(a);
-
-  if (aType !== toString.call(b)) {
-    return false;
-  }
-
-  const comparator = EXOTIC_OBJECT_COMPARATORS[aType] || areObjectsEqual;
-
-  return comparator(a, b, isEqual, meta);
 }
 
 /**

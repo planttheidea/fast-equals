@@ -1,7 +1,5 @@
 import {
   areArraysEqual,
-  areDatesEqual,
-  areExoticObjectsEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
@@ -15,6 +13,8 @@ import type { EqualityComparator, InternalEqualityComparator } from './types';
 
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
+
+const { valueOf } = Object.prototype;
 
 export type EqualityComparatorCreator = (
   fn: EqualityComparator,
@@ -67,7 +67,9 @@ export function createComparator(
       bShape = b instanceof Date;
 
       if (aShape || bShape) {
-        return aShape === bShape && areDatesEqual(a, b);
+        return (
+          aShape === bShape && sameValueZeroEqual(a.getTime(), b.getTime())
+        );
       }
 
       aShape = a instanceof RegExp;
@@ -99,7 +101,11 @@ export function createComparator(
         }
       }
 
-      return areExoticObjectsEqual(a, b, isEqual, meta);
+      if (a.valueOf !== valueOf || b.valueOf !== valueOf) {
+        return sameValueZeroEqual(a.valueOf(), b.valueOf());
+      }
+
+      return areObjectsEqual(a, b, isEqual, meta);
     }
 
     return a !== a && b !== b;

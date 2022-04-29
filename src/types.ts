@@ -15,10 +15,3 @@ export type EqualityComparator = <A, B, Meta>(
   objectB: B,
   meta?: Meta,
 ) => boolean;
-
-export type ExoticEqualityComparator = (
-  objectA: any,
-  objectB: any,
-  comparator: InternalEqualityComparator,
-  meta: any,
-) => boolean;
