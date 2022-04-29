@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 3.0.2
+
+- Fix [#73](https://github.com/planttheidea/fast-equals/issues/73) - support comparison of primitive wrappers
+- [#76](https://github.com/planttheidea/fast-equals/pull/76) - improve speed and accuracy of `RegExp` comparison in modern environments
+
 ## 3.0.1
 
 - Fix [#71](https://github.com/planttheidea/fast-equals/pull/71) - use generic types for better type flow-through
