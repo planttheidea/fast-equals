@@ -1,6 +1,4 @@
 import {
-  EqualityComparator,
-  InternalEqualityComparator,
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
@@ -11,17 +9,33 @@ import {
   sameValueZeroEqual,
 } from './utils';
 
+import type { EqualityComparator, InternalEqualityComparator } from './types';
+
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
 
-export type EqualityComparatorCreator = (fn: EqualityComparator) => InternalEqualityComparator;
+const { valueOf } = Object.prototype;
 
-export function createComparator(createIsEqual?: EqualityComparatorCreator): EqualityComparator {
+export type EqualityComparatorCreator = (
+  fn: EqualityComparator,
+) => InternalEqualityComparator;
+
+export function createComparator(
+  createIsEqual?: EqualityComparatorCreator,
+): EqualityComparator {
   const isEqual: InternalEqualityComparator =
     /* eslint-disable no-use-before-define */
     typeof createIsEqual === 'function'
       ? createIsEqual(comparator)
-      : (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any) => comparator(a, b, meta);
+      : (
+          a: any,
+          b: any,
+          indexOrKeyA: any,
+          indexOrKeyB: any,
+          parentA: any,
+          parentB: any,
+          meta: any,
+        ) => comparator(a, b, meta);
   /* eslint-enable */
 
   /**
@@ -85,6 +99,10 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator): Equ
         if (aShape || bShape) {
           return aShape === bShape && areSetsEqual(a, b, isEqual, meta);
         }
+      }
+
+      if (a.valueOf !== valueOf || b.valueOf !== valueOf) {
+        return sameValueZeroEqual(a.valueOf(), b.valueOf());
       }
 
       return areObjectsEqual(a, b, isEqual, meta);

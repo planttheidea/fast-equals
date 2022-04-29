@@ -1,27 +1,13 @@
-const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+import type { EqualityComparator, InternalEqualityComparator } from './types';
 
 const { keys } = Object;
+
+const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
 
 type Cache = {
   add: (value: any) => void;
   has: (value: any) => boolean;
 };
-
-export type InternalEqualityComparator = (
-  objectA: any,
-  objectB: any,
-  indexOrKeyA: any,
-  indexOrKeyB: any,
-  parentA: any,
-  parentB: any,
-  meta: any,
-) => boolean;
-
-export type EqualityComparator = <A, B, Meta>(
-  objectA: A,
-  objectB: B,
-  meta?: Meta,
-) => boolean;
 
 /**
  * are the values passed strictly equal or both NaN
