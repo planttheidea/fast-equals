@@ -5,7 +5,6 @@ import type {
 } from './types';
 
 const { keys } = Object;
-const { toString, valueOf } = Object.prototype;
 
 const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
 
