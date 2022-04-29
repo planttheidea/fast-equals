@@ -1,5 +1,3 @@
-export type Primitive = bigint | boolean | number | string | symbol;
-
 export type InternalEqualityComparator = (
   objectA: any,
   objectB: any,

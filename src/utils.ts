@@ -1,8 +1,4 @@
-import type {
-  EqualityComparator,
-  InternalEqualityComparator,
-  Primitive,
-} from './types';
+import type { EqualityComparator, InternalEqualityComparator } from './types';
 
 const { keys } = Object;
 
