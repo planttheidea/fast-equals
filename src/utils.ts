@@ -10,33 +10,6 @@ const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
 const { keys } = Object;
 
 /**
- * are the regExps equal in value
- *
- * @param a the regExp to test
- * @param b the regExp to test agains
- * @returns are the regExps equal
- */
-export const areRegExpsEqual = (() => {
-  if (/foo/g.flags === 'g') {
-    return function areRegExpsEqual(a: RegExp, b: RegExp) {
-      return a.source === b.source && a.flags === b.flags;
-    };
-  }
-
-  return function areRegExpsEqualFallback(a: RegExp, b: RegExp) {
-    return (
-      a.source === b.source &&
-      a.global === b.global &&
-      a.ignoreCase === b.ignoreCase &&
-      a.multiline === b.multiline &&
-      a.unicode === b.unicode &&
-      a.sticky === b.sticky &&
-      a.lastIndex === b.lastIndex
-    );
-  };
-})();
-
-/**
  * are the values passed strictly equal or both NaN
  *
  * @param a the value to compare against
@@ -301,6 +274,33 @@ export function areObjectsEqual(
 
   return true;
 }
+
+/**
+ * are the regExps equal in value
+ *
+ * @param a the regExp to test
+ * @param b the regExp to test agains
+ * @returns are the regExps equal
+ */
+export const areRegExpsEqual = (() => {
+  if (/foo/g.flags === 'g') {
+    return function areRegExpsEqual(a: RegExp, b: RegExp) {
+      return a.source === b.source && a.flags === b.flags;
+    };
+  }
+
+  return function areRegExpsEqualFallback(a: RegExp, b: RegExp) {
+    return (
+      a.source === b.source &&
+      a.global === b.global &&
+      a.ignoreCase === b.ignoreCase &&
+      a.multiline === b.multiline &&
+      a.unicode === b.unicode &&
+      a.sticky === b.sticky &&
+      a.lastIndex === b.lastIndex
+    );
+  };
+})();
 
 /**
  * are the sets equal in value
