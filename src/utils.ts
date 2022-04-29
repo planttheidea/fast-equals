@@ -25,10 +25,6 @@ export function sameValueZeroEqual(a: any, b: any) {
   return a === b || (a !== a && b !== b);
 }
 
-function strictEqual(a: any, b: any) {
-  return a === b;
-}
-
 /**
  * is the value a plain object
  *
