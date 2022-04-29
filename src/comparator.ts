@@ -1,7 +1,7 @@
 import {
-  EqualityComparator,
-  InternalEqualityComparator,
   areArraysEqual,
+  areDatesEqual,
+  areExoticObjectsEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
@@ -11,17 +11,31 @@ import {
   sameValueZeroEqual,
 } from './utils';
 
+import type { EqualityComparator, InternalEqualityComparator } from './types';
+
 const HAS_MAP_SUPPORT = typeof Map === 'function';
 const HAS_SET_SUPPORT = typeof Set === 'function';
 
-export type EqualityComparatorCreator = (fn: EqualityComparator) => InternalEqualityComparator;
+export type EqualityComparatorCreator = (
+  fn: EqualityComparator,
+) => InternalEqualityComparator;
 
-export function createComparator(createIsEqual?: EqualityComparatorCreator): EqualityComparator {
+export function createComparator(
+  createIsEqual?: EqualityComparatorCreator,
+): EqualityComparator {
   const isEqual: InternalEqualityComparator =
     /* eslint-disable no-use-before-define */
     typeof createIsEqual === 'function'
       ? createIsEqual(comparator)
-      : (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, meta: any) => comparator(a, b, meta);
+      : (
+          a: any,
+          b: any,
+          indexOrKeyA: any,
+          indexOrKeyB: any,
+          parentA: any,
+          parentB: any,
+          meta: any,
+        ) => comparator(a, b, meta);
   /* eslint-enable */
 
   /**
@@ -53,9 +67,7 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator): Equ
       bShape = b instanceof Date;
 
       if (aShape || bShape) {
-        return (
-          aShape === bShape && sameValueZeroEqual(a.getTime(), b.getTime())
-        );
+        return aShape === bShape && areDatesEqual(a, b);
       }
 
       aShape = a instanceof RegExp;
@@ -87,7 +99,7 @@ export function createComparator(createIsEqual?: EqualityComparatorCreator): Equ
         }
       }
 
-      return areObjectsEqual(a, b, isEqual, meta);
+      return areExoticObjectsEqual(a, b, isEqual, meta);
     }
 
     return a !== a && b !== b;
