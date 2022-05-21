@@ -71,7 +71,6 @@ export function getNewCacheFallback(): Cache {
     },
 
     get(key: object) {
-      console.log(key);
       for (let index = 0; index < entries.length; ++index) {
         if (entries[index][0] === key) {
           return entries[index][1];
@@ -80,7 +79,14 @@ export function getNewCacheFallback(): Cache {
     },
 
     set(key: object, value: object) {
-      entries.push([key, value])
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries[index][1] = value;
+          return;
+        }
+      }
+
+      entries.push([key, value]);
     }
   };
 }

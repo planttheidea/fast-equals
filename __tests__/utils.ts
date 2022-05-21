@@ -28,14 +28,14 @@ describe('areArraysEqual', () => {
   it('should return false when the arrays are different lengths', () => {
     const a = ['foo', 'bar'];
     const b = ['foo', 'bar', 'baz'];
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areArraysEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
 
   it('should return false when the arrays are not equal in value', () => {
     const a = ['foo', 'bar'];
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     const b = ['foo', 'baz'];
     expect(areArraysEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
@@ -44,7 +44,7 @@ describe('areArraysEqual', () => {
   it('should return true when the arrays are equal in value', () => {
     const a = ['foo', 'bar'];
     const b = ['foo', 'bar'];
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areArraysEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -54,7 +54,7 @@ describe('areMapsEqual', () => {
   it('should return false when maps are different sizes', () => {
     const a = new Map();
     const b = new Map().set('foo', 'bar');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -62,7 +62,7 @@ describe('areMapsEqual', () => {
   it('should return false when maps have different keys', () => {
     const a = new Map().set('foo', 'bar');
     const b = new Map().set('bar', 'bar');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -70,7 +70,7 @@ describe('areMapsEqual', () => {
   it('should return false when maps have different values', () => {
     const a = new Map().set('foo', 'bar');
     const b = new Map().set('foo', 'baz');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -78,7 +78,7 @@ describe('areMapsEqual', () => {
   it('should return true when maps have the same size, keys, and values', () => {
     const a = new Map().set('foo', 'bar');
     const b = new Map().set('foo', 'bar');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -86,7 +86,7 @@ describe('areMapsEqual', () => {
   it('should return true when maps have the same size, keys, and values regardless of order', () => {
     const a = new Map().set('bar', 'foo').set('foo', 'bar');
     const b = new Map().set('foo', 'bar').set('bar', 'foo');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areMapsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -148,7 +148,7 @@ describe('areMapsEqual', () => {
       (_, aEntries: any[], bEntries: any[], expected) => {
         const mapA = new Map<any, any>(aEntries);
         const mapB = new Map<any, any>(bEntries);
-        const cache = new WeakSet();
+        const cache = new WeakMap();
 
         expect(areMapsEqual(mapA, mapB, deepEqual, cache)).toBe(expected);
         expect(areMapsEqual(mapB, mapA, deepEqual, cache)).toBe(expected);
@@ -161,7 +161,7 @@ describe('areObjectsEqual', () => {
   it('should return false when the objects have different key lengths', () => {
     const a = { bar: 'bar', foo: 'foo' };
     const b = { bar: 'bar', baz: 'baz', foo: 'foo' };
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areObjectsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -169,7 +169,7 @@ describe('areObjectsEqual', () => {
   it('should return false when the objects have different keys', () => {
     const a = { bar: 'bar', foo: 'foo' };
     const b = { baz: 'bar', foo: 'foo' };
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areObjectsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -177,7 +177,7 @@ describe('areObjectsEqual', () => {
   it('should return false when the objects are not equal in value', () => {
     const a = { bar: 'bar', foo: 'foo' };
     const b = { bar: 'baz', foo: 'foo' };
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areObjectsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -185,7 +185,7 @@ describe('areObjectsEqual', () => {
   it('should return true when the objects are equal in value', () => {
     const a = { bar: 'bar', foo: 'foo' };
     const b = { bar: 'bar', foo: 'foo' };
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areObjectsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -246,7 +246,7 @@ describe('areSetsEqual', () => {
   it('should return false when the sets have different sizes', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -254,7 +254,7 @@ describe('areSetsEqual', () => {
   it('should return false when the sets have different values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('bar');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(false);
   });
@@ -262,7 +262,7 @@ describe('areSetsEqual', () => {
   it('should return true when the sets have the same values', () => {
     const a = new Set().add('foo');
     const b = new Set().add('foo');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -270,7 +270,7 @@ describe('areSetsEqual', () => {
   it('should return true when the sets have the same values regardless of order', () => {
     const a = new Set().add('foo').add('bar');
     const b = new Set().add('bar').add('foo');
-    const cache = new WeakSet();
+    const cache = new WeakMap();
 
     expect(areSetsEqual(a, b, sameValueZeroEqual, cache)).toBe(true);
   });
@@ -304,7 +304,7 @@ describe('areSetsEqual', () => {
     ])('should handle `Set` entries %s', (_, aEntries, bEntries, expected) => {
       const setA = new Set<any>(aEntries);
       const setB = new Set<any>(bEntries);
-      const cache = new WeakSet();
+      const cache = new WeakMap();
 
       expect(areSetsEqual(setA, setB, deepEqual, cache)).toBe(expected);
       expect(areSetsEqual(setB, setA, deepEqual, cache)).toBe(expected);
@@ -313,22 +313,28 @@ describe('areSetsEqual', () => {
 });
 
 describe('createCircularEqualCreator', () => {
-  it('should create the custom comparator that stores the values in cache', () => {
-    const ws = global.WeakSet;
+  it('should create the custom comparator that stores the values in fallback cache', () => {
+    const wm = global.WeakMap;
 
-    const values: any[] = [];
+    const entries: any[] = [];
 
-    const add = jest.fn().mockImplementation((object) => values.push(object));
-    const has = jest
-      .fn()
-      .mockImplementation((object) => values.indexOf(object) !== -1);
+    const del = jest.fn((key) => {
+      const index = entries.findIndex((entry) => entry[0] === key);
+
+      if (index === -1) {
+        entries.splice(index, 1);
+      }
+    });
+    const get = jest.fn((key) => entries.find((entry) => entry[0] === key))
+    const set = jest.fn((key, value) => entries.push([key, value]));
 
     // @ts-ignore
-    global.WeakSet = function WeakSet() {
-      this._values = values;
+    global.WeakMap = function WeakMap() {
+      this._entries = entries;
 
-      this.add = add;
-      this.has = has;
+      this.delete = del;
+      this.get = get;
+      this.set = set;
     };
 
     const handler = createCircularEqualCreator(undefined);
@@ -342,51 +348,42 @@ describe('createCircularEqualCreator', () => {
 
     const result = internalComparator(a, a, undefined, undefined, undefined, undefined, undefined);
 
-    expect(has).toHaveBeenCalledTimes(2);
-    expect(has).toHaveBeenNthCalledWith(1, a);
-    expect(has).toHaveBeenNthCalledWith(2, b);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledWith(a);
 
-    has.mockClear();
+    get.mockClear();
 
-    expect(add).toHaveBeenCalledTimes(2);
-    expect(add).toHaveBeenNthCalledWith(1, a);
-    expect(add).toHaveBeenNthCalledWith(2, b);
+    expect(set).toHaveBeenCalledTimes(2);
+    expect(set).toHaveBeenNthCalledWith(1, a, b);
+    expect(set).toHaveBeenNthCalledWith(2, b, a);
 
-    add.mockClear();
+    set.mockClear();
 
     expect(result).toBe(true);
 
-    internalComparator(a, b, undefined, undefined, undefined, undefined, undefined);
-
-    expect(has).toHaveBeenCalledTimes(2);
-    expect(has).toHaveBeenNthCalledWith(1, a);
-    expect(has).toHaveBeenNthCalledWith(2, b);
-
-    expect(add).not.toHaveBeenCalled();
-
-    global.WeakSet = ws;
+    global.WeakMap = wm;
   });
 });
 
 describe('getNewCache', () => {
-  it('should return a new WeakSet when support is present', () => {
+  it('should return a new WeakMap when support is present', () => {
     const cache = getNewCache();
 
-    expect(cache).toBeInstanceOf(WeakSet);
+    expect(cache).toBeInstanceOf(WeakMap);
   });
 
-  it('should work the same with the fallback when WeakSet is not supported', () => {
+  it('should work the same with the fallback when WeakMap is not supported', () => {
     const cache = getNewCacheFallback();
 
-    expect(cache).not.toBeInstanceOf(WeakSet);
+    expect(cache).not.toBeInstanceOf(WeakMap);
 
     const value = { foo: 'bar' };
 
-    expect(cache.has(value)).toBe(false);
+    expect(cache.get(value)).toBe(undefined);
 
-    cache.add(value);
+    cache.set(value, value);
 
-    expect(cache.has(value)).toBe(true);
+    expect(cache.get(value)).toBe(value);
   });
 });
 
