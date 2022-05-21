@@ -91,11 +91,11 @@ export function getNewCacheFallback(): Cache {
  * @returns the new cache object
  */
 export const getNewCache = ((canUseWeakMap: boolean) => {
-  // if (canUseWeakMap) {
-  //   return function _getNewCache(): Cache {
-  //     return new WeakMap();
-  //   };
-  // }
+  if (canUseWeakMap) {
+    return function _getNewCache(): Cache {
+      return new WeakMap();
+    };
+  }
 
   return getNewCacheFallback;
 })(HAS_WEAK_MAP_SUPPORT);
