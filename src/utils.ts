@@ -52,7 +52,7 @@ export function isReactElement(value: any) {
 }
 
 /**
- * in cases where WeakSet is not supported, creates a new custom
+ * in cases where WeakMap is not supported, creates a new custom
  * object that mimics the necessary API aspects for cache purposes
  *
  * @returns the new cache object

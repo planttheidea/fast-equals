@@ -247,7 +247,7 @@ console.groupEnd();
 
 console.group('circular object');
 
-const cache = new WeakSet();
+const cache = new WeakMap();
 
 const isDeepEqualCircular = createCustomEqual((comparator) => (a, b) => {
   if (cache.has(a) || cache.has(b)) {
