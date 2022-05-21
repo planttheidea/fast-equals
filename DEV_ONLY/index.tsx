@@ -251,15 +251,15 @@ const cache = new WeakMap();
 
 const isDeepEqualCircular = createCustomEqual((comparator) => (a, b) => {
   if (cache.has(a) || cache.has(b)) {
-    return cache.has(a) && cache.has(b);
+    return cache.get(a) === cache.get(b);
   }
 
   if (typeof a === 'object') {
-    cache.add(a);
+    cache.set(a, b);
   }
 
   if (typeof b === 'object') {
-    cache.add(b);
+    cache.set(b, a);
   }
 
   return comparator(a, b);
