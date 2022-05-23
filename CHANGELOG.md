@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 3.0.3
+
+- Fix [#77](https://github.com/planttheidea/fast-equals/issues/73) - better circular object validation
+
 ## 3.0.2
 
 - Fix [#73](https://github.com/planttheidea/fast-equals/issues/73) - support comparison of primitive wrappers
