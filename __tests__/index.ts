@@ -111,6 +111,15 @@ describe('circularDeepEqual', () => {
       false,
     );
   });
+
+  it('should handle shared references between objects', () => {
+    const x = [1]
+    const left =  [{ a: [1], b:  x  }]
+    const right = [{ a:  x,  b: [1] }]
+
+    // should returns true, but returns false
+    expect(circularDeepEqual( left, right )).toBe(true);
+  });
 });
 
 describe('circularShallowEqual', () => {

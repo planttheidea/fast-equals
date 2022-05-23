@@ -1,11 +1,12 @@
 import type { EqualityComparator, InternalEqualityComparator } from './types';
 
 interface Cache {
-  add: (value: any) => void;
-  has: (value: any) => boolean;
+  delete: (key: object) => void;
+  get: (key: object) => object | undefined;
+  set: (key: object, value: object) => void;
 }
 
-const HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+const HAS_WEAK_MAP_SUPPORT = typeof WeakMap === 'function';
 
 const { keys } = Object;
 
@@ -51,22 +52,42 @@ export function isReactElement(value: any) {
 }
 
 /**
- * in cases where WeakSet is not supported, creates a new custom
+ * in cases where WeakMap is not supported, creates a new custom
  * object that mimics the necessary API aspects for cache purposes
  *
  * @returns the new cache object
  */
 export function getNewCacheFallback(): Cache {
-  const values: any[] = [];
+  const entries: [object, object][] = [];
 
   return {
-    add(value: any) {
-      values.push(value);
+    delete(key: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries.splice(index, 1);
+          return;
+        }
+      }
     },
 
-    has(value: any) {
-      return values.indexOf(value) !== -1;
+    get(key: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          return entries[index][1];
+        }
+      }
     },
+
+    set(key: object, value: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries[index][1] = value;
+          return;
+        }
+      }
+
+      entries.push([key, value]);
+    }
   };
 }
 
@@ -78,12 +99,12 @@ export function getNewCacheFallback(): Cache {
 export const getNewCache = ((canUseWeakMap: boolean) => {
   if (canUseWeakMap) {
     return function _getNewCache(): Cache {
-      return new WeakSet();
+      return new WeakMap();
     };
   }
 
   return getNewCacheFallback;
-})(HAS_WEAKSET_SUPPORT);
+})(HAS_WEAK_MAP_SUPPORT);
 
 /**
  * create a custom isEqual handler specific to circular objects
@@ -109,24 +130,29 @@ export function createCircularEqualCreator(isEqual?: EqualityComparator) {
       const isCacheableA = !!a && typeof a === 'object';
       const isCacheableB = !!b && typeof b === 'object';
 
-      if (isCacheableA || isCacheableB) {
-        const hasA = isCacheableA && cache.has(a);
-        const hasB = isCacheableB && cache.has(b);
-
-        if (hasA || hasB) {
-          return hasA && hasB;
-        }
-
-        if (isCacheableA) {
-          cache.add(a);
-        }
-
-        if (isCacheableB) {
-          cache.add(b);
-        }
+      if (isCacheableA !== isCacheableB) {
+        return false;
       }
 
-      return _comparator(a, b, cache);
+      if (!isCacheableA && !isCacheableB) {
+        return _comparator(a, b, cache);
+      }
+
+      const cachedA = cache.get(a);
+      
+      if(cachedA && cache.get(b)) {
+        return cachedA === b;
+      }
+
+      cache.set(a, b);
+      cache.set(b, a);
+
+      const result = _comparator(a, b, cache);
+
+      cache.delete(a);
+      cache.delete(b);
+
+      return result;
     };
   };
 }
