@@ -1,10 +1,10 @@
-import { getNewCache } from "./cache";
-import { createComparatorCreator } from "./comparator";
-import { areArraysEqual, areArraysEqualCircular } from "./arrays";
-import { areMapsEqual, areMapsEqualCircular } from "./maps";
-import { areObjectsEqual, areObjectsEqualCircular } from "./objects";
-import { areSetsEqual, areSetsEqualCircular } from "./sets";
-import { sameValueZeroEqual } from "./utils";
+import { getNewCache } from './cache';
+import { createComparatorCreator } from './comparator';
+import { areArraysEqual, areArraysEqualCircular } from './arrays';
+import { areMapsEqual, areMapsEqualCircular } from './maps';
+import { areObjectsEqual, areObjectsEqualCircular } from './objects';
+import { areSetsEqual, areSetsEqualCircular } from './sets';
+import { sameValueZeroEqual } from './utils';
 
 export { sameValueZeroEqual };
 

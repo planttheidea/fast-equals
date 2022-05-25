@@ -1,4 +1,4 @@
-import type { Cache } from "./cache";
+import type { Cache } from './cache';
 
 export type InternalEqualityComparator = (
   objectA: any,
@@ -7,32 +7,32 @@ export type InternalEqualityComparator = (
   indexOrKeyB: any,
   parentA: any,
   parentB: any,
-  meta: any
+  meta: any,
 ) => boolean;
 
 export type EqualityComparator = <A, B, Meta>(
   objectA: A,
   objectB: B,
-  meta?: Meta
+  meta?: Meta,
 ) => boolean;
 
 export type NativeEqualityComparator = <A, B>(
   objectA: A,
-  objectB: B
+  objectB: B,
 ) => boolean;
 
 const { valueOf } = Object.prototype;
 
 export function createIsCircular<
-  AreItemsEqual extends (...args: any) => boolean
+  AreItemsEqual extends (...args: any) => boolean,
 >(areItemsEqual: AreItemsEqual) {
   return function isCircular(
     a: any,
     b: any,
     isEqual: InternalEqualityComparator,
-    cache: Cache
+    cache: Cache,
   ) {
-    if (!a || !b || typeof a !== "object" || typeof b !== "object") {
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
       return areItemsEqual(a, b, isEqual, cache);
     }
 
@@ -66,7 +66,7 @@ export function isPlainObject(value: any) {
 }
 
 export function isPrimitiveWrapper(
-  value: any
+  value: any,
 ): value is Boolean | BigInt | Number | String | Symbol {
   return value.valueOf !== valueOf;
 }
@@ -78,7 +78,7 @@ export function isPrimitiveWrapper(
  * @returns is the value promise-like
  */
 export function isPromiseLike(value: any) {
-  return typeof value.then === "function";
+  return typeof value.then === 'function';
 }
 
 /**

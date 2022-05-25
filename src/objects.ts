@@ -1,12 +1,12 @@
-import { createIsCircular } from "./utils";
+import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from "./utils";
+import type { InternalEqualityComparator } from './utils';
 
 interface Dictionary<Value> {
   [key: string]: Value;
 }
 
-const OWNER = "_owner";
+const OWNER = '_owner';
 const { hasOwnProperty } = Object.prototype;
 
 /**
@@ -21,7 +21,7 @@ export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
   isEqual: InternalEqualityComparator,
-  meta: any
+  meta: any,
 ) {
   const keysA = Object.keys(a);
 

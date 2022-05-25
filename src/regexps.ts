@@ -15,4 +15,4 @@ function areRegExpsEqualFallback(a: RegExp, b: RegExp) {
 }
 
 export const areRegExpsEqual =
-  /foo/g.flags === "g" ? areRegExpsEqualStandard : areRegExpsEqualFallback;
+  /foo/g.flags === 'g' ? areRegExpsEqualStandard : areRegExpsEqualFallback;

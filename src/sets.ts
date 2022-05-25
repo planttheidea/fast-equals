@@ -1,6 +1,6 @@
-import { createIsCircular } from "./utils";
+import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from "./utils";
+import type { InternalEqualityComparator } from './utils';
 
 /**
  * are the sets equal in value
@@ -15,7 +15,7 @@ export function areSetsEqual(
   a: Set<any>,
   b: Set<any>,
   isEqual: InternalEqualityComparator,
-  meta: any
+  meta: any,
 ) {
   let isValueEqual = a.size === b.size;
 

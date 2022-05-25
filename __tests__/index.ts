@@ -1,7 +1,7 @@
 /* globals afterEach,beforeEach,describe,expect,it,jest */
 
 // @ts-ignore
-import testSuites from "./__helpers__/testSuites";
+import testSuites from './__helpers__/testSuites';
 
 import {
   circularDeepEqual,
@@ -10,9 +10,9 @@ import {
   deepEqual,
   sameValueZeroEqual,
   shallowEqual,
-} from "../src/index";
+} from '../src/index';
 
-describe("exports", () => {
+describe('exports', () => {
   [
     circularDeepEqual,
     circularShallowEqual,
@@ -22,7 +22,7 @@ describe("exports", () => {
     shallowEqual,
   ].forEach((fn) => {
     it(`should have an export for ${fn.name}`, () => {
-      expect(typeof fn).toBe("function");
+      expect(typeof fn).toBe('function');
     });
   });
 });
@@ -40,11 +40,11 @@ type TestSuite = {
   tests: Test[];
 };
 
-describe("test suites", () => {
+describe('test suites', () => {
   testSuites.forEach(
     (
       { description: suiteDescription, tests }: TestSuite,
-      testSuiteIndex: number
+      testSuiteIndex: number,
     ) => {
       describe(`Suite ${testSuiteIndex}: ${suiteDescription}`, () => {
         tests.forEach(
@@ -56,7 +56,7 @@ describe("test suites", () => {
               value1,
               value2,
             }: Test,
-            testIndex: number
+            testIndex: number,
           ) => {
             it(`should return ${de} for deepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
               expect(deepEqual(value1, value2)).toBe(de);
@@ -73,15 +73,15 @@ describe("test suites", () => {
             it(`should return ${se} for circularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
               expect(circularShallowEqual(value1, value2)).toBe(se);
             });
-          }
+          },
         );
       });
-    }
+    },
   );
 });
 
-describe("circularDeepEqual", () => {
-  it("should handles deeply-nested circular objects", () => {
+describe('circularDeepEqual', () => {
+  it('should handles deeply-nested circular objects', () => {
     class Circular {
       me: {
         deeply: {
@@ -104,15 +104,15 @@ describe("circularDeepEqual", () => {
       }
     }
 
-    expect(circularDeepEqual(new Circular("foo"), new Circular("foo"))).toBe(
-      true
+    expect(circularDeepEqual(new Circular('foo'), new Circular('foo'))).toBe(
+      true,
     );
-    expect(circularDeepEqual(new Circular("foo"), new Circular("bar"))).toBe(
-      false
+    expect(circularDeepEqual(new Circular('foo'), new Circular('bar'))).toBe(
+      false,
     );
   });
 
-  it("should handle shared references between objects", () => {
+  it('should handle shared references between objects', () => {
     const x = [1];
     const left = [{ a: [1], b: x }];
     const right = [{ a: x, b: [1] }];
@@ -121,7 +121,7 @@ describe("circularDeepEqual", () => {
     expect(circularDeepEqual(left, right)).toBe(true);
   });
 
-  it("should handle shared circular arrays constructed differently", () => {
+  it('should handle shared circular arrays constructed differently', () => {
     type RecursiveArray = Array<number | RecursiveArray>;
     const x: RecursiveArray = [1];
     x.push(x);
@@ -132,13 +132,13 @@ describe("circularDeepEqual", () => {
   });
 });
 
-describe("circularShallowEqual", () => {
-  it("should handle shallowly-nested circular objects", () => {
-    const a: any[] = ["foo"];
+describe('circularShallowEqual', () => {
+  it('should handle shallowly-nested circular objects', () => {
+    const a: any[] = ['foo'];
 
     a.push(a);
 
-    expect(circularShallowEqual(a, ["foo", a])).toBe(true);
+    expect(circularShallowEqual(a, ['foo', a])).toBe(true);
     expect(circularShallowEqual(a, [a])).toBe(false);
   });
 });

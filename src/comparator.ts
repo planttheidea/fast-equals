@@ -1,16 +1,16 @@
-import { areRegExpsEqual } from "./regexps";
+import { areRegExpsEqual } from './regexps';
 import {
   isPlainObject,
   isPromiseLike,
   isPrimitiveWrapper,
   sameValueZeroEqual,
-} from "./utils";
+} from './utils';
 
-import type { areArraysEqual } from "./arrays";
-import type { areMapsEqual } from "./maps";
-import type { areObjectsEqual } from "./objects";
-import type { areSetsEqual } from "./sets";
-import type { EqualityComparator, InternalEqualityComparator } from "./utils";
+import type { areArraysEqual } from './arrays';
+import type { areMapsEqual } from './maps';
+import type { areObjectsEqual } from './objects';
+import type { areSetsEqual } from './sets';
+import type { EqualityComparator, InternalEqualityComparator } from './utils';
 
 export interface CreateComparatorCreatorOptions {
   areArraysEqual: typeof areArraysEqual;
@@ -20,7 +20,7 @@ export interface CreateComparatorCreatorOptions {
 }
 
 export type EqualityComparatorCreator = (
-  fn: EqualityComparator
+  fn: EqualityComparator,
 ) => InternalEqualityComparator;
 
 function createDefaultIsEqual(comparator: EqualityComparator) {
@@ -31,7 +31,7 @@ function createDefaultIsEqual(comparator: EqualityComparator) {
     indexOrKeyB: any,
     parentA: any,
     parentB: any,
-    meta: any
+    meta: any,
   ) {
     return comparator(a, b, meta);
   };
@@ -44,7 +44,7 @@ export function createComparatorCreator({
   areSetsEqual,
 }: CreateComparatorCreatorOptions) {
   return function createComparator(
-    createIsEqual: EqualityComparatorCreator = createDefaultIsEqual
+    createIsEqual: EqualityComparatorCreator = createDefaultIsEqual,
   ): EqualityComparator {
     const isEqual = createIsEqual(comparator);
 
@@ -61,7 +61,7 @@ export function createComparatorCreator({
         return true;
       }
 
-      if (!a || !b || typeof a !== "object" || typeof b !== "object") {
+      if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
         return a !== a && b !== b;
       }
 

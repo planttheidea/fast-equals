@@ -1,6 +1,6 @@
-import { createIsCircular } from "./utils";
+import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from "./utils";
+import type { InternalEqualityComparator } from './utils';
 
 /* are the arrays equal in value
  *
@@ -14,7 +14,7 @@ export function areArraysEqual(
   a: any[],
   b: any[],
   isEqual: InternalEqualityComparator,
-  meta: any
+  meta: any,
 ) {
   let index = a.length;
 

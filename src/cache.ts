@@ -48,4 +48,4 @@ function getNewCacheFallback(): Cache {
  * @returns the new cache object
  */
 export const getNewCache =
-  typeof WeakMap === "function" ? getNewCacheStandard : getNewCacheFallback;
+  typeof WeakMap === 'function' ? getNewCacheStandard : getNewCacheFallback;

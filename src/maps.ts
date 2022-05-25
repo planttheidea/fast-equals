@@ -1,6 +1,6 @@
-import { createIsCircular } from "./utils";
+import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from "./utils";
+import type { InternalEqualityComparator } from './utils';
 
 /**
  * are the maps equal in value
@@ -15,7 +15,7 @@ export function areMapsEqual(
   a: Map<any, any>,
   b: Map<any, any>,
   isEqual: InternalEqualityComparator,
-  meta: any
+  meta: any,
 ) {
   let isValueEqual = a.size === b.size;
 
