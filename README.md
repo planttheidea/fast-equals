@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.34kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.16kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -39,17 +39,17 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 You can either import the individual functions desired:
 
 ```javascript
-import { deepEqual } from "fast-equals";
+import { deepEqual } from 'fast-equals';
 
-console.log(deepEqual({ foo: "bar" }, { foo: "bar" })); // true
+console.log(deepEqual({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
 
 Or if you want to import all functions under a namespace:
 
 ```javascript
-import * as fe from "fast-equals";
+import * as fe from 'fast-equals';
 
-console.log(fe.deep({ foo: "bar" }, { foo: "bar" })); // true
+console.log(fe.deep({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
 
 ### Specific builds
@@ -72,10 +72,10 @@ There is also a pre-minified version of the UMD build available:
 Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
 ```javascript
-import { deepEqual } from "fast-equals";
+import { deepEqual } from 'fast-equals';
 
-const objectA = { foo: { bar: "baz" } };
-const objectB = { foo: { bar: "baz" } };
+const objectA = { foo: { bar: 'baz' } };
+const objectB = { foo: { bar: 'baz' } };
 
 console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
@@ -86,8 +86,8 @@ console.log(deepEqual(objectA, objectB)); // true
 `Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
 
 ```javascript
-const mapA = new Map([[{ foo: "bar" }, { baz: "quz" }]]);
-const mapB = new Map([[{ foo: "bar" }, { baz: "quz" }]]);
+const mapA = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
+const mapB = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
 
 deepEqual(mapA, mapB);
 ```
@@ -99,13 +99,13 @@ To support true deep equality of all contents, `fast-equals` will perform a deep
 Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
 ```javascript
-import { shallowEqual } from "fast-equals";
+import { shallowEqual } from 'fast-equals';
 
-const nestedObject = { bar: "baz" };
+const nestedObject = { bar: 'baz' };
 
 const objectA = { foo: nestedObject };
 const objectB = { foo: nestedObject };
-const objectC = { foo: { bar: "baz" } };
+const objectC = { foo: { bar: 'baz' } };
 
 console.log(objectA === objectB); // false
 console.log(shallowEqual(objectA, objectB)); // true
@@ -117,13 +117,13 @@ console.log(shallowEqual(objectA, objectC)); // false
 Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means either strictly equal or both `NaN`.
 
 ```javascript
-import { sameValueZeroEqual } from "fast-equals";
+import { sameValueZeroEqual } from 'fast-equals';
 
-const mainObject = { foo: NaN, bar: "baz" };
+const mainObject = { foo: NaN, bar: 'baz' };
 
-const objectA = "baz";
+const objectA = 'baz';
 const objectB = NaN;
-const objectC = { foo: NaN, bar: "baz" };
+const objectC = { foo: NaN, bar: 'baz' };
 
 console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
 console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
@@ -146,8 +146,8 @@ function Circular(value) {
   };
 }
 
-console.log(circularDeepEqual(new Circular("foo"), new Circular("foo"))); // true
-console.log(circularDeepEqual(new Circular("foo"), new Circular("bar"))); // false
+console.log(circularDeepEqual(new Circular('foo'), new Circular('foo'))); // true
+console.log(circularDeepEqual(new Circular('foo'), new Circular('bar'))); // false
 ```
 
 Just as with `deepEqual`, [both keys and values are compared for deep equality](#comparing-maps).
@@ -157,11 +157,11 @@ Just as with `deepEqual`, [both keys and values are compared for deep equality](
 Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only use if you know circular objects are present.
 
 ```javascript
-const array = ["foo"];
+const array = ['foo'];
 
 array.push(array);
 
-console.log(circularShallowEqual(array, ["foo", array])); // true
+console.log(circularShallowEqual(array, ['foo', array])); // true
 console.log(circularShallowEqual(array, [array])); // false
 ```
 
@@ -180,14 +180,14 @@ type InternalEqualityComparator = (
   indexOrKeyB: any,
   parentA: any,
   parentB: any,
-  meta: any
+  meta: any,
 ) => boolean;
 type EqualityComparatorCreator = (
-  deepEqual: EqualityComparator
+  deepEqual: EqualityComparator,
 ) => InternalEqualityComparator;
 
 function createCustomEqual(
-  createIsEqual?: EqualityComparatorCreator
+  createIsEqual?: EqualityComparatorCreator,
 ): EqualityComparator;
 ```
 
@@ -198,19 +198,19 @@ _**NOTE**: `Map` implementations compare equality for both keys and value. When 
 An example for a custom equality comparison that also checks against values in the meta object:
 
 ```javascript
-import { createCustomEqual } from "fast-equals";
+import { createCustomEqual } from 'fast-equals';
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual(
   (deepEqual) =>
     (objectA, objectB, indexOrKeyA, indexOrKeyB, parentA, parentB, meta) =>
       objectA.foo === meta ||
       objectB.foo === meta ||
-      deepEqual(objectA, objectB, meta)
+      deepEqual(objectA, objectB, meta),
 );
 
-const objectA = { foo: "bar" };
-const objectB = { foo: "baz" };
-const meta = "bar";
+const objectA = { foo: 'bar' };
+const objectB = { foo: 'baz' };
+const meta = 'bar';
 
 console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB, meta)); // true
 ```
