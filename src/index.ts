@@ -52,16 +52,9 @@ export interface CreateCustomEqualOptions<Meta = any> {
   isEqual?: EqualityComparatorCreator;
 }
 
-export function createCustomEqual(options: CreateCustomEqualOptions) {
-  const createComparator = createComparatorCreator<undefined>({
-    areArraysEqual,
-    areMapsEqual,
-    areObjectsEqual,
-    areSetsEqual,
-  });
-
-  const isCustomEqual = createComparator(options.isEqual);
-  return function customEqual<A, B>(a: A, b: B): boolean {
-    return isCustomEqual(a, b, options.createMeta());
-  };
-}
+export const createCustomEqual = createComparatorCreator<undefined>({
+  areArraysEqual,
+  areMapsEqual,
+  areObjectsEqual,
+  areSetsEqual,
+});

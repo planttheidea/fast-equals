@@ -27,11 +27,15 @@ export function createIsCircular<
   AreItemsEqual extends (...args: any) => boolean
 >(areItemsEqual: AreItemsEqual) {
   return function isCircular(
-    a: any[],
-    b: any[],
+    a: any,
+    b: any,
     isEqual: InternalEqualityComparator,
     cache: Cache
   ) {
+    if (!a || !b || typeof a !== "object" || typeof b !== "object") {
+      return areItemsEqual(a, b, isEqual, cache);
+    }
+
     const cachedA = cache.get(a);
     const cachedB = cache.get(b);
 
@@ -74,7 +78,7 @@ export function isPrimitiveWrapper(
  * @returns is the value promise-like
  */
 export function isPromiseLike(value: any) {
-  return !!value && typeof value.then === "function";
+  return typeof value.then === "function";
 }
 
 /**

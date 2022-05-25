@@ -239,33 +239,13 @@ const isNotDeeplyOne = (comparator: Comparator) => (a: any, b: any) => {
   return Object.keys(a).every((key) => comparator(a[key], b[key]));
 };
 
-const doesNotEverEqualOne = createCustomEqual({ isEqual: isNotDeeplyOne });
+const doesNotEverEqualOne = createCustomEqual(isNotDeeplyOne);
 
 console.log("true", doesNotEverEqualOne(object1, object2));
 console.log("false", doesNotEverEqualOne(object3, object4));
 console.groupEnd();
 
 console.group("circular object");
-
-const cache = new WeakMap();
-
-const isDeepEqualCircular = createCustomEqual({
-  isEqual: (comparator) => (a, b) => {
-    if (cache.has(a) || cache.has(b)) {
-      return cache.get(a) === cache.get(b);
-    }
-
-    if (typeof a === "object") {
-      cache.set(a, b);
-    }
-
-    if (typeof b === "object") {
-      cache.set(b, a);
-    }
-
-    return comparator(a, b);
-  },
-});
 
 interface Circular {
   me: {
@@ -309,6 +289,50 @@ console.log(
   circularDeepEqual(new Circular("foo"), new Circular("bar"))
 );
 console.log("false", circularDeepEqual(new Circular("foo"), { foo: "baz" }));
+
+console.groupEnd();
+
+console.group("custom circular");
+
+const customDeepEqualCircular = createCustomEqual(
+  (comparator) =>
+    (
+      a,
+      b,
+      keyA: any,
+      keyB: any,
+      parentA: any,
+      parentB: any,
+      cache = new WeakMap()
+    ) => {
+      if (cache.has(a) && cache.has(b)) {
+        return cache.get(a) === b && cache.get(b) === a;
+      }
+
+      if (typeof a === "object") {
+        cache.set(a, b);
+      }
+
+      if (typeof b === "object") {
+        cache.set(b, a);
+      }
+
+      return comparator(a, b, cache);
+    }
+);
+
+console.log(
+  "true",
+  customDeepEqualCircular(new Circular("foo"), new Circular("foo"))
+);
+console.log(
+  "false",
+  customDeepEqualCircular(new Circular("foo"), new Circular("bar"))
+);
+console.log(
+  "false",
+  customDeepEqualCircular(new Circular("foo"), { foo: "baz" })
+);
 
 console.groupEnd();
 
