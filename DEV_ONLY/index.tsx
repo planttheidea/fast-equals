@@ -1,6 +1,6 @@
 /* globals document */
 
-import * as React from "react";
+import * as React from 'react';
 
 import {
   createCustomEqual,
@@ -8,186 +8,186 @@ import {
   circularShallowEqual,
   deepEqual,
   shallowEqual,
-} from "../src";
+} from '../src';
 
-document.body.style.backgroundColor = "#1d1d1d";
-document.body.style.color = "#d5d5d5";
-document.body.style.margin = "0px";
-document.body.style.padding = "0px";
+document.body.style.backgroundColor = '#1d1d1d';
+document.body.style.color = '#d5d5d5';
+document.body.style.margin = '0px';
+document.body.style.padding = '0px';
 
-const div = document.createElement("div");
+const div = document.createElement('div');
 
-div.textContent = "Check the console for details.";
+div.textContent = 'Check the console for details.';
 
 document.body.appendChild(div);
 
-console.group("string");
-console.log("true", deepEqual("foo", "foo"));
-console.log("false", deepEqual("foo", "bar"));
+console.group('string');
+console.log('true', deepEqual('foo', 'foo'));
+console.log('false', deepEqual('foo', 'bar'));
 console.groupEnd();
 
-console.group("number");
-console.log("true", deepEqual(123, 123));
-console.log("false", deepEqual(123, 234));
+console.group('number');
+console.log('true', deepEqual(123, 123));
+console.log('false', deepEqual(123, 234));
 console.groupEnd();
 
-console.group("zero");
-console.log("true", deepEqual(0, 0));
-console.log("true", deepEqual(0, -0));
+console.group('zero');
+console.log('true', deepEqual(0, 0));
+console.log('true', deepEqual(0, -0));
 console.groupEnd();
 
-console.group("Infinity");
-console.log("true", deepEqual(Infinity, Infinity));
-console.log("false", deepEqual(Infinity, -Infinity));
+console.group('Infinity');
+console.log('true', deepEqual(Infinity, Infinity));
+console.log('false', deepEqual(Infinity, -Infinity));
 console.groupEnd();
 
-console.group("null");
-console.log("true", deepEqual(null, null));
-console.log("false", deepEqual(null, undefined));
+console.group('null');
+console.log('true', deepEqual(null, null));
+console.log('false', deepEqual(null, undefined));
 console.groupEnd();
 
-console.group("NaN");
-console.log("true", deepEqual(NaN, NaN));
-console.log("false", deepEqual(NaN, 123));
+console.group('NaN');
+console.log('true', deepEqual(NaN, NaN));
+console.log('false', deepEqual(NaN, 123));
 console.groupEnd();
 
-console.group("array");
-console.log("true", deepEqual([1, 2, 3], [1, 2, 3]));
-console.log("false", deepEqual([1, 2, 3], [3, 2, 1]));
-console.log("false", deepEqual([1, 2, 3], [1, 2, 3, 4]));
-console.log("false", deepEqual({}, []));
+console.group('array');
+console.log('true', deepEqual([1, 2, 3], [1, 2, 3]));
+console.log('false', deepEqual([1, 2, 3], [3, 2, 1]));
+console.log('false', deepEqual([1, 2, 3], [1, 2, 3, 4]));
+console.log('false', deepEqual({}, []));
 console.groupEnd();
 
-console.group("deep array");
+console.group('deep array');
 console.log(
-  "true",
-  deepEqual([{ foo: "bar" }, { bar: "baz" }], [{ foo: "bar" }, { bar: "baz" }])
+  'true',
+  deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ foo: 'bar' }, { bar: 'baz' }]),
 );
 console.log(
-  "false",
-  deepEqual([{ foo: "bar" }, { bar: "baz" }], [{ bar: "baz" }, { foo: "bar" }])
+  'false',
+  deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ bar: 'baz' }, { foo: 'bar' }]),
 );
 console.groupEnd();
 
-console.group("date");
-console.log("true", deepEqual(new Date(), new Date()));
-console.log("false", deepEqual(new Date(), new Date(2017, 0, 1)));
+console.group('date');
+console.log('true', deepEqual(new Date(), new Date()));
+console.log('false', deepEqual(new Date(), new Date(2017, 0, 1)));
 console.groupEnd();
 
-console.group("regexp");
-console.log("true", deepEqual(/foo/, /foo/));
-console.log("false", deepEqual(/foo/, /foo/g));
+console.group('regexp');
+console.log('true', deepEqual(/foo/, /foo/));
+console.log('false', deepEqual(/foo/, /foo/g));
 console.groupEnd();
 
-console.group("promise");
-const promise = Promise.resolve("foo");
+console.group('promise');
+const promise = Promise.resolve('foo');
 
 console.log(true, deepEqual({ promise }, { promise }));
-console.log(false, deepEqual({ promise }, { promise: Promise.resolve("foo") }));
+console.log(false, deepEqual({ promise }, { promise: Promise.resolve('foo') }));
 console.groupEnd();
 
-console.group("map deep");
+console.group('map deep');
 
 console.log(
-  "true",
+  'true',
   deepEqual(
-    new Map().set("foo", "bar").set("bar", { baz: "baz" }),
-    new Map().set("foo", "bar").set("bar", { baz: "baz" })
-  )
+    new Map().set('foo', 'bar').set('bar', { baz: 'baz' }),
+    new Map().set('foo', 'bar').set('bar', { baz: 'baz' }),
+  ),
 );
 console.log(
-  "false",
+  'false',
   deepEqual(
-    new Map().set("foo", "bar").set("bar", { baz: "baz" }),
-    new Map().set("foo", "bar").set("bar", { baz: "quz" })
-  )
+    new Map().set('foo', 'bar').set('bar', { baz: 'baz' }),
+    new Map().set('foo', 'bar').set('bar', { baz: 'quz' }),
+  ),
 );
 console.log(
-  "true",
+  'true',
   deepEqual(
-    new Map().set("foo", { bar: "baz" }).set("bar", "baz"),
-    new Map().set("bar", "baz").set("foo", { bar: "baz" })
-  )
+    new Map().set('foo', { bar: 'baz' }).set('bar', 'baz'),
+    new Map().set('bar', 'baz').set('foo', { bar: 'baz' }),
+  ),
 );
 console.log(
-  "false",
+  'false',
   deepEqual(
     new Map([
-      ["key1", "foo"],
-      ["key2", "bar"],
+      ['key1', 'foo'],
+      ['key2', 'bar'],
     ]),
     new Map([
-      ["key1", "bar"],
-      ["key2", "foo"],
-    ])
-  )
+      ['key1', 'bar'],
+      ['key2', 'foo'],
+    ]),
+  ),
 );
 
 console.groupEnd();
 
-console.group("map shallow");
+console.group('map shallow');
 console.log(
-  "true",
+  'true',
   shallowEqual(
-    new Map().set("foo", "bar").set("bar", "baz"),
-    new Map().set("foo", "bar").set("bar", "baz")
-  )
+    new Map().set('foo', 'bar').set('bar', 'baz'),
+    new Map().set('foo', 'bar').set('bar', 'baz'),
+  ),
 );
 console.log(
-  "false",
+  'false',
   shallowEqual(
-    new Map().set("foo", { bar: "baz" }).set("bar", "baz"),
-    new Map().set("foo", { bar: "baz" }).set("bar", "baz")
-  )
+    new Map().set('foo', { bar: 'baz' }).set('bar', 'baz'),
+    new Map().set('foo', { bar: 'baz' }).set('bar', 'baz'),
+  ),
 );
 console.log(
-  "true",
+  'true',
   shallowEqual(
-    new Map().set("foo", "bar").set("bar", "baz"),
-    new Map().set("bar", "baz").set("foo", "bar")
-  )
+    new Map().set('foo', 'bar').set('bar', 'baz'),
+    new Map().set('bar', 'baz').set('foo', 'bar'),
+  ),
 );
 console.log(
-  "false",
+  'false',
   shallowEqual(
     new Map([
-      ["key1", "foo"],
-      ["key2", "bar"],
+      ['key1', 'foo'],
+      ['key2', 'bar'],
     ]),
     new Map([
-      ["key1", "bar"],
-      ["key2", "foo"],
-    ])
-  )
+      ['key1', 'bar'],
+      ['key2', 'foo'],
+    ]),
+  ),
 );
 
 console.groupEnd();
 
-console.group("set");
+console.group('set');
 
-console.log("true", deepEqual(new Set().add("bar"), new Set().add("bar")));
-console.log("false", deepEqual(new Set().add("bar"), new Set().add("baz")));
+console.log('true', deepEqual(new Set().add('bar'), new Set().add('bar')));
+console.log('false', deepEqual(new Set().add('bar'), new Set().add('baz')));
 
 console.groupEnd();
 
-console.group("object");
+console.group('object');
 console.log(
-  "true",
+  'true',
   deepEqual(
-    { some: { deeply: { nested: "value" } } },
-    { some: { deeply: { nested: "value" } } }
-  )
+    { some: { deeply: { nested: 'value' } } },
+    { some: { deeply: { nested: 'value' } } },
+  ),
 );
 console.log(
-  "false",
+  'false',
   deepEqual(
-    { some: { deeply: { nested: "value" } } },
-    { some: { deeply: { nested: "thing" } } }
-  )
+    { some: { deeply: { nested: 'value' } } },
+    { some: { deeply: { nested: 'thing' } } },
+  ),
 );
 console.groupEnd();
 
-console.group("custom");
+console.group('custom');
 
 const object1 = {
   deep: {
@@ -231,32 +231,24 @@ const object4 = {
 
 type Comparator = <A, B>(a: A, b: B) => boolean;
 
-const isNotDeeplyOne = (comparator: Comparator) => (a: any, b: any) => {
-  if (typeof a === "number" || typeof b === "number") {
-    return a !== 1 && b !== 1;
-  }
+const doesNotEverEqualOne = createCustomEqual((defaultOptions) => {
+  return {
+    ...defaultOptions,
+    createIsEqual: (comparator: Comparator) => (a: any, b: any) => {
+      if (typeof a === 'number' || typeof b === 'number') {
+        return a !== 1 && b !== 1;
+      }
 
-  return Object.keys(a).every((key) => comparator(a[key], b[key]));
-};
+      return Object.keys(a).every((key) => comparator(a[key], b[key]));
+    },
+  };
+});
 
-const doesNotEverEqualOne = createCustomEqual(isNotDeeplyOne);
-
-console.log("true", doesNotEverEqualOne(object1, object2));
-console.log("false", doesNotEverEqualOne(object3, object4));
+console.log('true', doesNotEverEqualOne(object1, object2));
+console.log('false', doesNotEverEqualOne(object3, object4));
 console.groupEnd();
 
-console.group("circular object");
-
-interface Circular {
-  me: {
-    deeply: {
-      nested: {
-        reference: Circular;
-      };
-    };
-    value: string;
-  };
-}
+console.group('circular object');
 
 class Circular {
   me: {
@@ -265,6 +257,7 @@ class Circular {
         reference: Circular;
       };
     };
+    regexp: RegExp;
     value: string;
   };
 
@@ -275,89 +268,150 @@ class Circular {
           reference: this,
         },
       },
+      regexp: new RegExp(value, 'g'),
       value,
     };
   }
 }
 
 console.log(
-  "true",
-  circularDeepEqual(new Circular("foo"), new Circular("foo"))
+  'true',
+  circularDeepEqual(new Circular('foo'), new Circular('foo')),
 );
 console.log(
-  "false",
-  circularDeepEqual(new Circular("foo"), new Circular("bar"))
+  'false',
+  circularDeepEqual(new Circular('foo'), new Circular('bar')),
 );
-console.log("false", circularDeepEqual(new Circular("foo"), { foo: "baz" }));
+console.log('false', circularDeepEqual(new Circular('foo'), { foo: 'baz' }));
 
 console.groupEnd();
 
-console.group("custom circular");
+console.group('custom circular');
 
-const customDeepEqualCircular = createCustomEqual(
-  (comparator) =>
-    (
-      a,
-      b,
-      keyA: any,
-      keyB: any,
-      parentA: any,
-      parentB: any,
-      cache = new WeakMap()
-    ) => {
-      if (cache.has(a) && cache.has(b)) {
-        return cache.get(a) === b && cache.get(b) === a;
+function getFakeWeakMap(): Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'> {
+  const entries: [object, object][] = [];
+
+  return {
+    delete(key: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries.splice(index, 1);
+          return true;
+        }
       }
 
-      if (typeof a === "object") {
-        cache.set(a, b);
+      return false;
+    },
+
+    get(key: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          return entries[index][1];
+        }
+      }
+    },
+
+    set(key: object, value: object) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries[index][1] = value;
+          return this;
+        }
       }
 
-      if (typeof b === "object") {
-        cache.set(b, a);
+      entries.push([key, value]);
+
+      return this;
+    },
+  };
+}
+
+function areRegExpsEqual(a: RegExp, b: RegExp) {
+  return (
+    a.source === b.source &&
+    a.global === b.global &&
+    a.ignoreCase === b.ignoreCase &&
+    a.multiline === b.multiline &&
+    a.unicode === b.unicode &&
+    a.sticky === b.sticky &&
+    a.lastIndex === b.lastIndex
+  );
+}
+
+const customDeepEqualCircular = createCustomEqual((defaultOptions) => {
+  const isNestedEqual = (comparator) =>
+    defaultOptions.createIsNestedEqual(comparator);
+  const cache = getFakeWeakMap();
+
+  function wrap<Fn extends (...args: any[]) => boolean>(fn: Fn): Fn {
+    return function (a, b, isEqual, meta): boolean {
+      const cachedA = cache.get(a);
+      const cachedB = cache.get(b);
+
+      if (cachedA && cachedB) {
+        return cachedA === b && cachedB === a;
       }
 
-      return comparator(a, b, cache);
-    }
-);
+      cache.set(a, b);
+      cache.set(b, a);
+
+      const result = fn(a, b, isEqual, meta);
+
+      cache.delete(a);
+      cache.delete(b);
+
+      return result;
+    } as Fn;
+  }
+
+  return {
+    ...defaultOptions,
+    areArraysEqual: wrap(defaultOptions.areArraysEqual),
+    areMapsEqual: wrap(defaultOptions.areMapsEqual),
+    areObjectsEqual: wrap(defaultOptions.areObjectsEqual),
+    areRegExpsEqual,
+    areSetsEqual: wrap(defaultOptions.areSetsEqual),
+    isNestedEqual,
+  };
+});
 
 console.log(
-  "true",
-  customDeepEqualCircular(new Circular("foo"), new Circular("foo"))
+  'true',
+  customDeepEqualCircular(new Circular('foo'), new Circular('foo')),
 );
 console.log(
-  "false",
-  customDeepEqualCircular(new Circular("foo"), new Circular("bar"))
+  'false',
+  customDeepEqualCircular(new Circular('foo'), new Circular('bar')),
 );
 console.log(
-  "false",
-  customDeepEqualCircular(new Circular("foo"), { foo: "baz" })
+  'false',
+  customDeepEqualCircular(new Circular('foo'), { foo: 'baz' }),
 );
 
 console.groupEnd();
 
-console.group("circular array");
+console.group('circular array');
 
-const array: any[] = ["foo"];
+const array: any[] = ['foo'];
 
 array[1] = array;
 
-console.log("true", circularShallowEqual(array, ["foo", array]));
-console.log("false", circularShallowEqual(array, [array]));
+console.log('true', circularShallowEqual(array, ['foo', array]));
+console.log('false', circularShallowEqual(array, [array]));
 
 console.groupEnd();
 
-console.group("react small");
+console.group('react small');
 
-console.log("true", deepEqual(<div>foo</div>, <div>foo</div>));
-console.log("false", deepEqual(<div>foo</div>, <div>bar</div>));
+console.log('true', deepEqual(<div>foo</div>, <div>foo</div>));
+console.log('false', deepEqual(<div>foo</div>, <div>bar</div>));
 
 console.groupEnd();
 
-console.group("react large");
+console.group('react large');
 
 console.log(
-  "true",
+  'true',
   deepEqual(
     <main>
       <h1>Title</h1>
@@ -367,9 +421,9 @@ console.log(
       <p>Content</p>
       <p>Content</p>
 
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: "1 1 auto" }}>Item</div>
-        <div style={{ flex: "1 1 0" }}>Item</div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: '1 1 auto' }}>Item</div>
+        <div style={{ flex: '1 1 0' }}>Item</div>
       </div>
     </main>,
     <main>
@@ -380,15 +434,15 @@ console.log(
       <p>Content</p>
       <p>Content</p>
 
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: "1 1 auto" }}>Item</div>
-        <div style={{ flex: "1 1 0" }}>Item</div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: '1 1 auto' }}>Item</div>
+        <div style={{ flex: '1 1 0' }}>Item</div>
       </div>
-    </main>
-  )
+    </main>,
+  ),
 );
 console.log(
-  "false",
+  'false',
   deepEqual(
     <main>
       <h1>Title</h1>
@@ -398,9 +452,9 @@ console.log(
       <p>Content</p>
       <p>Content</p>
 
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: "1 1 auto" }}>Item</div>
-        <div style={{ flex: "1 1 0" }}>Item</div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: '1 1 auto' }}>Item</div>
+        <div style={{ flex: '1 1 0' }}>Item</div>
       </div>
     </main>,
     <main>
@@ -411,12 +465,12 @@ console.log(
       <p>Content</p>
       <p>Other Content</p>
 
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: "1 1 auto" }}>Item</div>
-        <div style={{ flex: "1 1 0" }}>Item</div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: '1 1 auto' }}>Item</div>
+        <div style={{ flex: '1 1 0' }}>Item</div>
       </div>
-    </main>
-  )
+    </main>,
+  ),
 );
 
 console.groupEnd();

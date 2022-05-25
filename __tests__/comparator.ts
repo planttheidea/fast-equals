@@ -1,21 +1,25 @@
-import { createComparatorCreator } from '../src/comparator';
+import { createComparator } from '../src/comparator';
 import { areArraysEqual, areArraysEqualCircular } from '../src/arrays';
 import { areMapsEqual, areMapsEqualCircular } from '../src/maps';
 import { areObjectsEqual, areObjectsEqualCircular } from '../src/objects';
+import { areRegExpsEqual } from '../src/regexps';
 import { areSetsEqual, areSetsEqualCircular } from '../src/sets';
+import { sameValueZeroEqual } from '../src/utils';
 
-import type { EqualityComparatorCreator } from '../src/comparator';
+import type { EqualityComparatorCreator } from '../src/utils';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
+  areRegExpsEqual,
   areSetsEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   areArraysEqual: areArraysEqualCircular,
   areMapsEqual: areMapsEqualCircular,
   areObjectsEqual: areObjectsEqualCircular,
+  areRegExpsEqual,
   areSetsEqual: areSetsEqualCircular,
 };
 
@@ -32,17 +36,9 @@ describe('createComparator', () => {
       options: CIRCULAR_COMPARATOR_OPTIONS,
     },
   ].forEach(({ createMeta, name, options }) => {
-    const createComparator = createComparatorCreator(options);
-
     describe(name, () => {
-      it('should return a function', () => {
-        const comparator = createComparator();
-
-        expect(typeof comparator).toBe('function');
-      });
-
       it('should default to a deep-equal setup when no equality comparator is provided', () => {
-        const comparator = createComparator();
+        const comparator = createComparator(options);
         const meta = createMeta();
 
         const a = { foo: { bar: 'baz' } };
@@ -52,9 +48,10 @@ describe('createComparator', () => {
       });
 
       it('should use the custom comparator when one is provided', () => {
-        const createIsEqual = () => (a: any, b: any) => a === b;
-
-        const comparator = createComparator(createIsEqual);
+        const comparator = createComparator({
+          ...options,
+          createIsNestedEqual: () => sameValueZeroEqual,
+        });
         const meta = createMeta();
 
         const a = { foo: { bar: 'baz' } };
@@ -73,7 +70,7 @@ describe('createComparator', () => {
           [{ foo: 'bar' }, 1],
         ]);
 
-        const createIsEqual: EqualityComparatorCreator =
+        const createIsNestedEqual: EqualityComparatorCreator =
           (deepEqual) =>
           (
             a: any,
@@ -92,7 +89,10 @@ describe('createComparator', () => {
 
             return deepEqual(a, b, meta);
           };
-        const comparator = createComparator(createIsEqual);
+        const comparator = createComparator({
+          ...options,
+          createIsNestedEqual,
+        });
         const meta = createMeta();
 
         comparator(mapA, mapB, meta);
@@ -108,7 +108,7 @@ describe('createComparator', () => {
           ['foo', 'bar'],
         ]);
 
-        const createIsEqual: EqualityComparatorCreator =
+        const createIsNestedEqual: EqualityComparatorCreator =
           (deepEqual) =>
           (
             a: any,
@@ -130,7 +130,10 @@ describe('createComparator', () => {
 
             return deepEqual(a, b, meta);
           };
-        const comparator = createComparator(createIsEqual);
+        const comparator = createComparator({
+          ...options,
+          createIsNestedEqual,
+        });
         const meta = createMeta();
 
         comparator(mapA, mapB, meta);
@@ -139,13 +142,9 @@ describe('createComparator', () => {
   });
 
   describe('custom', () => {
-    const createComparator = createComparatorCreator(
-      STANDARD_COMPARATOR_OPTIONS,
-    );
-
     it('should call the custom comparator with the correct params', () => {
       const customComparatorMock = jest.fn();
-      const createIsEqual: EqualityComparatorCreator =
+      const createIsNestedEqual: EqualityComparatorCreator =
         (deepEqual) =>
         (
           ...args: [
@@ -162,7 +161,10 @@ describe('createComparator', () => {
           const [a, b, , , , , meta] = args;
           return deepEqual(a, b, meta);
         };
-      const comparator = createComparator(createIsEqual);
+      const comparator = createComparator({
+        ...STANDARD_COMPARATOR_OPTIONS,
+        createIsNestedEqual,
+      });
 
       const a = {
         foo: {

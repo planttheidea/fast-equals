@@ -14,6 +14,10 @@ export type EqualityComparator = <A, B, Meta>(
   meta?: Meta,
 ) => boolean;
 
+export type EqualityComparatorCreator = (
+  fn: EqualityComparator,
+) => InternalEqualityComparator;
+
 export type NativeEqualityComparator = <A, B>(
   objectA: A,
   objectB: B,
