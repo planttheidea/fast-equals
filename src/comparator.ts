@@ -1,5 +1,10 @@
 import { areRegExpsEqual } from "./primitives";
-import { isPlainObject, isPromiseLike, sameValueZeroEqual } from "./utils";
+import {
+  isPlainObject,
+  isPromiseLike,
+  isPrimitiveWrapper,
+  sameValueZeroEqual,
+} from "./utils";
 
 import type { areArraysEqual } from "./arrays";
 import type { areMapsEqual } from "./maps";
@@ -7,14 +12,11 @@ import type { areObjectsEqual } from "./objects";
 import type { areSetsEqual } from "./sets";
 import type { EqualityComparator, InternalEqualityComparator } from "./utils";
 
-export type CreateMeta<Meta> = () => Meta;
-
 export interface CreateComparatorCreatorOptions<Meta> {
   areArraysEqual: typeof areArraysEqual;
   areMapsEqual: typeof areMapsEqual;
   areObjectsEqual: typeof areObjectsEqual;
   areSetsEqual: typeof areSetsEqual;
-  createMeta: CreateMeta<Meta>;
 }
 
 export type EqualityComparatorCreator = (
@@ -24,32 +26,30 @@ export type EqualityComparatorCreator = (
 const HAS_MAP_SUPPORT = typeof Map === "function";
 const HAS_SET_SUPPORT = typeof Set === "function";
 
-const { valueOf } = Object.prototype;
+function createDefaultIsEqual(comparator: EqualityComparator) {
+  return function isEqual(
+    a: any,
+    b: any,
+    indexOrKeyA: any,
+    indexOrKeyB: any,
+    parentA: any,
+    parentB: any,
+    meta: any
+  ) {
+    return comparator(a, b, meta);
+  };
+}
 
 export function createComparatorCreator<Meta>({
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
   areSetsEqual,
-  createMeta,
 }: CreateComparatorCreatorOptions<Meta>) {
   return function createComparator(
-    createIsEqual?: EqualityComparatorCreator
+    createIsEqual: EqualityComparatorCreator = createDefaultIsEqual
   ): EqualityComparator {
-    const isEqual: InternalEqualityComparator =
-      /* eslint-disable no-use-before-define */
-      typeof createIsEqual === "function"
-        ? createIsEqual(comparator)
-        : (
-            a: any,
-            b: any,
-            indexOrKeyA: any,
-            indexOrKeyB: any,
-            parentA: any,
-            parentB: any,
-            meta: any
-          ) => comparator(a, b, meta);
-    /* eslint-enable */
+    const isEqual = createIsEqual(comparator);
 
     /**
      * compare the value of the two objects and return true if they are equivalent in values
@@ -59,7 +59,7 @@ export function createComparatorCreator<Meta>({
      * @param [meta] an optional meta object that is passed through to all equality test calls
      * @returns are a and b equivalent in value
      */
-    function comparator(a: any, b: any, meta: any) {
+    function comparator(a: any, b: any, meta?: any) {
       if (a === b) {
         return true;
       }
@@ -114,7 +114,7 @@ export function createComparatorCreator<Meta>({
           }
         }
 
-        if (a.valueOf !== valueOf || b.valueOf !== valueOf) {
+        if (isPrimitiveWrapper(a) || isPrimitiveWrapper(b)) {
           return sameValueZeroEqual(a.valueOf(), b.valueOf());
         }
 
@@ -124,8 +124,6 @@ export function createComparatorCreator<Meta>({
       return a !== a && b !== b;
     }
 
-    return function (a: any, b: any) {
-      return comparator(a, b, createMeta());
-    };
+    return comparator;
   };
 }

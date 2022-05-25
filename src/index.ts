@@ -7,16 +7,17 @@ import { areSetsEqual, areSetsEqualCircular } from "./sets";
 import { sameValueZeroEqual } from "./utils";
 
 import type { Cache } from "./cache";
-import type { CreateMeta, EqualityComparatorCreator } from "./comparator";
+import type { EqualityComparatorCreator } from "./comparator";
 
-const noop = function () {} as () => undefined;
+export type CreateMeta<Meta> = () => Meta;
+
+export { sameValueZeroEqual };
 
 const createStandardEqual = createComparatorCreator<undefined>({
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
   areSetsEqual,
-  createMeta: noop,
 });
 
 const createCircularEqual = createComparatorCreator<Cache>({
@@ -24,14 +25,27 @@ const createCircularEqual = createComparatorCreator<Cache>({
   areMapsEqual: areMapsEqualCircular,
   areObjectsEqual: areObjectsEqualCircular,
   areSetsEqual: areSetsEqualCircular,
-  createMeta: getNewCache,
 });
 
-export const deepEqual = createStandardEqual();
-export const shallowEqual = createStandardEqual(() => sameValueZeroEqual);
+const isDeepEqual = createStandardEqual();
+export function deepEqual<A, B>(a: A, b: B): boolean {
+  return isDeepEqual(a, b, undefined);
+}
 
-export const circularDeepEqual = createCircularEqual();
-export const circularShallowEqual = createCircularEqual();
+const isShallowEqual = createStandardEqual(() => sameValueZeroEqual);
+export function shallowEqual<A, B>(a: A, b: B): boolean {
+  return isShallowEqual(a, b, undefined);
+}
+
+const isCircularDeepEqual = createCircularEqual();
+export function circularDeepEqual<A, B>(a: A, b: B): boolean {
+  return isCircularDeepEqual(a, b, getNewCache());
+}
+
+const isCircularShallowEqual = createCircularEqual(() => sameValueZeroEqual);
+export function circularShallowEqual<A, B>(a: A, b: B): boolean {
+  return isCircularShallowEqual(a, b, getNewCache());
+}
 
 export interface CreateCustomEqualOptions<Meta = any> {
   createMeta?: CreateMeta<Meta>;
@@ -39,11 +53,15 @@ export interface CreateCustomEqualOptions<Meta = any> {
 }
 
 export function createCustomEqual(options: CreateCustomEqualOptions) {
-  return createComparatorCreator<undefined>({
+  const createComparator = createComparatorCreator<undefined>({
     areArraysEqual,
     areMapsEqual,
     areObjectsEqual,
     areSetsEqual,
-    createMeta: options.createMeta || noop,
-  })(options.isEqual);
+  });
+
+  const isCustomEqual = createComparator(options.isEqual);
+  return function customEqual<A, B>(a: A, b: B): boolean {
+    return isCustomEqual(a, b, options.createMeta());
+  };
 }

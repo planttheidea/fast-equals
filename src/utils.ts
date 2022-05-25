@@ -21,6 +21,8 @@ export type NativeEqualityComparator = <A, B>(
   objectB: B
 ) => boolean;
 
+const { valueOf } = Object.prototype;
+
 export function createIsCircular<
   AreItemsEqual extends (...args: any) => boolean
 >(areItemsEqual: AreItemsEqual) {
@@ -57,6 +59,12 @@ export function createIsCircular<
  */
 export function isPlainObject(value: any) {
   return value.constructor === Object || value.constructor == null;
+}
+
+export function isPrimitiveWrapper(
+  value: any
+): value is Boolean | BigInt | Number | String | Symbol {
+  return value.valueOf !== valueOf;
 }
 
 /**
