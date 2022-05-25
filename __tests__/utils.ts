@@ -58,7 +58,6 @@ describe('isSameValueZero', () => {
   Object.keys(mainValues).forEach((key: keyof typeof mainValues) => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
       it(`should have ${key} be equal by SameValueZero`, () => {
-        // @ts-ignore
         expect(sameValueZeroEqual(mainValues[key], mainValues[key])).toBe(true);
       });
     }

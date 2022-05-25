@@ -1,4 +1,3 @@
-import { getNewCache } from '../src/cache';
 import { createComparatorCreator } from '../src/comparator';
 import { areArraysEqual, areArraysEqualCircular } from '../src/arrays';
 import { areMapsEqual, areMapsEqualCircular } from '../src/maps';
@@ -28,7 +27,7 @@ describe('createComparator', () => {
       options: STANDARD_COMPARATOR_OPTIONS,
     },
     {
-      createMeta: () => getNewCache(),
+      createMeta: () => new WeakMap(),
       name: 'circular',
       options: CIRCULAR_COMPARATOR_OPTIONS,
     },

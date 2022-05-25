@@ -1,5 +1,3 @@
-import type { Cache } from './cache';
-
 export type InternalEqualityComparator = (
   objectA: any,
   objectB: any,
@@ -30,7 +28,7 @@ export function createIsCircular<
     a: any,
     b: any,
     isEqual: InternalEqualityComparator,
-    cache: Cache,
+    cache: WeakMap<any, any>,
   ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
       return areItemsEqual(a, b, isEqual, cache);

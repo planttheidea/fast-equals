@@ -1,6 +1,4 @@
-/* globals afterEach,beforeEach,describe,expect,it,jest */
-
-// @ts-ignore
+// @ts-expect-error - Types do not exist for `testSuites`
 import testSuites from './__helpers__/testSuites';
 
 import {

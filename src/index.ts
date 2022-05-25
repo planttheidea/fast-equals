@@ -1,4 +1,3 @@
-import { getNewCache } from './cache';
 import { createComparatorCreator } from './comparator';
 import { areArraysEqual, areArraysEqualCircular } from './arrays';
 import { areMapsEqual, areMapsEqualCircular } from './maps';
@@ -34,12 +33,12 @@ export function shallowEqual<A, B>(a: A, b: B): boolean {
 
 const isCircularDeepEqual = createCircularEqual();
 export function circularDeepEqual<A, B>(a: A, b: B): boolean {
-  return isCircularDeepEqual(a, b, getNewCache());
+  return isCircularDeepEqual(a, b, new WeakMap());
 }
 
 const isCircularShallowEqual = createCircularEqual(() => sameValueZeroEqual);
 export function circularShallowEqual<A, B>(a: A, b: B): boolean {
-  return isCircularShallowEqual(a, b, getNewCache());
+  return isCircularShallowEqual(a, b, new WeakMap());
 }
 
 export const createCustomEqual = createComparatorCreator({

@@ -61,7 +61,7 @@ const MINIFIED_CONFIG = {
     file: pkg.browser.replace('.js', '.min.js'),
     sourcemap: false,
   },
-  plugins: [...UMD_CONFIG.plugins, terser()],
+  plugins: [...UMD_CONFIG.plugins, terser({ compress: { passes: 3 } })],
 };
 
 export default [UMD_CONFIG, FORMATTED_CONFIG, MINIFIED_CONFIG];
