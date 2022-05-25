@@ -1,26 +1,19 @@
-declare type EqualityComparator = (
-  objectA: any,
-  objectB: any,
-  meta?: any,
-) => boolean;
-declare type InternalEqualityComparator = (
-  objectA: any,
-  objectB: any,
-  indexOrKeyA: any,
-  indexOrKeyB: any,
-  parentA: any,
-  parentB: any,
-  meta: any,
-) => boolean;
-declare type EqualityComparatorCreator = (
-  comparator: EqualityComparator,
-) => InternalEqualityComparator;
+import type { CreateComparatorCreatorOptions } from './src/comparator';
+import type { EqualityComparator } from './src/utils';
 
-export declare function createCustomEqual(
-  createIsEqual?: EqualityComparatorCreator,
+export type { CreateComparatorCreatorOptions } from './src/comparator';
+export type {
+  EqualityComparator,
+  EqualityComparatorCreator,
+  InternalEqualityComparator,
+  NativeEqualityComparator,
+} from './src/utils';
+
+export function createCustomEqual(
+  createCustomEqualOptions: CreateComparatorCreatorOptions,
 ): EqualityComparator;
-export declare function circularDeepEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function circularShallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function deepEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function shallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function sameValueZeroEqual<A, B>(objectA: A, objectB: B): boolean;
+export function circularDeepEqual<A, B>(objectA: A, objectB: B): boolean;
+export function circularShallowEqual<A, B>(objectA: A, objectB: B): boolean;
+export function deepEqual<A, B>(objectA: A, objectB: B): boolean;
+export function shallowEqual<A, B>(objectA: A, objectB: B): boolean;
+export function sameValueZeroEqual<A, B>(objectA: A, objectB: B): boolean;
