@@ -35,12 +35,12 @@ export function areSetsEqual(
       let matchIndex = 0;
 
       b.forEach((bValue, bKey) => {
-        if (!hasMatch && !matchedIndices[matchIndex]) {
-          hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta);
-
-          if (hasMatch) {
-            matchedIndices[matchIndex] = true;
-          }
+        if (
+          !hasMatch &&
+          !matchedIndices[matchIndex] &&
+          (hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta))
+        ) {
+          matchedIndices[matchIndex] = true;
         }
 
         matchIndex++;

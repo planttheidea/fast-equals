@@ -37,14 +37,14 @@ export function areMapsEqual(
       let matchIndexB = 0;
 
       b.forEach((bValue, bKey) => {
-        if (!hasMatch && !matchedIndices[matchIndexB]) {
-          hasMatch =
+        if (
+          !hasMatch &&
+          !matchedIndices[matchIndexB] &&
+          (hasMatch =
             isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
-            isEqual(aValue, bValue, aKey, bKey, a, b, meta);
-
-          if (hasMatch) {
-            matchedIndices[matchIndexB] = true;
-          }
+            isEqual(aValue, bValue, aKey, bKey, a, b, meta))
+        ) {
+          matchedIndices[matchIndexB] = true;
         }
 
         matchIndexB++;
