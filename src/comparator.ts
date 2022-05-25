@@ -64,64 +64,60 @@ export function createComparatorCreator<Meta>({
         return true;
       }
 
-      if (a && b && typeof a === "object" && typeof b === "object") {
-        if (isPlainObject(a) && isPlainObject(b)) {
-          return areObjectsEqual(a, b, isEqual, meta);
-        }
+      if (!a || !b || typeof a !== "object" || typeof b !== "object") {
+        return a !== a && b !== b;
+      }
 
-        let aShape = Array.isArray(a);
-        let bShape = Array.isArray(b);
-
-        if (aShape || bShape) {
-          return aShape === bShape && areArraysEqual(a, b, isEqual, meta);
-        }
-
-        aShape = a instanceof Date;
-        bShape = b instanceof Date;
-
-        if (aShape || bShape) {
-          return (
-            aShape === bShape && sameValueZeroEqual(a.getTime(), b.getTime())
-          );
-        }
-
-        aShape = a instanceof RegExp;
-        bShape = b instanceof RegExp;
-
-        if (aShape || bShape) {
-          return aShape === bShape && areRegExpsEqual(a, b);
-        }
-
-        if (isPromiseLike(a) || isPromiseLike(b)) {
-          return a === b;
-        }
-
-        if (HAS_MAP_SUPPORT) {
-          aShape = a instanceof Map;
-          bShape = b instanceof Map;
-
-          if (aShape || bShape) {
-            return aShape === bShape && areMapsEqual(a, b, isEqual, meta);
-          }
-        }
-
-        if (HAS_SET_SUPPORT) {
-          aShape = a instanceof Set;
-          bShape = b instanceof Set;
-
-          if (aShape || bShape) {
-            return aShape === bShape && areSetsEqual(a, b, isEqual, meta);
-          }
-        }
-
-        if (isPrimitiveWrapper(a) || isPrimitiveWrapper(b)) {
-          return sameValueZeroEqual(a.valueOf(), b.valueOf());
-        }
-
+      if (isPlainObject(a) && isPlainObject(b)) {
         return areObjectsEqual(a, b, isEqual, meta);
       }
 
-      return a !== a && b !== b;
+      let aShape = Array.isArray(a);
+      let bShape = Array.isArray(b);
+
+      if (aShape || bShape) {
+        return aShape === bShape && areArraysEqual(a, b, isEqual, meta);
+      }
+
+      aShape = a instanceof Date;
+      bShape = b instanceof Date;
+
+      if (aShape || bShape) {
+        return (
+          aShape === bShape && sameValueZeroEqual(a.getTime(), b.getTime())
+        );
+      }
+
+      aShape = a instanceof RegExp;
+      bShape = b instanceof RegExp;
+
+      if (aShape || bShape) {
+        return aShape === bShape && areRegExpsEqual(a, b);
+      }
+
+      aShape = a instanceof Map;
+      bShape = b instanceof Map;
+
+      if (aShape || bShape) {
+        return aShape === bShape && areMapsEqual(a, b, isEqual, meta);
+      }
+
+      aShape = a instanceof Set;
+      bShape = b instanceof Set;
+
+      if (aShape || bShape) {
+        return aShape === bShape && areSetsEqual(a, b, isEqual, meta);
+      }
+
+      if (isPromiseLike(a) || isPromiseLike(b)) {
+        return a === b;
+      }
+
+      if (isPrimitiveWrapper(a) || isPrimitiveWrapper(b)) {
+        return sameValueZeroEqual(a.valueOf(), b.valueOf());
+      }
+
+      return areObjectsEqual(a, b, isEqual, meta);
     }
 
     return comparator;

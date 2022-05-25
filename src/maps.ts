@@ -19,34 +19,41 @@ export function areMapsEqual(
 ) {
   let isValueEqual = a.size === b.size;
 
-  if (isValueEqual && a.size) {
-    const matchedIndices: Record<number, true> = {};
-    let indexA = 0;
-
-    a.forEach((aValue, aKey) => {
-      if (isValueEqual) {
-        let hasMatch = false;
-        let matchIndexB = 0;
-
-        b.forEach((bValue, bKey) => {
-          if (!hasMatch && !matchedIndices[matchIndexB]) {
-            hasMatch =
-              isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
-              isEqual(aValue, bValue, aKey, bKey, a, b, meta);
-
-            if (hasMatch) {
-              matchedIndices[matchIndexB] = true;
-            }
-          }
-
-          matchIndexB++;
-        });
-
-        indexA++;
-        isValueEqual = hasMatch;
-      }
-    });
+  if (!isValueEqual) {
+    return false;
   }
+
+  if (!a.size) {
+    return true;
+  }
+
+  const matchedIndices: Record<number, true> = {};
+
+  let indexA = 0;
+
+  a.forEach((aValue, aKey) => {
+    if (isValueEqual) {
+      let hasMatch = false;
+      let matchIndexB = 0;
+
+      b.forEach((bValue, bKey) => {
+        if (!hasMatch && !matchedIndices[matchIndexB]) {
+          hasMatch =
+            isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
+            isEqual(aValue, bValue, aKey, bKey, a, b, meta);
+
+          if (hasMatch) {
+            matchedIndices[matchIndexB] = true;
+          }
+        }
+
+        matchIndexB++;
+      });
+
+      indexA++;
+      isValueEqual = hasMatch;
+    }
+  });
 
   return isValueEqual;
 }

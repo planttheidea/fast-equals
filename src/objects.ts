@@ -36,30 +36,25 @@ export function areObjectsEqual(
     return false;
   }
 
-  if (index) {
-    let key: string;
+  let key: string;
 
-    while (index-- > 0) {
-      key = keysA[index];
+  while (index-- > 0) {
+    key = keysA[index];
 
-      if (key === OWNER) {
-        const reactElementA = isReactElement(a);
-        const reactElementB = isReactElement(b);
+    if (key === OWNER) {
+      const reactElementA = isReactElement(a);
+      const reactElementB = isReactElement(b);
 
-        if (
-          (reactElementA || reactElementB) &&
-          reactElementA !== reactElementB
-        ) {
-          return false;
-        }
-      }
-
-      if (
-        !hasOwnProperty.call(b, key) ||
-        !isEqual(a[key], b[key], key, key, a, b, meta)
-      ) {
+      if ((reactElementA || reactElementB) && reactElementA !== reactElementB) {
         return false;
       }
+    }
+
+    if (
+      !hasOwnProperty.call(b, key) ||
+      !isEqual(a[key], b[key], key, key, a, b, meta)
+    ) {
+      return false;
     }
   }
 

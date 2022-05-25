@@ -19,30 +19,36 @@ export function areSetsEqual(
 ) {
   let isValueEqual = a.size === b.size;
 
-  if (isValueEqual && a.size) {
-    const matchedIndices: Record<number, true> = {};
-
-    a.forEach((aValue, aKey) => {
-      if (isValueEqual) {
-        let hasMatch = false;
-        let matchIndex = 0;
-
-        b.forEach((bValue, bKey) => {
-          if (!hasMatch && !matchedIndices[matchIndex]) {
-            hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta);
-
-            if (hasMatch) {
-              matchedIndices[matchIndex] = true;
-            }
-          }
-
-          matchIndex++;
-        });
-
-        isValueEqual = hasMatch;
-      }
-    });
+  if (!isValueEqual) {
+    return false;
   }
+
+  if (!a.size) {
+    return true;
+  }
+
+  const matchedIndices: Record<number, true> = {};
+
+  a.forEach((aValue, aKey) => {
+    if (isValueEqual) {
+      let hasMatch = false;
+      let matchIndex = 0;
+
+      b.forEach((bValue, bKey) => {
+        if (!hasMatch && !matchedIndices[matchIndex]) {
+          hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta);
+
+          if (hasMatch) {
+            matchedIndices[matchIndex] = true;
+          }
+        }
+
+        matchIndex++;
+      });
+
+      isValueEqual = hasMatch;
+    }
+  });
 
   return isValueEqual;
 }
