@@ -9,13 +9,8 @@ interface Dictionary<Value> {
 const OWNER = "_owner";
 const { hasOwnProperty } = Object.prototype;
 
-export function isReactElement(value: any) {
-  return !!(value && value.$$typeof);
-}
-
 /**
  * are the objects equal in value
- *
  * @param a the object to test
  * @param b the object to test against
  * @param isEqual the comparator to determine equality
@@ -42,8 +37,8 @@ export function areObjectsEqual(
     key = keysA[index];
 
     if (key === OWNER) {
-      const reactElementA = isReactElement(a);
-      const reactElementB = isReactElement(b);
+      const reactElementA = !!a.$$typeof;
+      const reactElementB = !!b.$$typeof;
 
       if ((reactElementA || reactElementB) && reactElementA !== reactElementB) {
         return false;

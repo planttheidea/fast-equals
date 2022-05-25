@@ -6,7 +6,7 @@ import { deepEqual } from "../src/index";
 import { areArraysEqual } from "../src/arrays";
 import { getNewCache } from "../src/cache";
 import { areMapsEqual } from "../src/maps";
-import { areObjectsEqual, isReactElement } from "../src/objects";
+import { areObjectsEqual } from "../src/objects";
 import { areRegExpsEqual } from "../src/regexps";
 import { areSetsEqual } from "../src/sets";
 
@@ -393,20 +393,6 @@ describe("areSetsEqual", () => {
 //     expect(cache.get(value)).toBe(value);
 //   });
 // });
-
-describe("isReactElement", () => {
-  it("should return true if the appropriate keys are present and truthy", () => {
-    const div = React.createElement("div", {}, "foo");
-
-    expect(isReactElement(div)).toBe(true);
-  });
-
-  it("should return false if the appropriate keys are not present", () => {
-    const div = { foo: "bar" };
-
-    expect(isReactElement(div)).toBe(false);
-  });
-});
 
 describe("isPlainObject", () => {
   it("should return true when a plain object", () => {
