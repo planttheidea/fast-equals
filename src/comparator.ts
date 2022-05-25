@@ -23,9 +23,6 @@ export type EqualityComparatorCreator = (
   fn: EqualityComparator
 ) => InternalEqualityComparator;
 
-const HAS_MAP_SUPPORT = typeof Map === "function";
-const HAS_SET_SUPPORT = typeof Set === "function";
-
 function createDefaultIsEqual(comparator: EqualityComparator) {
   return function isEqual(
     a: any,
