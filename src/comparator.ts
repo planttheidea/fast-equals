@@ -1,4 +1,4 @@
-import { areRegExpsEqual } from "./primitives";
+import { areRegExpsEqual } from "./regexps";
 import {
   isPlainObject,
   isPromiseLike,
@@ -12,7 +12,7 @@ import type { areObjectsEqual } from "./objects";
 import type { areSetsEqual } from "./sets";
 import type { EqualityComparator, InternalEqualityComparator } from "./utils";
 
-export interface CreateComparatorCreatorOptions<Meta> {
+export interface CreateComparatorCreatorOptions {
   areArraysEqual: typeof areArraysEqual;
   areMapsEqual: typeof areMapsEqual;
   areObjectsEqual: typeof areObjectsEqual;
@@ -37,12 +37,12 @@ function createDefaultIsEqual(comparator: EqualityComparator) {
   };
 }
 
-export function createComparatorCreator<Meta>({
+export function createComparatorCreator({
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
   areSetsEqual,
-}: CreateComparatorCreatorOptions<Meta>) {
+}: CreateComparatorCreatorOptions) {
   return function createComparator(
     createIsEqual: EqualityComparatorCreator = createDefaultIsEqual
   ): EqualityComparator {

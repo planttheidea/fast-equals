@@ -6,21 +6,16 @@ import { areObjectsEqual, areObjectsEqualCircular } from "./objects";
 import { areSetsEqual, areSetsEqualCircular } from "./sets";
 import { sameValueZeroEqual } from "./utils";
 
-import type { Cache } from "./cache";
-import type { EqualityComparatorCreator } from "./comparator";
-
-export type CreateMeta<Meta> = () => Meta;
-
 export { sameValueZeroEqual };
 
-const createStandardEqual = createComparatorCreator<undefined>({
+const createStandardEqual = createComparatorCreator({
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
   areSetsEqual,
 });
 
-const createCircularEqual = createComparatorCreator<Cache>({
+const createCircularEqual = createComparatorCreator({
   areArraysEqual: areArraysEqualCircular,
   areMapsEqual: areMapsEqualCircular,
   areObjectsEqual: areObjectsEqualCircular,
@@ -47,12 +42,7 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
   return isCircularShallowEqual(a, b, getNewCache());
 }
 
-export interface CreateCustomEqualOptions<Meta = any> {
-  createMeta?: CreateMeta<Meta>;
-  isEqual?: EqualityComparatorCreator;
-}
-
-export const createCustomEqual = createComparatorCreator<undefined>({
+export const createCustomEqual = createComparatorCreator({
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,

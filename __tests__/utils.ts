@@ -7,7 +7,7 @@ import { areArraysEqual } from "../src/arrays";
 import { getNewCache } from "../src/cache";
 import { areMapsEqual } from "../src/maps";
 import { areObjectsEqual, isReactElement } from "../src/objects";
-import { areRegExpsEqual } from "../src/primitives";
+import { areRegExpsEqual } from "../src/regexps";
 import { areSetsEqual } from "../src/sets";
 
 import {
