@@ -1,12 +1,49 @@
-import { createComparator } from './comparator';
-import { createCircularEqualCreator, sameValueZeroEqual } from './utils';
+import { getNewCache } from "./cache";
+import { createComparatorCreator } from "./comparator";
+import { areArraysEqual, areArraysEqualCircular } from "./arrays";
+import { areMapsEqual, areMapsEqualCircular } from "./maps";
+import { areObjectsEqual, areObjectsEqualCircular } from "./objects";
+import { areSetsEqual, areSetsEqualCircular } from "./sets";
+import { sameValueZeroEqual } from "./utils";
 
-export { createComparator as createCustomEqual, sameValueZeroEqual };
+import type { Cache } from "./cache";
+import type { CreateMeta, EqualityComparatorCreator } from "./comparator";
 
-export const deepEqual = createComparator();
-export const shallowEqual = createComparator(() => sameValueZeroEqual);
+const noop = function () {} as () => undefined;
 
-export const circularDeepEqual = createComparator(createCircularEqualCreator());
-export const circularShallowEqual = createComparator(
-  createCircularEqualCreator(sameValueZeroEqual),
-);
+const createStandardEqual = createComparatorCreator<undefined>({
+  areArraysEqual,
+  areMapsEqual,
+  areObjectsEqual,
+  areSetsEqual,
+  createMeta: noop,
+});
+
+const createCircularEqual = createComparatorCreator<Cache>({
+  areArraysEqual: areArraysEqualCircular,
+  areMapsEqual: areMapsEqualCircular,
+  areObjectsEqual: areObjectsEqualCircular,
+  areSetsEqual: areSetsEqualCircular,
+  createMeta: getNewCache,
+});
+
+export const deepEqual = createStandardEqual();
+export const shallowEqual = createStandardEqual(() => sameValueZeroEqual);
+
+export const circularDeepEqual = createCircularEqual();
+export const circularShallowEqual = createCircularEqual();
+
+export interface CreateCustomEqualOptions<Meta = any> {
+  createMeta?: CreateMeta<Meta>;
+  isEqual?: EqualityComparatorCreator;
+}
+
+export function createCustomEqual(options: CreateCustomEqualOptions) {
+  return createComparatorCreator<undefined>({
+    areArraysEqual,
+    areMapsEqual,
+    areObjectsEqual,
+    areSetsEqual,
+    createMeta: options.createMeta || noop,
+  })(options.isEqual);
+}
