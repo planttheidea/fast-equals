@@ -9,7 +9,7 @@ interface Dictionary<Value> {
 const OWNER = "_owner";
 const { hasOwnProperty } = Object.prototype;
 
-function isReactElement(value: any) {
+export function isReactElement(value: any) {
   return !!(value && value.$$typeof);
 }
 
