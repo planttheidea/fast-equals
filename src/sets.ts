@@ -3,13 +3,7 @@ import { createIsCircular } from './utils';
 import type { InternalEqualityComparator } from './utils';
 
 /**
- * are the sets equal in value
- *
- * @param a the set to test
- * @param b the set to test against
- * @param isEqual the comparator to determine equality
- * @param meta the meta set to pass through
- * @returns are the sets equal
+ * Whether the `Set`s are equal in value.
  */
 export function areSetsEqual(
   a: Set<any>,
@@ -26,6 +20,12 @@ export function areSetsEqual(
   if (!a.size) {
     return true;
   }
+
+  // The use of `forEach()` is to avoid the transpilation cost of `for...of` comparisons, and
+  // the inability to control the performance of the resulting code. It also avoids excessive
+  // iteration compared to doing comparisons of `keys()` and `values()`. As a result, though,
+  // we cannot short-circuit the iterations; bookkeeping must be done to short-circuit the
+  // equality checks themselves.
 
   const matchedIndices: Record<number, true> = {};
 
@@ -53,4 +53,7 @@ export function areSetsEqual(
   return isValueEqual;
 }
 
+/**
+ * Whether the `Set`s are equal in value, including circular references.
+ */
 export const areSetsEqualCircular = createIsCircular(areSetsEqual);

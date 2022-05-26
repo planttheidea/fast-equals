@@ -23,8 +23,11 @@ export type NativeEqualityComparator = <A, B>(
   objectB: B,
 ) => boolean;
 
-const { valueOf } = Object.prototype;
-
+/**
+ * Wrap the provided `areItemsEqual` method to manage the circular cache, allowing
+ * for circular references to be safely included in the comparison without creating
+ * stack overflows.
+ */
 export function createIsCircular<
   AreItemsEqual extends (...args: any) => boolean,
 >(areItemsEqual: AreItemsEqual) {
@@ -58,37 +61,24 @@ export function createIsCircular<
 }
 
 /**
- * is the value a plain object
+ * Whether the value is a plain object.
  *
- * @param value the value to test
- * @returns is the value a plain object
+ * @NOTE
+ * This is a same-realm compariosn only.
  */
 export function isPlainObject(value: any) {
   return value.constructor === Object || value.constructor == null;
 }
 
-export function isPrimitiveWrapper(
-  value: any,
-): value is Boolean | BigInt | Number | String | Symbol {
-  return value.valueOf !== valueOf;
-}
-
 /**
- * is the value promise-like (meaning it is thenable)
- *
- * @param value the value to test
- * @returns is the value promise-like
+ * When the value is `Promise`-like, aka "then-able".
  */
 export function isPromiseLike(value: any) {
   return typeof value.then === 'function';
 }
 
 /**
- * are the values passed strictly equal or both NaN
- *
- * @param a the value to compare against
- * @param b the value to test
- * @returns are the values equal by the SameValueZero principle
+ * Whether the values passed are strictly equal or both NaN.
  */
 export function sameValueZeroEqual(a: any, b: any) {
   return a === b || (a !== a && b !== b);

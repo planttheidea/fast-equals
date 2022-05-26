@@ -2,13 +2,8 @@ import { createIsCircular } from './utils';
 
 import type { InternalEqualityComparator } from './utils';
 
-/* are the arrays equal in value
- *
- * @param a the array to test
- * @param b the array to test against
- * @param isEqual the comparator to determine equality
- * @param meta the meta object to pass through
- * @returns are the arrays equal
+/**
+ * Whether the arrays are equal in value.
  */
 export function areArraysEqual(
   a: any[],
@@ -22,6 +17,10 @@ export function areArraysEqual(
     return false;
   }
 
+  // Decrementing `while` showed faster results than either incrementing or
+  // decrementing `for` loop and than an incrementing `while` loop. Declarative
+  // methods like `some` / `every` were not used to avoid incurring the garbage
+  // cost of anonymous callbacks.
   while (index-- > 0) {
     if (!isEqual(a[index], b[index], index, index, a, b, meta)) {
       return false;
@@ -31,4 +30,7 @@ export function areArraysEqual(
   return true;
 }
 
+/**
+ * Whether the arrays are equal in value, including circular references.
+ */
 export const areArraysEqualCircular = createIsCircular(areArraysEqual);

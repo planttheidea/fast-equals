@@ -10,12 +10,7 @@ const OWNER = '_owner';
 const { hasOwnProperty } = Object.prototype;
 
 /**
- * are the objects equal in value
- * @param a the object to test
- * @param b the object to test against
- * @param isEqual the comparator to determine equality
- * @param meta the meta object to pass through
- * @returns are the objects equal
+ * Whether the objects are equal in value.
  */
 export function areObjectsEqual(
   a: Dictionary<any>,
@@ -33,6 +28,10 @@ export function areObjectsEqual(
 
   let key: string;
 
+  // Decrementing `while` showed faster results than either incrementing or
+  // decrementing `for` loop and than an incrementing `while` loop. Declarative
+  // methods like `some` / `every` were not used to avoid incurring the garbage
+  // cost of anonymous callbacks.
   while (index-- > 0) {
     key = keysA[index];
 
@@ -56,4 +55,7 @@ export function areObjectsEqual(
   return true;
 }
 
+/**
+ * Whether the objects are equal in value, including circular references.
+ */
 export const areObjectsEqualCircular = createIsCircular(areObjectsEqual);
