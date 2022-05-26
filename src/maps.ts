@@ -32,27 +32,29 @@ export function areMapsEqual(
   let indexA = 0;
 
   a.forEach((aValue, aKey) => {
-    if (isValueEqual) {
-      let hasMatch = false;
-      let matchIndexB = 0;
-
-      b.forEach((bValue, bKey) => {
-        if (
-          !hasMatch &&
-          !matchedIndices[matchIndexB] &&
-          (hasMatch =
-            isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
-            isEqual(aValue, bValue, aKey, bKey, a, b, meta))
-        ) {
-          matchedIndices[matchIndexB] = true;
-        }
-
-        matchIndexB++;
-      });
-
-      indexA++;
-      isValueEqual = hasMatch;
+    if (!isValueEqual) {
+      return;
     }
+
+    let hasMatch = false;
+    let matchIndexB = 0;
+
+    b.forEach((bValue, bKey) => {
+      if (
+        !hasMatch &&
+        !matchedIndices[matchIndexB] &&
+        (hasMatch =
+          isEqual(aKey, bKey, indexA, matchIndexB, a, b, meta) &&
+          isEqual(aValue, bValue, aKey, bKey, a, b, meta))
+      ) {
+        matchedIndices[matchIndexB] = true;
+      }
+
+      matchIndexB++;
+    });
+
+    indexA++;
+    isValueEqual = hasMatch;
   });
 
   return isValueEqual;

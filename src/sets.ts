@@ -30,24 +30,26 @@ export function areSetsEqual(
   const matchedIndices: Record<number, true> = {};
 
   a.forEach((aValue, aKey) => {
-    if (isValueEqual) {
-      let hasMatch = false;
-      let matchIndex = 0;
-
-      b.forEach((bValue, bKey) => {
-        if (
-          !hasMatch &&
-          !matchedIndices[matchIndex] &&
-          (hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta))
-        ) {
-          matchedIndices[matchIndex] = true;
-        }
-
-        matchIndex++;
-      });
-
-      isValueEqual = hasMatch;
+    if (!isValueEqual) {
+      return;
     }
+
+    let hasMatch = false;
+    let matchIndex = 0;
+
+    b.forEach((bValue, bKey) => {
+      if (
+        !hasMatch &&
+        !matchedIndices[matchIndex] &&
+        (hasMatch = isEqual(aValue, bValue, aKey, bKey, a, b, meta))
+      ) {
+        matchedIndices[matchIndex] = true;
+      }
+
+      matchIndex++;
+    });
+
+    isValueEqual = hasMatch;
   });
 
   return isValueEqual;
