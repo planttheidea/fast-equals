@@ -1,6 +1,7 @@
 import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 
 import type { areArraysEqual } from './arrays';
+import type { areDatesEqual } from './dates';
 import type { areMapsEqual } from './maps';
 import type { areObjectsEqual } from './objects';
 import type { areRegExpsEqual } from './regexps';
@@ -13,6 +14,7 @@ import type {
 
 export interface CreateComparatorCreatorOptions {
   areArraysEqual: typeof areArraysEqual;
+  areDatesEqual: typeof areDatesEqual;
   areMapsEqual: typeof areMapsEqual;
   areObjectsEqual: typeof areObjectsEqual;
   areRegExpsEqual: typeof areRegExpsEqual;
@@ -51,6 +53,7 @@ export const createDefaultIsEqual: EqualityComparatorCreator =
 
 export function createComparator({
   areArraysEqual,
+  areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
@@ -120,7 +123,7 @@ export function createComparator({
     if (aTag === DATE_TAG) {
       // `getTime()` showed better results compared to alternatives like `valueOf()`
       // or the unary `+` operator.
-      return sameValueZeroEqual(a.getTime(), b.getTime());
+      return areDatesEqual(a, b);
     }
 
     if (aTag === REG_EXP_TAG) {

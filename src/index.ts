@@ -1,5 +1,6 @@
 import { createComparator, createDefaultIsEqual } from './comparator';
 import { areArraysEqual, areArraysEqualCircular } from './arrays';
+import { areDatesEqual } from './dates';
 import { areMapsEqual, areMapsEqualCircular } from './maps';
 import { areObjectsEqual, areObjectsEqualCircular } from './objects';
 import { areRegExpsEqual } from './regexps';
@@ -12,6 +13,7 @@ export { sameValueZeroEqual };
 
 const DEFAULT_CONFIG = {
   areArraysEqual,
+  areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,

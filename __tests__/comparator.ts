@@ -1,5 +1,6 @@
 import { createComparator } from '../src/comparator';
 import { areArraysEqual, areArraysEqualCircular } from '../src/arrays';
+import { areDatesEqual } from '../src/dates';
 import { areMapsEqual, areMapsEqualCircular } from '../src/maps';
 import { areObjectsEqual, areObjectsEqualCircular } from '../src/objects';
 import { areRegExpsEqual } from '../src/regexps';
@@ -10,16 +11,17 @@ import type { EqualityComparatorCreator } from '../src/utils';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,
+  areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
+  ...STANDARD_COMPARATOR_OPTIONS,
   areArraysEqual: areArraysEqualCircular,
   areMapsEqual: areMapsEqualCircular,
   areObjectsEqual: areObjectsEqualCircular,
-  areRegExpsEqual,
   areSetsEqual: areSetsEqualCircular,
 };
 
