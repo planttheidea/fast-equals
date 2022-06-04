@@ -6,11 +6,7 @@ import type { areMapsEqual } from './maps';
 import type { areObjectsEqual } from './objects';
 import type { areRegExpsEqual } from './regexps';
 import type { areSetsEqual } from './sets';
-import type {
-  EqualityComparator,
-  EqualityComparatorCreator,
-  InternalEqualityComparator,
-} from './utils';
+import type { EqualityComparator, EqualityComparatorCreator } from './utils';
 
 export interface CreateComparatorCreatorOptions {
   areArraysEqual: typeof areArraysEqual;
@@ -19,7 +15,7 @@ export interface CreateComparatorCreatorOptions {
   areObjectsEqual: typeof areObjectsEqual;
   areRegExpsEqual: typeof areRegExpsEqual;
   areSetsEqual: typeof areSetsEqual;
-  createIsNestedEqual?: EqualityComparatorCreator;
+  createIsNestedEqual: EqualityComparatorCreator;
 }
 
 const ARGUMENTS_TAG = '[object Arguments]';
@@ -34,23 +30,6 @@ const STRING_TAG = '[object String]';
 
 const { toString } = Object.prototype;
 
-export const createDefaultIsEqual: EqualityComparatorCreator =
-  function createDefaultIsEqual(
-    comparator: EqualityComparator,
-  ): InternalEqualityComparator {
-    return function isEqual(
-      a: any,
-      b: any,
-      indexOrKeyA: any,
-      indexOrKeyB: any,
-      parentA: any,
-      parentB: any,
-      meta: any,
-    ) {
-      return comparator(a, b, meta);
-    };
-  };
-
 export function createComparator({
   areArraysEqual,
   areDatesEqual,
@@ -58,19 +37,14 @@ export function createComparator({
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-  createIsNestedEqual = createDefaultIsEqual,
+  createIsNestedEqual,
 }: CreateComparatorCreatorOptions): EqualityComparator {
   const isEqual = createIsNestedEqual(comparator);
 
   /**
    * compare the value of the two objects and return true if they are equivalent in values
-   *
-   * @param a the value to test against
-   * @param b the value to test
-   * @param [meta] an optional meta object that is passed through to all equality test calls
-   * @returns are a and b equivalent in value
    */
-  function comparator(a: any, b: any, meta?: any) {
+  function comparator(a: any, b: any, meta: any) {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;

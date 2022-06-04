@@ -1,31 +1,45 @@
-import { createComparator, createDefaultIsEqual } from './comparator';
+import { createComparator } from './comparator';
 import { areArraysEqual, areArraysEqualCircular } from './arrays';
 import { areDatesEqual } from './dates';
 import { areMapsEqual, areMapsEqualCircular } from './maps';
 import { areObjectsEqual, areObjectsEqualCircular } from './objects';
 import { areRegExpsEqual } from './regexps';
 import { areSetsEqual, areSetsEqualCircular } from './sets';
-import { sameValueZeroEqual } from './utils';
+import { createDefaultIsNestedEqual, merge, sameValueZeroEqual } from './utils';
 
 import type { CreateComparatorCreatorOptions } from './comparator';
 
 export { sameValueZeroEqual };
 
-const DEFAULT_CONFIG = {
+export type { CreateComparatorCreatorOptions } from './comparator';
+export type {
+  EqualityComparator,
+  EqualityComparatorCreator,
+  InternalEqualityComparator,
+  NativeEqualityComparator,
+} from './utils';
+
+type GetComparatorOptions = (
+  defaultOptions: CreateComparatorCreatorOptions,
+) => Partial<CreateComparatorCreatorOptions>;
+
+const DEFAULT_CONFIG: CreateComparatorCreatorOptions = Object.freeze({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-};
-const DEFAULT_CIRCULAR_CONFIG = {
-  ...DEFAULT_CONFIG,
-  areArraysEqual: areArraysEqualCircular,
-  areMapsEqual: areMapsEqualCircular,
-  areObjectsEqual: areObjectsEqualCircular,
-  areSetsEqual: areSetsEqualCircular,
-};
+  createIsNestedEqual: createDefaultIsNestedEqual,
+});
+const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions = Object.freeze(
+  merge(DEFAULT_CONFIG, {
+    areArraysEqual: areArraysEqualCircular,
+    areMapsEqual: areMapsEqualCircular,
+    areObjectsEqual: areObjectsEqualCircular,
+    areSetsEqual: areSetsEqualCircular,
+  }),
+);
 
 const isDeepEqual = createComparator(DEFAULT_CONFIG);
 
@@ -36,16 +50,15 @@ export function deepEqual<A, B>(a: A, b: B): boolean {
   return isDeepEqual(a, b, undefined);
 }
 
-const isShallowEqual = createComparator({
-  ...DEFAULT_CONFIG,
-  createIsNestedEqual: () => sameValueZeroEqual,
-});
+const isShallowEqual = createComparator(
+  merge(DEFAULT_CONFIG, { createIsNestedEqual: () => sameValueZeroEqual }),
+);
 
 /**
  * Whether the items passed are shallowly-equal in value.
  */
 export function shallowEqual<A, B>(a: A, b: B): boolean {
-  return isShallowEqual(a, b, undefined);
+  return isShallowEqual<A, B, undefined>(a, b, undefined);
 }
 
 const isCircularDeepEqual = createComparator(DEFAULT_CIRCULAR_CONFIG);
@@ -57,10 +70,11 @@ export function circularDeepEqual<A, B>(a: A, b: B): boolean {
   return isCircularDeepEqual(a, b, new WeakMap());
 }
 
-const isCircularShallowEqual = createComparator({
-  ...DEFAULT_CIRCULAR_CONFIG,
-  createIsNestedEqual: () => sameValueZeroEqual,
-});
+const isCircularShallowEqual = createComparator(
+  merge(DEFAULT_CIRCULAR_CONFIG, {
+    createIsNestedEqual: () => sameValueZeroEqual,
+  }),
+);
 
 /**
  * Whether the items passed are shallowly-equal in value, including circular references.
@@ -70,23 +84,33 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
 }
 
 /**
- * Create a custom equality comparison method. This can be done to create very targeted
- * comparisons in extreme hot-path scenarios where the standard methods are not performant
- * enough, but can also be used to provide support for legacy environments that do not
- * support expected features like `WeakMap` out of the box.
+ * Create a custom equality comparison method.
+ *
+ * This can be done to create very targeted comparisons in extreme hot-path scenarios
+ * where the standard methods are not performant enough, but can also be used to provide
+ * support for legacy environments that do not support expected features like
+ * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual(
-  getComparatorOptions: (
-    defaultOptions: CreateComparatorCreatorOptions,
-  ) => CreateComparatorCreatorOptions,
-) {
-  const defaultOptions = {
-    ...DEFAULT_CONFIG,
-    createIsNestedEqual: createDefaultIsEqual,
-  };
+export function createCustomEqual(getComparatorOptions: GetComparatorOptions) {
+  return createComparator(
+    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+  );
+}
 
-  return createComparator({
-    ...defaultOptions,
-    ...getComparatorOptions(defaultOptions),
-  });
+/**
+ * Create a custom equality comparison method that handles circular references. This is very
+ * similar to `createCustomEqual`, with the only difference being that `meta` expects to be
+ * populated with a `WeakMap`-like contract.
+ *
+ * This can be done to create very targeted comparisons in extreme hot-path scenarios
+ * where the standard methods are not performant enough, but can also be used to provide
+ * support for legacy environments that do not support expected features like
+ * `WeakMap` out of the box.
+ */
+export function createCustomCircularEqual(
+  getComparatorOptions: GetComparatorOptions,
+) {
+  return createComparator(
+    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+  );
 }

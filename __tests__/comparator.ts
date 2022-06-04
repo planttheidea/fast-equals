@@ -5,7 +5,7 @@ import { areMapsEqual, areMapsEqualCircular } from '../src/maps';
 import { areObjectsEqual, areObjectsEqualCircular } from '../src/objects';
 import { areRegExpsEqual } from '../src/regexps';
 import { areSetsEqual, areSetsEqualCircular } from '../src/sets';
-import { sameValueZeroEqual } from '../src/utils';
+import { createDefaultIsNestedEqual, sameValueZeroEqual } from '../src/utils';
 
 import type { EqualityComparatorCreator } from '../src/utils';
 
@@ -16,6 +16,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
+  createIsNestedEqual: createDefaultIsNestedEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   ...STANDARD_COMPARATOR_OPTIONS,

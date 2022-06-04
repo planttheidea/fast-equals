@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import {
   createCustomEqual,
+  createCustomCircularEqual,
   circularDeepEqual,
   circularShallowEqual,
   deepEqual,
@@ -338,38 +339,11 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
   );
 }
 
-const customDeepEqualCircular = createCustomEqual((defaultOptions) => {
-  const cache = getFakeWeakMap();
-
-  function wrap<Fn extends (...args: any[]) => boolean>(fn: Fn): Fn {
-    return function (a, b, isEqual, meta): boolean {
-      const cachedA = cache.get(a);
-      const cachedB = cache.get(b);
-
-      if (cachedA && cachedB) {
-        return cachedA === b && cachedB === a;
-      }
-
-      cache.set(a, b);
-      cache.set(b, a);
-
-      const result = fn(a, b, isEqual, meta);
-
-      cache.delete(a);
-      cache.delete(b);
-
-      return result;
-    } as Fn;
-  }
-
-  return {
-    areArraysEqual: wrap(defaultOptions.areArraysEqual),
-    areMapsEqual: wrap(defaultOptions.areMapsEqual),
-    areObjectsEqual: wrap(defaultOptions.areObjectsEqual),
-    areRegExpsEqual,
-    areSetsEqual: wrap(defaultOptions.areSetsEqual),
-  };
-});
+const customDeepEqualCircularHandler = createCustomCircularEqual(() => ({
+  areRegExpsEqual,
+}));
+const customDeepEqualCircular = (a: any, b: any) =>
+  customDeepEqualCircularHandler(a, b, getFakeWeakMap());
 
 console.log(
   'true',
@@ -382,6 +356,29 @@ console.log(
 console.log(
   'false',
   customDeepEqualCircular(new Circular('foo'), { foo: 'baz' }),
+);
+
+console.groupEnd();
+
+console.group('targeted custom');
+
+const isDeepEqualOrFooMatchesMeta = createCustomEqual(() => ({
+  createIsNestedEqual:
+    (deepEqual) => (a, b, keyA, keyB, parentA, parentB, meta) =>
+      a === meta || b === meta || deepEqual(a, b, meta),
+}));
+
+console.log(
+  'shallow',
+  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }, 'bar'),
+);
+console.log(
+  'deep',
+  isDeepEqualOrFooMatchesMeta(
+    { nested: { foo: 'bar' } },
+    { nested: { foo: 'baz' } },
+    'bar',
+  ),
 );
 
 console.groupEnd();
