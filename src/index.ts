@@ -83,14 +83,17 @@ export function createCustomEqual(
     defaultOptions: CreateComparatorCreatorOptions,
   ) => CreateComparatorCreatorOptions,
 ) {
-  return createComparator(
-    getComparatorOptions({
-      areArraysEqual,
-      areMapsEqual,
-      areObjectsEqual,
-      areRegExpsEqual,
-      areSetsEqual,
-      createIsNestedEqual: createDefaultIsEqual,
-    }),
-  );
+  const defaultOptions = {
+    areArraysEqual,
+    areMapsEqual,
+    areObjectsEqual,
+    areRegExpsEqual,
+    areSetsEqual,
+    createIsNestedEqual: createDefaultIsEqual,
+  };
+
+  return createComparator({
+    ...defaultOptions,
+    ...getComparatorOptions(defaultOptions),
+  });
 }

@@ -339,8 +339,6 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
 }
 
 const customDeepEqualCircular = createCustomEqual((defaultOptions) => {
-  const isNestedEqual = (comparator) =>
-    defaultOptions.createIsNestedEqual(comparator);
   const cache = getFakeWeakMap();
 
   function wrap<Fn extends (...args: any[]) => boolean>(fn: Fn): Fn {
@@ -365,13 +363,11 @@ const customDeepEqualCircular = createCustomEqual((defaultOptions) => {
   }
 
   return {
-    ...defaultOptions,
     areArraysEqual: wrap(defaultOptions.areArraysEqual),
     areMapsEqual: wrap(defaultOptions.areMapsEqual),
     areObjectsEqual: wrap(defaultOptions.areObjectsEqual),
     areRegExpsEqual,
     areSetsEqual: wrap(defaultOptions.areSetsEqual),
-    isNestedEqual,
   };
 });
 
