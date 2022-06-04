@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.16kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.23kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -36,20 +36,10 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
 
 ## Usage
 
-You can either import the individual functions desired:
-
-```javascript
+```ts
 import { deepEqual } from 'fast-equals';
 
 console.log(deepEqual({ foo: 'bar' }, { foo: 'bar' })); // true
-```
-
-Or if you want to import all functions under a namespace:
-
-```javascript
-import * as fe from 'fast-equals';
-
-console.log(fe.deep({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
 
 ### Specific builds
@@ -60,9 +50,6 @@ There are three builds, an ESM build for modern build systems / runtimes, a Comm
   - For older `nodejs` versions that do not allow ESM with file extensions other than `.mjs` => `fast-equals/dist/fast-equals.mjs`
 - CommonJS => `fast-equals/dist/fast-equals.cjs.js`
 - UMD => `fast-equals/dist/fast-equals.js`
-
-There is also a pre-minified version of the UMD build available:
-
 - Minified UMD => `fast-equals/dist/fast-equals.min.js`
 
 ## Available methods
@@ -71,7 +58,7 @@ There is also a pre-minified version of the UMD build available:
 
 Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
-```javascript
+```ts
 import { deepEqual } from 'fast-equals';
 
 const objectA = { foo: { bar: 'baz' } };
@@ -85,7 +72,7 @@ console.log(deepEqual(objectA, objectB)); // true
 
 `Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
 
-```javascript
+```ts
 const mapA = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
 const mapB = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
 
@@ -98,7 +85,7 @@ To support true deep equality of all contents, `fast-equals` will perform a deep
 
 Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
 
-```javascript
+```ts
 import { shallowEqual } from 'fast-equals';
 
 const nestedObject = { bar: 'baz' };
@@ -116,7 +103,7 @@ console.log(shallowEqual(objectA, objectC)); // false
 
 Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means either strictly equal or both `NaN`.
 
-```javascript
+```ts
 import { sameValueZeroEqual } from 'fast-equals';
 
 const mainObject = { foo: NaN, bar: 'baz' };
@@ -134,7 +121,7 @@ console.log(sameValueZeroEqual(mainObject, objectC)); // false
 
 Performs the same comparison as `deepEqual` but supports circular objects. It is slower than `deepEqual`, so only use if you know circular objects are present.
 
-```javascript
+```ts
 function Circular(value) {
   this.me = {
     deeply: {
@@ -156,7 +143,7 @@ Just as with `deepEqual`, [both keys and values are compared for deep equality](
 
 Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only use if you know circular objects are present.
 
-```javascript
+```ts
 const array = ['foo'];
 
 array.push(array);
@@ -167,12 +154,11 @@ console.log(circularShallowEqual(array, [array])); // false
 
 ### createCustomEqual
 
-Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a partial-application function that will receive the internal comparator and should return a function that compares two objects.
+Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a factory method that receives the default options used internally, and allows you to override the defaults as needed. This is generally for extreme edge-cases, or supporting legacy environments.
 
 The signature is as follows:
 
-```typescript
-type EqualityComparator = (a: any, b: any, meta?: any) => boolean;
+```ts
 type InternalEqualityComparator = (
   a: any,
   b: any,
@@ -182,37 +168,173 @@ type InternalEqualityComparator = (
   parentB: any,
   meta: any,
 ) => boolean;
-type EqualityComparatorCreator = (
-  deepEqual: EqualityComparator,
-) => InternalEqualityComparator;
+
+type TypeEqualityComparator = <Type, Meta>(
+  a: Type,
+  b: Type,
+  isEqual: InternalEqualityComparator,
+  meta: Meta,
+) => boolean;
+
+interface CreateComparatorCreatorOptions<Meta> {
+  areArraysEqual: TypeEqualityComparator<any[], Meta>;
+  areDatesEqual: TypeEqualityComparator<Date, Meta>;
+  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
+  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
+  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
+  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
+  createIsNestedEqual?: (
+    comparator: <A, B>(a: A, b: B, meta: Meta) => boolean,
+  ) => InternalEqualityComparator;
+}
 
 function createCustomEqual(
-  createIsEqual?: EqualityComparatorCreator,
+  getComparatorOptions: (
+    defaultOptions: CreateComparatorOptions,
+  ) => Partial<CreateComparatorOptions>,
 ): EqualityComparator;
 ```
 
-The `meta` parameter in `EqualityComparator` and `InternalEqualityComparator` is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects.
+The `meta` parameter above is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects. You also only need to return the override handlers; absent being provided, the defaults are used.
 
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
 
-An example for a custom equality comparison that also checks against values in the meta object:
+#### Legacy environment support
 
-```javascript
+Starting in `4.x.x`, `RegExp.prototype.flags` is expected to be available in the environment. All modern browsers support this feature, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment, creating a custom comparator that uses a more verbose comparison of all possible flags is a simple solution.
+
+```ts
+import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
+
+function areRegExpsEqual(a: RegExp, b: RegExp): Boolean {
+  return (
+    a.source === b.source &&
+    a.global === b.global &&
+    a.ignoreCase === b.ignoreCase &&
+    a.multiline === b.multiline &&
+    a.unicode === b.unicode &&
+    a.sticky === b.sticky &&
+    a.lastIndex === b.lastIndex
+  );
+}
+
+const deepEqual = createCustomEqual(() => ({ areRegExpEqual }));
+const shallowEqual = createCustomEqual(() => ({
+  areRegExpsEqual,
+  createIsNestedEqual: () => sameValueZeroEqual,
+}));
+```
+
+#### Custom targeted comparisons
+
+Sometimes it is necessary to squeeze every once of performance out of your runtime code, and deep equality checks can be a bottleneck. When this is occurs, it can be advantageous to build a custom comparison that allows for highly specific equality checks.
+
+An example where you know the shape of the objects being passed in, where the `foo` property is a simple primitive and the `bar` property is a nested object:
+
+```ts
 import { createCustomEqual } from 'fast-equals';
 
-const isDeepEqualOrFooMatchesMeta = createCustomEqual(
-  (deepEqual) =>
-    (objectA, objectB, indexOrKeyA, indexOrKeyB, parentA, parentB, meta) =>
-      objectA.foo === meta ||
-      objectB.foo === meta ||
-      deepEqual(objectA, objectB, meta),
+const isCollectionEqual = createCustomEqual<Meta>({
+  areObjectsEqual(a, b, isEqual, meta) {
+    return a.foo === b.foo && isEqual(a.bar, b.bar, meta);
+  },
+});
+```
+
+This avoids ambiguous iteration and type-checking, which can boost performance in extreme hot-path scenarios.
+
+Here is another example, with a custom equality comparison that also checks against values in the meta object:
+
+```ts
+import { createCustomEqual } from 'fast-equals';
+
+const isDeepEqualOrFooMatchesMeta = createCustomEqual<Meta>(() => ({
+  createIsNestedEqual(deepEqual) {
+    return (a, b, keyA, keyB, parentA, parentB, meta) =>
+      a === meta || b === meta || deepEqual(a, b, meta);
+  },
+}));
+
+console.log(
+  'shallow',
+  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }, 'bar'),
 );
+console.log(
+  'deep',
+  isDeepEqualOrFooMatchesMeta(
+    { nested: { foo: 'bar' } },
+    { nested: { foo: 'baz' } },
+    'bar',
+  ),
+); // true
+```
 
-const objectA = { foo: 'bar' };
-const objectB = { foo: 'baz' };
-const meta = 'bar';
+### `createCustomCircularEqual`
 
-console.log(isDeepEqualOrFooMatchesMeta(objectA, objectB, meta)); // true
+Operates nearly identically to [`createCustomEqual`](#createcustomequal), with the difference being that the `meta` property expected by the comparator is expected to have a `WeakMap` contract. This is because it is used for caching accessed objects to avoid maximum stack exceeded errors. The most common use for this method is a simple way to support circular checks for references that do not have `WeakMap` natively.
+
+#### Legacy environment support
+
+Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment, creating a custom comparator that uses a custom cache implementation with the same contract is a simple solution.
+
+```ts
+import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
+
+interface Cache {
+  delete(key: object): boolean;
+  get(key: object): any;
+  set(key: object, value: any);
+
+  customMethod(): void;
+  customValue: string;
+}
+
+function getCache(): Cache {
+  const entries = [];
+
+  return {
+    delete(key) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries.splice(index, 1);
+          return true;
+        }
+      }
+
+      return false;
+    },
+
+    get(key) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          return entries[index][1];
+        }
+      }
+    },
+
+    set(key, value) {
+      for (let index = 0; index < entries.length; ++index) {
+        if (entries[index][0] === key) {
+          entries[index][1] = value;
+          return this;
+        }
+      }
+
+      entries.push([key, value]);
+
+      return this;
+    },
+
+    customMethod() {
+      console.log('hello!');
+    },
+    customValue: 'goodbye',
+  };
+}
+
+const customCircularHandler = createCustomCircularEqual(() => ({}));
+
+const circularDeepEqual = (a, b) => customCircularHandler(a, b, getCache());
 ```
 
 ## Benchmarks
