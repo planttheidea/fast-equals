@@ -5,7 +5,12 @@ import { areMapsEqual, areMapsEqualCircular } from './maps';
 import { areObjectsEqual, areObjectsEqualCircular } from './objects';
 import { areRegExpsEqual } from './regexps';
 import { areSetsEqual, areSetsEqualCircular } from './sets';
-import { createDefaultIsNestedEqual, merge, sameValueZeroEqual } from './utils';
+import {
+  createDefaultIsNestedEqual,
+  EqualityComparator,
+  merge,
+  sameValueZeroEqual,
+} from './utils';
 
 import type { CreateComparatorCreatorOptions } from './comparator';
 
@@ -19,7 +24,12 @@ export type {
   NativeEqualityComparator,
 } from './utils';
 
-type GetComparatorOptions = <Meta>(
+export type BaseCircularMeta = Pick<
+  WeakMap<any, any>,
+  'delete' | 'get' | 'set'
+>;
+
+export type GetComparatorOptions<Meta> = (
   defaultOptions: CreateComparatorCreatorOptions<Meta>,
 ) => Partial<CreateComparatorCreatorOptions<Meta>>;
 
@@ -96,8 +106,8 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
  * `RegExp.prototype.flags` out of the box.
  */
 export function createCustomEqual<Meta>(
-  getComparatorOptions: GetComparatorOptions,
-) {
+  getComparatorOptions: GetComparatorOptions<Meta>,
+): EqualityComparator<Meta> {
   return createComparator<Meta>(
     merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
   );
@@ -113,10 +123,13 @@ export function createCustomEqual<Meta>(
  * support for legacy environments that do not support expected features like
  * `WeakMap` out of the box.
  */
-export function createCustomCircularEqual<Meta>(
-  getComparatorOptions: GetComparatorOptions,
-) {
+export function createCustomCircularEqual<Meta extends BaseCircularMeta>(
+  getComparatorOptions: GetComparatorOptions<Meta>,
+): EqualityComparator<Meta> {
   return createComparator<Meta>(
-    merge(DEFAULT_CIRCULAR_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+    merge(
+      DEFAULT_CIRCULAR_CONFIG,
+      getComparatorOptions(DEFAULT_CIRCULAR_CONFIG as any),
+    ),
   );
 }

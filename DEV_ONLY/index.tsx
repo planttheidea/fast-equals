@@ -11,6 +11,8 @@ import {
   shallowEqual,
 } from '../src';
 
+import type { BaseCircularMeta } from '../src';
+
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';
 document.body.style.margin = '0px';
@@ -289,7 +291,10 @@ console.groupEnd();
 
 console.group('custom circular');
 
-type CustomCircularCache = Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'>;
+interface CustomCircularCache extends BaseCircularMeta {
+  customMethod(value: any): void;
+  customValue: string;
+}
 
 function getCustomCircularCache(): CustomCircularCache {
   const entries: [object, object][] = [];
@@ -326,6 +331,11 @@ function getCustomCircularCache(): CustomCircularCache {
 
       return this;
     },
+
+    customMethod(value) {
+      console.log('hello', value);
+    },
+    customValue: 'goodbye',
   };
 }
 
@@ -342,7 +352,12 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
 }
 
 const customDeepEqualCircularHandler =
-  createCustomCircularEqual<CustomCircularCache>(() => ({
+  createCustomCircularEqual<CustomCircularCache>((defaultOptions) => ({
+    areObjectsEqual(a, b, isEqual, cache) {
+      cache.customMethod(cache.customValue);
+
+      return defaultOptions.areObjectsEqual(a, b, isEqual, cache);
+    },
     areRegExpsEqual,
   }));
 const customDeepEqualCircular = (a: any, b: any) =>

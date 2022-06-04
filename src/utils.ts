@@ -53,8 +53,8 @@ export function createDefaultIsNestedEqual<Meta>(
  * stack overflows.
  */
 export function createIsCircular<
-  AreItemsEqual extends (...args: any) => boolean,
->(areItemsEqual: AreItemsEqual) {
+  AreItemsEqual extends TypeEqualityComparator<any, any>,
+>(areItemsEqual: AreItemsEqual): AreItemsEqual {
   return function isCircular(
     a: any,
     b: any,
@@ -111,20 +111,20 @@ export function merge<A extends object, B extends object>(a: A, b: B): A & B {
  * @NOTE
  * This is a same-realm compariosn only.
  */
-export function isPlainObject(value: any) {
+export function isPlainObject(value: any): boolean {
   return value.constructor === Object || value.constructor == null;
 }
 
 /**
  * When the value is `Promise`-like, aka "then-able".
  */
-export function isPromiseLike(value: any) {
+export function isPromiseLike(value: any): boolean {
   return typeof value.then === 'function';
 }
 
 /**
  * Whether the values passed are strictly equal or both NaN.
  */
-export function sameValueZeroEqual(a: any, b: any) {
+export function sameValueZeroEqual(a: any, b: any): boolean {
   return a === b || (a !== a && b !== b);
 }

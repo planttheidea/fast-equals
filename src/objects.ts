@@ -17,7 +17,7 @@ export function areObjectsEqual(
   b: Dictionary<any>,
   isEqual: InternalEqualityComparator,
   meta: any,
-) {
+): boolean {
   const keysA = Object.keys(a);
 
   let index = keysA.length;

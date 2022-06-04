@@ -10,7 +10,7 @@ export function areSetsEqual(
   b: Set<any>,
   isEqual: InternalEqualityComparator,
   meta: any,
-) {
+): boolean {
   let isValueEqual = a.size === b.size;
 
   if (!isValueEqual) {

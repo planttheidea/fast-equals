@@ -10,7 +10,7 @@ export function areMapsEqual(
   b: Map<any, any>,
   isEqual: InternalEqualityComparator,
   meta: any,
-) {
+): boolean {
   let isValueEqual = a.size === b.size;
 
   if (!isValueEqual) {

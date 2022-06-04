@@ -10,7 +10,7 @@ export function areArraysEqual(
   b: any[],
   isEqual: InternalEqualityComparator,
   meta: any,
-) {
+): boolean {
   let index = a.length;
 
   if (b.length !== index) {

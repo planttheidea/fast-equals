@@ -42,7 +42,7 @@ export function createComparator<Meta>({
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
-  function comparator(a: any, b: any, meta: any) {
+  function comparator(a: any, b: any, meta: any): boolean {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;
