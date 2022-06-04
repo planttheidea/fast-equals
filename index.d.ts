@@ -9,11 +9,14 @@ export type {
   NativeEqualityComparator,
 } from './src/utils';
 
+export function circularDeepEqual<A, B>(a: A, b: B): boolean;
+export function circularShallowEqual<A, B>(a: A, b: B): boolean;
 export function createCustomEqual(
   createCustomEqualOptions: CreateComparatorCreatorOptions,
 ): EqualityComparator;
-export function circularDeepEqual<A, B>(objectA: A, objectB: B): boolean;
-export function circularShallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export function deepEqual<A, B>(objectA: A, objectB: B): boolean;
-export function shallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export function sameValueZeroEqual<A, B>(objectA: A, objectB: B): boolean;
+export function createCustomCircularEqual(
+  createCustomCircularEqualOptions: CreateComparatorCreatorOptions,
+): EqualityComparator;
+export function deepEqual<A, B>(a: A, b: B): boolean;
+export function shallowEqual<A, B>(a: A, b: B): boolean;
+export function sameValueZeroEqual<A, B>(a: A, b: B): boolean;
