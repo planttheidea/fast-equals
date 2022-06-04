@@ -230,17 +230,17 @@ const object4 = {
   zero: 0,
 };
 
-type Comparator = <A, B>(a: A, b: B) => boolean;
-
-const doesNotEverEqualOne = createCustomEqual((defaultOptions) => {
+const doesNotEverEqualOne = createCustomEqual<undefined>((defaultOptions) => {
   return {
     ...defaultOptions,
-    createIsEqual: (comparator: Comparator) => (a: any, b: any) => {
-      if (typeof a === 'number' || typeof b === 'number') {
-        return a !== 1 && b !== 1;
-      }
+    createIsNestedEqual(comparator) {
+      return (a: any, b: any) => {
+        if (typeof a === 'number' || typeof b === 'number') {
+          return a !== 1 && b !== 1;
+        }
 
-      return Object.keys(a).every((key) => comparator(a[key], b[key]));
+        return Object.keys(a).every((key) => comparator(a[key], b[key]));
+      };
     },
   };
 });
@@ -289,7 +289,9 @@ console.groupEnd();
 
 console.group('custom circular');
 
-function getFakeWeakMap(): Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'> {
+type CustomCircularCache = Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'>;
+
+function getCustomCircularCache(): CustomCircularCache {
   const entries: [object, object][] = [];
 
   return {
@@ -339,11 +341,12 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
   );
 }
 
-const customDeepEqualCircularHandler = createCustomCircularEqual(() => ({
-  areRegExpsEqual,
-}));
+const customDeepEqualCircularHandler =
+  createCustomCircularEqual<CustomCircularCache>(() => ({
+    areRegExpsEqual,
+  }));
 const customDeepEqualCircular = (a: any, b: any) =>
-  customDeepEqualCircularHandler(a, b, getFakeWeakMap());
+  customDeepEqualCircularHandler(a, b, getCustomCircularCache());
 
 console.log(
   'true',

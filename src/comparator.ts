@@ -1,21 +1,19 @@
 import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 
-import type { areArraysEqual } from './arrays';
-import type { areDatesEqual } from './dates';
-import type { areMapsEqual } from './maps';
-import type { areObjectsEqual } from './objects';
-import type { areRegExpsEqual } from './regexps';
-import type { areSetsEqual } from './sets';
-import type { EqualityComparator, EqualityComparatorCreator } from './utils';
+import type {
+  EqualityComparator,
+  EqualityComparatorCreator,
+  TypeEqualityComparator,
+} from './utils';
 
-export interface CreateComparatorCreatorOptions {
-  areArraysEqual: typeof areArraysEqual;
-  areDatesEqual: typeof areDatesEqual;
-  areMapsEqual: typeof areMapsEqual;
-  areObjectsEqual: typeof areObjectsEqual;
-  areRegExpsEqual: typeof areRegExpsEqual;
-  areSetsEqual: typeof areSetsEqual;
-  createIsNestedEqual: EqualityComparatorCreator;
+export interface CreateComparatorCreatorOptions<Meta> {
+  areArraysEqual: TypeEqualityComparator<any[], Meta>;
+  areDatesEqual: TypeEqualityComparator<Date, Meta>;
+  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
+  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
+  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
+  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
+  createIsNestedEqual: EqualityComparatorCreator<Meta>;
 }
 
 const ARGUMENTS_TAG = '[object Arguments]';
@@ -30,7 +28,7 @@ const STRING_TAG = '[object String]';
 
 const { toString } = Object.prototype;
 
-export function createComparator({
+export function createComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
@@ -38,7 +36,7 @@ export function createComparator({
   areRegExpsEqual,
   areSetsEqual,
   createIsNestedEqual,
-}: CreateComparatorCreatorOptions): EqualityComparator {
+}: CreateComparatorCreatorOptions<Meta>): EqualityComparator<Meta> {
   const isEqual = createIsNestedEqual(comparator);
 
   /**
@@ -97,11 +95,11 @@ export function createComparator({
     if (aTag === DATE_TAG) {
       // `getTime()` showed better results compared to alternatives like `valueOf()`
       // or the unary `+` operator.
-      return areDatesEqual(a, b);
+      return areDatesEqual(a, b, isEqual, meta);
     }
 
     if (aTag === REG_EXP_TAG) {
-      return areRegExpsEqual(a, b);
+      return areRegExpsEqual(a, b, isEqual, meta);
     }
 
     if (aTag === MAP_TAG) {

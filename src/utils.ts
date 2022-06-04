@@ -1,6 +1,6 @@
 export type InternalEqualityComparator = (
-  objectA: any,
-  objectB: any,
+  a: any,
+  b: any,
   indexOrKeyA: any,
   indexOrKeyB: any,
   parentA: any,
@@ -8,36 +8,40 @@ export type InternalEqualityComparator = (
   meta: any,
 ) => boolean;
 
-export type EqualityComparator = <A, B, Meta>(
-  objectA: A,
-  objectB: B,
+export type EqualityComparator<Meta> = <A, B>(
+  a: A,
+  b: B,
   meta?: Meta,
 ) => boolean;
 
-export type EqualityComparatorCreator = (
-  fn: EqualityComparator,
+export type EqualityComparatorCreator<Meta> = (
+  fn: EqualityComparator<Meta>,
 ) => InternalEqualityComparator;
 
-export type NativeEqualityComparator = <A, B>(
-  objectA: A,
-  objectB: B,
+export type NativeEqualityComparator = <A, B>(a: A, b: B) => boolean;
+
+export type TypeEqualityComparator<Type, Meta> = (
+  a: Type,
+  b: Type,
+  isEqual: InternalEqualityComparator,
+  meta: Meta,
 ) => boolean;
 
 /**
  * Default equality comparator pass-through, used as the standard `isEqual` creator for
  * use inside the built comparator.
  */
-export function createDefaultIsNestedEqual(
-  comparator: EqualityComparator,
+export function createDefaultIsNestedEqual<Meta>(
+  comparator: EqualityComparator<Meta>,
 ): InternalEqualityComparator {
-  return function isEqual(
-    a: any,
-    b: any,
+  return function isEqual<A, B>(
+    a: A,
+    b: B,
     indexOrKeyA: any,
     indexOrKeyB: any,
     parentA: any,
     parentB: any,
-    meta: any,
+    meta: Meta,
   ) {
     return comparator(a, b, meta);
   };

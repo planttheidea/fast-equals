@@ -4,13 +4,12 @@ import testSuites from './__helpers__/testSuites';
 import {
   circularDeepEqual,
   circularShallowEqual,
+  createCustomCircularEqual,
   createCustomEqual,
   deepEqual,
   sameValueZeroEqual,
   shallowEqual,
 } from '../src/index';
-
-import type { EqualityComparator } from '../src/utils';
 
 describe('exports', () => {
   [
@@ -146,7 +145,9 @@ describe('circularShallowEqual', () => {
 });
 
 describe('createCustomEqual', () => {
-  function getFakeWeakMap(): Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'> {
+  type FakeWeakMap = Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'>;
+
+  function getFakeWeakMap(): FakeWeakMap {
     const entries: [object, object][] = [];
 
     return {
@@ -196,42 +197,14 @@ describe('createCustomEqual', () => {
     );
   }
 
-  const customDeepEqualCircular = createCustomEqual((defaultOptions) => {
-    const isNestedEqual = (comparator: EqualityComparator) =>
-      defaultOptions.createIsNestedEqual(comparator);
-    const cache = getFakeWeakMap();
-
-    function wrap<Fn extends (...args: any[]) => boolean>(fn: Fn): Fn {
-      return function (a, b, isEqual, meta): boolean {
-        const cachedA = cache.get(a);
-        const cachedB = cache.get(b);
-
-        if (cachedA && cachedB) {
-          return cachedA === b && cachedB === a;
-        }
-
-        cache.set(a, b);
-        cache.set(b, a);
-
-        const result = fn(a, b, isEqual, meta);
-
-        cache.delete(a);
-        cache.delete(b);
-
-        return result;
-      } as Fn;
-    }
-
-    return {
-      ...defaultOptions,
-      areArraysEqual: wrap(defaultOptions.areArraysEqual),
-      areMapsEqual: wrap(defaultOptions.areMapsEqual),
-      areObjectsEqual: wrap(defaultOptions.areObjectsEqual),
+  const customDeepEqualComparator = createCustomCircularEqual<FakeWeakMap>(
+    () => ({
       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
-      areSetsEqual: wrap(defaultOptions.areSetsEqual),
-      isNestedEqual,
-    };
-  });
+    }),
+  );
+
+  const customDeepEqualCircular = <A, B>(a: A, b: B) =>
+    customDeepEqualComparator(a, b, getFakeWeakMap());
 
   it('should handle the custom equality check', () => {
     expect(

@@ -19,20 +19,24 @@ export type {
   NativeEqualityComparator,
 } from './utils';
 
-type GetComparatorOptions = (
-  defaultOptions: CreateComparatorCreatorOptions,
-) => Partial<CreateComparatorCreatorOptions>;
+type GetComparatorOptions = <Meta>(
+  defaultOptions: CreateComparatorCreatorOptions<Meta>,
+) => Partial<CreateComparatorCreatorOptions<Meta>>;
 
-const DEFAULT_CONFIG: CreateComparatorCreatorOptions = Object.freeze({
-  areArraysEqual,
-  areDatesEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-  createIsNestedEqual: createDefaultIsNestedEqual,
-});
-const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions = Object.freeze(
+const DEFAULT_CONFIG: CreateComparatorCreatorOptions<undefined> = Object.freeze(
+  {
+    areArraysEqual,
+    areDatesEqual,
+    areMapsEqual,
+    areObjectsEqual,
+    areRegExpsEqual,
+    areSetsEqual,
+    createIsNestedEqual: createDefaultIsNestedEqual,
+  },
+);
+const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions<
+  WeakMap<object, any>
+> = Object.freeze(
   merge(DEFAULT_CONFIG, {
     areArraysEqual: areArraysEqualCircular,
     areMapsEqual: areMapsEqualCircular,
@@ -58,7 +62,7 @@ const isShallowEqual = createComparator(
  * Whether the items passed are shallowly-equal in value.
  */
 export function shallowEqual<A, B>(a: A, b: B): boolean {
-  return isShallowEqual<A, B, undefined>(a, b, undefined);
+  return isShallowEqual(a, b, undefined);
 }
 
 const isCircularDeepEqual = createComparator(DEFAULT_CIRCULAR_CONFIG);
@@ -91,8 +95,10 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual(getComparatorOptions: GetComparatorOptions) {
-  return createComparator(
+export function createCustomEqual<Meta>(
+  getComparatorOptions: GetComparatorOptions,
+) {
+  return createComparator<Meta>(
     merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
   );
 }
@@ -107,10 +113,10 @@ export function createCustomEqual(getComparatorOptions: GetComparatorOptions) {
  * support for legacy environments that do not support expected features like
  * `WeakMap` out of the box.
  */
-export function createCustomCircularEqual(
+export function createCustomCircularEqual<Meta>(
   getComparatorOptions: GetComparatorOptions,
 ) {
-  return createComparator(
-    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+  return createComparator<Meta>(
+    merge(DEFAULT_CIRCULAR_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
   );
 }

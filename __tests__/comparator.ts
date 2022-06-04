@@ -73,7 +73,7 @@ describe('createComparator', () => {
           [{ foo: 'bar' }, 1],
         ]);
 
-        const createIsNestedEqual: EqualityComparatorCreator =
+        const createIsNestedEqual: EqualityComparatorCreator<undefined> =
           (deepEqual) =>
           (
             a: any,
@@ -111,7 +111,7 @@ describe('createComparator', () => {
           ['foo', 'bar'],
         ]);
 
-        const createIsNestedEqual: EqualityComparatorCreator =
+        const createIsNestedEqual: EqualityComparatorCreator<undefined> =
           (deepEqual) =>
           (
             a: any,
@@ -147,7 +147,7 @@ describe('createComparator', () => {
   describe('custom', () => {
     it('should call the custom comparator with the correct params', () => {
       const customComparatorMock = jest.fn();
-      const createIsNestedEqual: EqualityComparatorCreator =
+      const createIsNestedEqual: EqualityComparatorCreator<undefined> =
         (deepEqual) =>
         (
           ...args: [
