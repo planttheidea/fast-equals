@@ -10,13 +10,22 @@ import type { CreateComparatorCreatorOptions } from './comparator';
 
 export { sameValueZeroEqual };
 
-const isDeepEqual = createComparator({
+const DEFAULT_CONFIG = {
   areArraysEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-});
+};
+const DEFAULT_CIRCULAR_CONFIG = {
+  ...DEFAULT_CONFIG,
+  areArraysEqual: areArraysEqualCircular,
+  areMapsEqual: areMapsEqualCircular,
+  areObjectsEqual: areObjectsEqualCircular,
+  areSetsEqual: areSetsEqualCircular,
+};
+
+const isDeepEqual = createComparator(DEFAULT_CONFIG);
 
 /**
  * Whether the items passed are deeply-equal in value.
@@ -26,11 +35,7 @@ export function deepEqual<A, B>(a: A, b: B): boolean {
 }
 
 const isShallowEqual = createComparator({
-  areArraysEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  areRegExpsEqual,
-  areSetsEqual,
+  ...DEFAULT_CONFIG,
   createIsNestedEqual: () => sameValueZeroEqual,
 });
 
@@ -41,13 +46,7 @@ export function shallowEqual<A, B>(a: A, b: B): boolean {
   return isShallowEqual(a, b, undefined);
 }
 
-const isCircularDeepEqual = createComparator({
-  areArraysEqual: areArraysEqualCircular,
-  areMapsEqual: areMapsEqualCircular,
-  areObjectsEqual: areObjectsEqualCircular,
-  areRegExpsEqual,
-  areSetsEqual: areSetsEqualCircular,
-});
+const isCircularDeepEqual = createComparator(DEFAULT_CIRCULAR_CONFIG);
 
 /**
  * Whether the items passed are deeply-equal in value, including circular references.
@@ -57,11 +56,7 @@ export function circularDeepEqual<A, B>(a: A, b: B): boolean {
 }
 
 const isCircularShallowEqual = createComparator({
-  areArraysEqual: areArraysEqualCircular,
-  areMapsEqual: areMapsEqualCircular,
-  areObjectsEqual: areObjectsEqualCircular,
-  areRegExpsEqual,
-  areSetsEqual: areSetsEqualCircular,
+  ...DEFAULT_CIRCULAR_CONFIG,
   createIsNestedEqual: () => sameValueZeroEqual,
 });
 
@@ -84,11 +79,7 @@ export function createCustomEqual(
   ) => CreateComparatorCreatorOptions,
 ) {
   const defaultOptions = {
-    areArraysEqual,
-    areMapsEqual,
-    areObjectsEqual,
-    areRegExpsEqual,
-    areSetsEqual,
+    ...DEFAULT_CONFIG,
     createIsNestedEqual: createDefaultIsEqual,
   };
 
