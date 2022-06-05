@@ -27,6 +27,10 @@ Like `createCustomEqual`, it will create a custom equality comparator, with the 
 
 Prior to `4.x.x.`, `instanceof` was used internally for checking of object classes, which only worked when comparing objects from the same [Realm](https://262.ecma-international.org/6.0/#sec-code-realms). This has changed to instead use an object's [StringTag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag), which is not realm-specific.
 
+#### TypeScript typings improved
+
+For better typing in edge-case scenarios like custom comparators with `meta` values, typings have been refactored for accuracy and better narrow flow-through.
+
 ## 3.0.3
 
 - Fix [#77](https://github.com/planttheidea/fast-equals/issues/73) - better circular object validation

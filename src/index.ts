@@ -105,7 +105,7 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual<Meta>(
+export function createCustomEqual<Meta = undefined>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta> {
   return createComparator<Meta>(
@@ -123,9 +123,9 @@ export function createCustomEqual<Meta>(
  * support for legacy environments that do not support expected features like
  * `WeakMap` out of the box.
  */
-export function createCustomCircularEqual<Meta extends BaseCircularMeta>(
-  getComparatorOptions: GetComparatorOptions<Meta>,
-): EqualityComparator<Meta> {
+export function createCustomCircularEqual<
+  Meta extends BaseCircularMeta = WeakMap<any, any>,
+>(getComparatorOptions: GetComparatorOptions<Meta>): EqualityComparator<Meta> {
   const comparator = createComparator<Meta>(
     merge(
       DEFAULT_CIRCULAR_CONFIG,
