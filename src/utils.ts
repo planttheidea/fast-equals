@@ -1,29 +1,27 @@
-export type InternalEqualityComparator = (
+export type InternalEqualityComparator<Meta> = (
   a: any,
   b: any,
   indexOrKeyA: any,
   indexOrKeyB: any,
   parentA: any,
   parentB: any,
-  meta: any,
+  meta: Meta,
 ) => boolean;
 
-export type EqualityComparator<Meta> = <A, B>(
-  a: A,
-  b: B,
-  meta?: Meta,
-) => boolean;
+export type EqualityComparator<Meta> = Meta extends undefined
+  ? <A, B>(a: A, b: B, meta?: Meta) => boolean
+  : <A, B>(a: A, b: B, meta: Meta) => boolean;
 
 export type EqualityComparatorCreator<Meta> = (
   fn: EqualityComparator<Meta>,
-) => InternalEqualityComparator;
+) => InternalEqualityComparator<Meta>;
 
 export type NativeEqualityComparator = <A, B>(a: A, b: B) => boolean;
 
 export type TypeEqualityComparator<Type, Meta> = (
   a: Type,
   b: Type,
-  isEqual: InternalEqualityComparator,
+  isEqual: InternalEqualityComparator<Meta>,
   meta: Meta,
 ) => boolean;
 
@@ -33,7 +31,7 @@ export type TypeEqualityComparator<Type, Meta> = (
  */
 export function createDefaultIsNestedEqual<Meta>(
   comparator: EqualityComparator<Meta>,
-): InternalEqualityComparator {
+): InternalEqualityComparator<Meta> {
   return function isEqual<A, B>(
     a: A,
     b: B,
@@ -58,7 +56,7 @@ export function createIsCircular<
   return function isCircular(
     a: any,
     b: any,
-    isEqual: InternalEqualityComparator,
+    isEqual: InternalEqualityComparator<WeakMap<any, any>>,
     cache: WeakMap<any, any>,
   ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {

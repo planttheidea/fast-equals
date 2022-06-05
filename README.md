@@ -199,143 +199,25 @@ The `meta` parameter above is whatever you want it to be. It will be passed thro
 
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
 
-#### Legacy environment support
+#### Recipes
 
-Starting in `4.x.x`, `RegExp.prototype.flags` is expected to be available in the environment. All modern browsers support this feature, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment, creating a custom comparator that uses a more verbose comparison of all possible flags is a simple solution.
+Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable to the problem you are solving, they can offer guidance of how to structure your solution.
 
-```ts
-import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
-
-function areRegExpsEqual(a: RegExp, b: RegExp): Boolean {
-  return (
-    a.source === b.source &&
-    a.global === b.global &&
-    a.ignoreCase === b.ignoreCase &&
-    a.multiline === b.multiline &&
-    a.unicode === b.unicode &&
-    a.sticky === b.sticky &&
-    a.lastIndex === b.lastIndex
-  );
-}
-
-const deepEqual = createCustomEqual(() => ({ areRegExpEqual }));
-const shallowEqual = createCustomEqual(() => ({
-  areRegExpsEqual,
-  createIsNestedEqual: () => sameValueZeroEqual,
-}));
-```
-
-#### Custom targeted comparisons
-
-Sometimes it is necessary to squeeze every once of performance out of your runtime code, and deep equality checks can be a bottleneck. When this is occurs, it can be advantageous to build a custom comparison that allows for highly specific equality checks.
-
-An example where you know the shape of the objects being passed in, where the `foo` property is a simple primitive and the `bar` property is a nested object:
-
-```ts
-import { createCustomEqual } from 'fast-equals';
-
-const isCollectionEqual = createCustomEqual<Meta>({
-  areObjectsEqual(a, b, isEqual, meta) {
-    return a.foo === b.foo && isEqual(a.bar, b.bar, meta);
-  },
-});
-```
-
-This avoids ambiguous iteration and type-checking, which can boost performance in extreme hot-path scenarios.
-
-Here is another example, with a custom equality comparison that also checks against values in the meta object:
-
-```ts
-import { createCustomEqual } from 'fast-equals';
-
-const isDeepEqualOrFooMatchesMeta = createCustomEqual<Meta>(() => ({
-  createIsNestedEqual(deepEqual) {
-    return (a, b, keyA, keyB, parentA, parentB, meta) =>
-      a === meta || b === meta || deepEqual(a, b, meta);
-  },
-}));
-
-console.log(
-  'shallow',
-  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }, 'bar'),
-);
-console.log(
-  'deep',
-  isDeepEqualOrFooMatchesMeta(
-    { nested: { foo: 'bar' } },
-    { nested: { foo: 'baz' } },
-    'bar',
-  ),
-); // true
-```
+- [Legacy environment support for `RegExp` comparators](./recipes/legacy-regexp-support.md)
+- [Explicit property check](./recipes/explicit-property-check.md)
+- [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
+- [Comparing non-standard properties](./recipes/non-standard-properties.md)
+- [Strict property descriptor comparison](./recipes/strict-equality-checks.md)
 
 ### `createCustomCircularEqual`
 
 Operates nearly identically to [`createCustomEqual`](#createcustomequal), with the difference being that the `meta` property expected by the comparator is expected to have a `WeakMap` contract. This is because it is used for caching accessed objects to avoid maximum stack exceeded errors. The most common use for this method is a simple way to support circular checks for references that do not have `WeakMap` natively.
 
-#### Legacy environment support
+#### Recipes
 
-Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment, creating a custom comparator that uses a custom cache implementation with the same contract is a simple solution.
+Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable to the problem you are solving, they can offer guidance of how to structure your solution.
 
-```ts
-import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
-
-interface Cache {
-  delete(key: object): boolean;
-  get(key: object): any;
-  set(key: object, value: any);
-
-  customMethod(): void;
-  customValue: string;
-}
-
-function getCache(): Cache {
-  const entries = [];
-
-  return {
-    delete(key) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index][0] === key) {
-          entries.splice(index, 1);
-          return true;
-        }
-      }
-
-      return false;
-    },
-
-    get(key) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index][0] === key) {
-          return entries[index][1];
-        }
-      }
-    },
-
-    set(key, value) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index][0] === key) {
-          entries[index][1] = value;
-          return this;
-        }
-      }
-
-      entries.push([key, value]);
-
-      return this;
-    },
-
-    customMethod() {
-      console.log('hello!');
-    },
-    customValue: 'goodbye',
-  };
-}
-
-const customCircularHandler = createCustomCircularEqual(() => ({}));
-
-const circularDeepEqual = (a, b) => customCircularHandler(a, b, getCache());
-```
+- [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
 
 ## Benchmarks
 

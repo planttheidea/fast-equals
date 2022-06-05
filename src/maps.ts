@@ -8,7 +8,7 @@ import type { InternalEqualityComparator } from './utils';
 export function areMapsEqual(
   a: Map<any, any>,
   b: Map<any, any>,
-  isEqual: InternalEqualityComparator,
+  isEqual: InternalEqualityComparator<any>,
   meta: any,
 ): boolean {
   let isValueEqual = a.size === b.size;

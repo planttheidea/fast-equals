@@ -22,6 +22,7 @@ export type {
   EqualityComparatorCreator,
   InternalEqualityComparator,
   NativeEqualityComparator,
+  TypeEqualityComparator,
 } from './utils';
 
 export type BaseCircularMeta = Pick<
@@ -133,5 +134,6 @@ export function createCustomCircularEqual<
     ),
   );
 
-  return (a: any, b: any, meta: any = new WeakMap()) => comparator(a, b, meta);
+  return ((a: any, b: any, meta: any = new WeakMap()) =>
+    comparator(a, b, meta)) as EqualityComparator<Meta>;
 }

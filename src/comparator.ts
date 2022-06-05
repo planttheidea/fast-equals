@@ -37,12 +37,12 @@ export function createComparator<Meta>({
   areSetsEqual,
   createIsNestedEqual,
 }: CreateComparatorCreatorOptions<Meta>): EqualityComparator<Meta> {
-  const isEqual = createIsNestedEqual(comparator);
+  const isEqual = createIsNestedEqual(comparator as EqualityComparator<Meta>);
 
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
-  function comparator(a: any, b: any, meta: any): boolean {
+  function comparator(a: any, b: any, meta: Meta): boolean {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;
@@ -142,5 +142,5 @@ export function createComparator<Meta>({
     return a === b;
   }
 
-  return comparator;
+  return comparator as EqualityComparator<Meta>;
 }

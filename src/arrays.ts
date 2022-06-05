@@ -8,7 +8,7 @@ import type { InternalEqualityComparator } from './utils';
 export function areArraysEqual(
   a: any[],
   b: any[],
-  isEqual: InternalEqualityComparator,
+  isEqual: InternalEqualityComparator<any>,
   meta: any,
 ): boolean {
   let index = a.length;

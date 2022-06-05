@@ -15,7 +15,7 @@ const { hasOwnProperty } = Object.prototype;
 export function areObjectsEqual(
   a: Dictionary<any>,
   b: Dictionary<any>,
-  isEqual: InternalEqualityComparator,
+  isEqual: InternalEqualityComparator<any>,
   meta: any,
 ): boolean {
   const keysA = Object.keys(a);
