@@ -1,6 +1,5 @@
 // @ts-expect-error - Types do not exist for `testSuites`
 import testSuites from './__helpers__/testSuites';
-
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -10,7 +9,8 @@ import {
   sameValueZeroEqual,
   shallowEqual,
 } from '../src';
-import { BaseCircularMeta } from '../index.d';
+
+import type { BaseCircularMeta } from '../index.d';
 
 describe('exports', () => {
   [

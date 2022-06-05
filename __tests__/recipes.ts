@@ -55,7 +55,10 @@ describe('recipes', () => {
         };
       }
 
-      const areObjectsEqual = (a: SpecialObject, b: SpecialObject) => {
+      const areObjectsEqual: TypeEqualityComparator<
+        SpecialObject,
+        undefined
+      > = (a, b) => {
         return a.foo === b.foo && a.bar.baz === b.bar.baz;
       };
 
