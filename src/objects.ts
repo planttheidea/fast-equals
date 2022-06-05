@@ -1,9 +1,10 @@
 import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from './utils';
+import type { InternalEqualityComparator } from '../index.d';
 
 interface Dictionary<Value> {
   [key: string]: Value;
+  $$typeof?: any;
 }
 
 const OWNER = '_owner';

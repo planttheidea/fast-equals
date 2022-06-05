@@ -7,7 +7,7 @@ import { areRegExpsEqual } from '../src/regexps';
 import { areSetsEqual, areSetsEqualCircular } from '../src/sets';
 import { createDefaultIsNestedEqual, sameValueZeroEqual } from '../src/utils';
 
-import type { EqualityComparatorCreator } from '../src/utils';
+import type { EqualityComparatorCreator } from '../index.d';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,

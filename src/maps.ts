@@ -1,6 +1,6 @@
 import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from './utils';
+import type { InternalEqualityComparator } from '../index.d';
 
 /**
  * Whether the `Map`s are equal in value.

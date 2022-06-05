@@ -5,34 +5,16 @@ import { areMapsEqual, areMapsEqualCircular } from './maps';
 import { areObjectsEqual, areObjectsEqualCircular } from './objects';
 import { areRegExpsEqual } from './regexps';
 import { areSetsEqual, areSetsEqualCircular } from './sets';
-import {
-  createDefaultIsNestedEqual,
-  EqualityComparator,
-  merge,
-  sameValueZeroEqual,
-} from './utils';
+import { createDefaultIsNestedEqual, merge, sameValueZeroEqual } from './utils';
 
-import type { CreateComparatorCreatorOptions } from './comparator';
+import type {
+  BaseCircularMeta,
+  CreateComparatorCreatorOptions,
+  EqualityComparator,
+  GetComparatorOptions,
+} from '../index.d';
 
 export { sameValueZeroEqual };
-
-export type { CreateComparatorCreatorOptions } from './comparator';
-export type {
-  EqualityComparator,
-  EqualityComparatorCreator,
-  InternalEqualityComparator,
-  NativeEqualityComparator,
-  TypeEqualityComparator,
-} from './utils';
-
-export type BaseCircularMeta = Pick<
-  WeakMap<any, any>,
-  'delete' | 'get' | 'set'
->;
-
-export type GetComparatorOptions<Meta> = (
-  defaultOptions: CreateComparatorCreatorOptions<Meta>,
-) => Partial<CreateComparatorCreatorOptions<Meta>>;
 
 const DEFAULT_CONFIG: CreateComparatorCreatorOptions<undefined> = Object.freeze(
   {
@@ -45,16 +27,16 @@ const DEFAULT_CONFIG: CreateComparatorCreatorOptions<undefined> = Object.freeze(
     createIsNestedEqual: createDefaultIsNestedEqual,
   },
 );
-const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions<
-  WeakMap<object, any>
-> = Object.freeze(
-  merge(DEFAULT_CONFIG, {
+const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions<BaseCircularMeta> =
+  Object.freeze({
     areArraysEqual: areArraysEqualCircular,
+    areDatesEqual,
     areMapsEqual: areMapsEqualCircular,
     areObjectsEqual: areObjectsEqualCircular,
+    areRegExpsEqual,
     areSetsEqual: areSetsEqualCircular,
-  }),
-);
+    createIsNestedEqual: createDefaultIsNestedEqual,
+  });
 
 const isDeepEqual = createComparator(DEFAULT_CONFIG);
 
@@ -110,7 +92,7 @@ export function createCustomEqual<Meta = undefined>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta> {
   return createComparator<Meta>(
-    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG as any)),
   );
 }
 

@@ -11,7 +11,7 @@ import {
   shallowEqual,
 } from '../src';
 
-import type { BaseCircularMeta } from '../src';
+import type { BaseCircularMeta } from '../index.d';
 
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';
@@ -382,7 +382,7 @@ console.group('targeted custom');
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>(() => ({
   createIsNestedEqual:
-    (deepEqual) => (a, b, keyA, keyB, parentA, parentB, meta) =>
+    (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, meta) =>
       a === meta || b === meta || deepEqual(a, b, meta),
 }));
 

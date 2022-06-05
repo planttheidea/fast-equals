@@ -1,6 +1,5 @@
 // @ts-expect-error - Types do not exist for `testSuites`
 import testSuites from './__helpers__/testSuites';
-
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -9,7 +8,9 @@ import {
   deepEqual,
   sameValueZeroEqual,
   shallowEqual,
-} from '../src/index';
+} from '../src';
+
+import type { BaseCircularMeta } from '../index.d';
 
 describe('exports', () => {
   [
@@ -145,9 +146,7 @@ describe('circularShallowEqual', () => {
 });
 
 describe('createCustomEqual', () => {
-  type FakeWeakMap = Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'>;
-
-  function getFakeWeakMap(): FakeWeakMap {
+  function getFakeWeakMap(): BaseCircularMeta {
     const entries: [object, object][] = [];
 
     return {
@@ -197,7 +196,7 @@ describe('createCustomEqual', () => {
     );
   }
 
-  const customDeepEqualComparator = createCustomCircularEqual<FakeWeakMap>(
+  const customDeepEqualComparator = createCustomCircularEqual<BaseCircularMeta>(
     () => ({
       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
     }),

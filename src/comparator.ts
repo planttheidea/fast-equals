@@ -1,20 +1,9 @@
 import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 
 import type {
+  CreateComparatorCreatorOptions,
   EqualityComparator,
-  EqualityComparatorCreator,
-  TypeEqualityComparator,
-} from './utils';
-
-export interface CreateComparatorCreatorOptions<Meta> {
-  areArraysEqual: TypeEqualityComparator<any[], Meta>;
-  areDatesEqual: TypeEqualityComparator<Date, Meta>;
-  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
-  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
-  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  createIsNestedEqual: EqualityComparatorCreator<Meta>;
-}
+} from '../index.d';
 
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
