@@ -1,5 +1,36 @@
 # fast-equals CHANGELOG
 
+## 4.0.0
+
+### Breaking Changes
+
+#### Certain ES2015 features are now required
+
+In previous versions, there were automatic fallbacks for certain ES2015 features if they did not exist:
+
+- [`RegExp.prototype.flags`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags)
+- [`WeakMap`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)
+
+Due to the omnipresence of support in both browser and NodeJS, these have been deprecated. There is still an option if you require support for these legacy environments, however; see [`createCustomEqual`](./README.md#createcustomequal) and [`createCustomCircularEqual`](./README.md#createcustomcircularequal) for more details.
+
+#### `createCustomEqual` contract has changed
+
+To allow more flexibility and customizability for a variety of edge cases, `createCustomEqual` now allows override of specific type value comparisons in addition to the general comparator it did prior. See [the documentation](./README.md#createcustomequal) for more details.
+
+### Enhancements
+
+#### `createCustomCircularEqual` added
+
+Like `createCustomEqual`, it will create a custom equality comparator, with the exception that it will handle circular references. See [the documentation](./README.md#createcustomcircularequal) for more details.
+
+#### Cross-realm comparisons are now supported
+
+Prior to `4.x.x.`, `instanceof` was used internally for checking of object classes, which only worked when comparing objects from the same [Realm](https://262.ecma-international.org/6.0/#sec-code-realms). This has changed to instead use an object's [StringTag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag), which is not realm-specific.
+
+#### TypeScript typings improved
+
+For better typing in edge-case scenarios like custom comparators with `meta` values, typings have been refactored for accuracy and better narrow flow-through.
+
 ## 3.0.3
 
 - Fix [#77](https://github.com/planttheidea/fast-equals/issues/73) - better circular object validation

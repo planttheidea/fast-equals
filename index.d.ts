@@ -1,26 +1,27 @@
-declare type EqualityComparator = (
-  objectA: any,
-  objectB: any,
-  meta?: any,
-) => boolean;
-declare type InternalEqualityComparator = (
-  objectA: any,
-  objectB: any,
-  indexOrKeyA: any,
-  indexOrKeyB: any,
-  parentA: any,
-  parentB: any,
-  meta: any,
-) => boolean;
-declare type EqualityComparatorCreator = (
-  comparator: EqualityComparator,
-) => InternalEqualityComparator;
+import type {
+  circularDeepEqual as CircularDeepEqual,
+  circularShallowEqual as CircularShallowEqual,
+  createCustomEqual as CreateCustomEqual,
+  createCustomCircularEqual as CreateCustomCircularEqual,
+  deepEqual as DeepEqual,
+  shallowEqual as ShallowEqual,
+  sameValueZeroEqual as SameValueZeroEqual,
+} from './src/index';
 
-export declare function createCustomEqual(
-  createIsEqual?: EqualityComparatorCreator,
-): EqualityComparator;
-export declare function circularDeepEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function circularShallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function deepEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function shallowEqual<A, B>(objectA: A, objectB: B): boolean;
-export declare function sameValueZeroEqual<A, B>(objectA: A, objectB: B): boolean;
+export type { BaseCircularMeta, GetComparatorOptions } from './src/index';
+export type { CreateComparatorCreatorOptions } from './src/comparator';
+export type {
+  EqualityComparator,
+  EqualityComparatorCreator,
+  InternalEqualityComparator,
+  NativeEqualityComparator,
+  TypeEqualityComparator,
+} from './src/utils';
+
+export const circularDeepEqual: typeof CircularDeepEqual;
+export const circularShallowEqual: typeof CircularShallowEqual;
+export const createCustomEqual: typeof CreateCustomEqual;
+export const createCustomCircularEqual: typeof CreateCustomCircularEqual;
+export const deepEqual: typeof DeepEqual;
+export const shallowEqual: typeof ShallowEqual;
+export const sameValueZeroEqual: typeof SameValueZeroEqual;
