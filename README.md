@@ -31,6 +31,9 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
     - [circularDeepEqual](#circulardeepequal)
     - [circularShallowEqual](#circularshallowequal)
     - [createCustomEqual](#createcustomequal)
+      - [Recipes](#recipes)
+    - [`createCustomCircularEqual`](#createcustomcircularequal)
+      - [Recipes](#recipes-1)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
 
