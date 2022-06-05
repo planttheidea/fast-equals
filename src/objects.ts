@@ -4,6 +4,7 @@ import type { InternalEqualityComparator } from './utils';
 
 interface Dictionary<Value> {
   [key: string]: Value;
+  $$typeof?: any;
 }
 
 const OWNER = '_owner';

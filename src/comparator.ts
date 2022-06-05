@@ -7,12 +7,12 @@ import type {
 } from './utils';
 
 export interface CreateComparatorCreatorOptions<Meta> {
-  areArraysEqual: TypeEqualityComparator<any[], Meta>;
-  areDatesEqual: TypeEqualityComparator<Date, Meta>;
-  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
-  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
-  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
+  areArraysEqual: TypeEqualityComparator<any, Meta>;
+  areDatesEqual: TypeEqualityComparator<any, Meta>;
+  areMapsEqual: TypeEqualityComparator<any, Meta>;
+  areObjectsEqual: TypeEqualityComparator<any, Meta>;
+  areRegExpsEqual: TypeEqualityComparator<any, Meta>;
+  areSetsEqual: TypeEqualityComparator<any, Meta>;
   createIsNestedEqual: EqualityComparatorCreator<Meta>;
 }
 

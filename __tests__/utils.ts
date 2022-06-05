@@ -47,31 +47,40 @@ describe('isPromiseLike', () => {
 });
 
 describe('isSameValueZero', () => {
-  Object.keys(primitiveValues).forEach((key: keyof typeof primitiveValues) => {
+  Object.keys(primitiveValues).forEach((key) => {
     it(`should have ${key} be equal by SameValueZero`, () => {
-      expect(sameValueZeroEqual(primitiveValues[key], mainValues[key])).toBe(
-        true,
-      );
+      expect(
+        sameValueZeroEqual(
+          primitiveValues[key as keyof typeof primitiveValues],
+          mainValues[key as keyof typeof primitiveValues],
+        ),
+      ).toBe(true);
     });
   });
 
-  Object.keys(mainValues).forEach((key: keyof typeof mainValues) => {
+  Object.keys(mainValues).forEach((key) => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
       it(`should have ${key} be equal by SameValueZero`, () => {
-        expect(sameValueZeroEqual(mainValues[key], mainValues[key])).toBe(true);
+        expect(
+          sameValueZeroEqual(
+            mainValues[key as keyof typeof mainValues],
+            mainValues[key as keyof typeof mainValues],
+          ),
+        ).toBe(true);
       });
     }
   });
 
-  Object.keys(alternativeValues).forEach(
-    (key: keyof typeof alternativeValues) => {
-      if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
-        it(`should have ${key} not be equal by SameValueZero`, () => {
-          expect(
-            sameValueZeroEqual(alternativeValues[key], mainValues[key]),
-          ).toBe(false);
-        });
-      }
-    },
-  );
+  Object.keys(alternativeValues).forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
+      it(`should have ${key} not be equal by SameValueZero`, () => {
+        expect(
+          sameValueZeroEqual(
+            alternativeValues[key as keyof typeof alternativeValues],
+            mainValues[key as keyof typeof alternativeValues],
+          ),
+        ).toBe(false);
+      });
+    }
+  });
 });

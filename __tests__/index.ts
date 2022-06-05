@@ -2,6 +2,7 @@
 import testSuites from './__helpers__/testSuites';
 
 import {
+  BaseCircularMeta,
   circularDeepEqual,
   circularShallowEqual,
   createCustomCircularEqual,
@@ -145,9 +146,7 @@ describe('circularShallowEqual', () => {
 });
 
 describe('createCustomEqual', () => {
-  type FakeWeakMap = Pick<WeakMap<any, any>, 'delete' | 'get' | 'set'>;
-
-  function getFakeWeakMap(): FakeWeakMap {
+  function getFakeWeakMap(): BaseCircularMeta {
     const entries: [object, object][] = [];
 
     return {
@@ -197,7 +196,7 @@ describe('createCustomEqual', () => {
     );
   }
 
-  const customDeepEqualComparator = createCustomCircularEqual<FakeWeakMap>(
+  const customDeepEqualComparator = createCustomCircularEqual<BaseCircularMeta>(
     () => ({
       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
     }),

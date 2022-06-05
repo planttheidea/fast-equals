@@ -25,10 +25,10 @@ export type {
   TypeEqualityComparator,
 } from './utils';
 
-export type BaseCircularMeta = Pick<
-  WeakMap<any, any>,
-  'delete' | 'get' | 'set'
->;
+export interface BaseCircularMeta
+  extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
+  set(key: object, value: any): BaseCircularMeta;
+}
 
 export type GetComparatorOptions<Meta> = (
   defaultOptions: CreateComparatorCreatorOptions<Meta>,
@@ -45,16 +45,16 @@ const DEFAULT_CONFIG: CreateComparatorCreatorOptions<undefined> = Object.freeze(
     createIsNestedEqual: createDefaultIsNestedEqual,
   },
 );
-const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions<
-  WeakMap<object, any>
-> = Object.freeze(
-  merge(DEFAULT_CONFIG, {
+const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions<BaseCircularMeta> =
+  Object.freeze({
     areArraysEqual: areArraysEqualCircular,
+    areDatesEqual,
     areMapsEqual: areMapsEqualCircular,
     areObjectsEqual: areObjectsEqualCircular,
+    areRegExpsEqual,
     areSetsEqual: areSetsEqualCircular,
-  }),
-);
+    createIsNestedEqual: createDefaultIsNestedEqual,
+  });
 
 const isDeepEqual = createComparator(DEFAULT_CONFIG);
 
@@ -110,7 +110,7 @@ export function createCustomEqual<Meta = undefined>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta> {
   return createComparator<Meta>(
-    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG)),
+    merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG as any)),
   );
 }
 

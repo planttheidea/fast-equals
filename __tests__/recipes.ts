@@ -54,14 +54,11 @@ describe('recipes', () => {
         };
       }
 
-      const areObjectsEqual: TypeEqualityComparator<
-        SpecialObject,
-        undefined
-      > = (a, b) => {
+      const areObjectsEqual = (a: SpecialObject, b: SpecialObject) => {
         return a.foo === b.foo && a.bar.baz === b.bar.baz;
       };
 
-      const spy = jest.fn(areObjectsEqual);
+      const spy = jest.fn(areObjectsEqual) as typeof areObjectsEqual;
 
       const isSpecialObjectEqual = createCustomEqual(() => ({
         areObjectsEqual: spy,
@@ -85,7 +82,7 @@ describe('recipes', () => {
       const mutableState: MutableState = { state: 'baz' };
 
       const createIsNestedEqual: EqualityComparatorCreator<MutableState> =
-        (deepEqual) => (a, b, keyA, keyB, parentA, parentB, meta) =>
+        (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, meta) =>
           deepEqual(a, b, meta) || a === meta.state || b === meta.state;
 
       const deepEqual = createCustomEqual(() => ({ createIsNestedEqual }));

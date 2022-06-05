@@ -35,10 +35,10 @@ export function createDefaultIsNestedEqual<Meta>(
   return function isEqual<A, B>(
     a: A,
     b: B,
-    indexOrKeyA: any,
-    indexOrKeyB: any,
-    parentA: any,
-    parentB: any,
+    _indexOrKeyA: any,
+    _indexOrKeyB: any,
+    _parentA: any,
+    _parentB: any,
     meta: Meta,
   ) {
     return comparator(a, b, meta);
