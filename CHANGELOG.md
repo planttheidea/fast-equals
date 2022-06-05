@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 4.0.1
+
+- [#81](https://github.com/planttheidea/fast-equals/issues/81) - Fix typing issues related to importing in `index.d.ts` file
+
 ## 4.0.0
 
 ### Breaking Changes
