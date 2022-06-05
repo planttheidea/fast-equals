@@ -382,7 +382,7 @@ console.group('targeted custom');
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>(() => ({
   createIsNestedEqual:
-    (deepEqual) => (a, b, keyA, keyB, parentA, parentB, meta) =>
+    (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, meta) =>
       a === meta || b === meta || deepEqual(a, b, meta),
 }));
 
