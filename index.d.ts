@@ -1,6 +1,6 @@
 export interface BaseCircularMeta
   extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
-  set(key: object, value: any): BaseCircularMeta;
+  set(key: object, value: any): any;
 }
 
 export interface CreateComparatorCreatorOptions<Meta> {
