@@ -2,7 +2,6 @@
 import testSuites from './__helpers__/testSuites';
 
 import {
-  BaseCircularMeta,
   circularDeepEqual,
   circularShallowEqual,
   createCustomCircularEqual,
@@ -11,6 +10,7 @@ import {
   sameValueZeroEqual,
   shallowEqual,
 } from '../src';
+import { BaseCircularMeta } from '../index.d';
 
 describe('exports', () => {
   [

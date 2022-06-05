@@ -2,7 +2,7 @@ import {
   EqualityComparator,
   InternalEqualityComparator,
   TypeEqualityComparator,
-} from './types';
+} from '../index.d';
 
 /**
  * Default equality comparator pass-through, used as the standard `isEqual` creator for

@@ -3,11 +3,12 @@ import {
   createCustomEqual,
   sameValueZeroEqual,
 } from '../src/index';
+
 import type {
   BaseCircularMeta,
   EqualityComparatorCreator,
   TypeEqualityComparator,
-} from '../src/index';
+} from '../index.d';
 
 describe('recipes', () => {
   describe('createCustomEqual', () => {

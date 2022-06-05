@@ -1,6 +1,6 @@
 import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from './types';
+import type { InternalEqualityComparator } from '../index.d';
 
 /**
  * Whether the `Set`s are equal in value.

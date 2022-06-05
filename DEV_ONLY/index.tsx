@@ -11,7 +11,7 @@ import {
   shallowEqual,
 } from '../src';
 
-import type { BaseCircularMeta } from '../src';
+import type { BaseCircularMeta } from '../index.d';
 
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';

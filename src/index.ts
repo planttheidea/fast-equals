@@ -12,9 +12,7 @@ import type {
   CreateComparatorCreatorOptions,
   EqualityComparator,
   GetComparatorOptions,
-} from './types';
-
-export * from './types';
+} from '../index.d';
 
 export { sameValueZeroEqual };
 

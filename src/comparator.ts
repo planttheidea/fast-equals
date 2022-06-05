@@ -3,7 +3,7 @@ import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 import type {
   CreateComparatorCreatorOptions,
   EqualityComparator,
-} from './types';
+} from '../index.d';
 
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
