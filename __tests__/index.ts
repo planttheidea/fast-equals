@@ -10,7 +10,7 @@ import {
   deepEqual,
   sameValueZeroEqual,
   shallowEqual,
-} from '../src/index';
+} from '../src';
 
 describe('exports', () => {
   [

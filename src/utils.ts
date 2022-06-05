@@ -1,29 +1,8 @@
-export type InternalEqualityComparator<Meta> = (
-  a: any,
-  b: any,
-  indexOrKeyA: any,
-  indexOrKeyB: any,
-  parentA: any,
-  parentB: any,
-  meta: Meta,
-) => boolean;
-
-export type EqualityComparator<Meta> = Meta extends undefined
-  ? <A, B>(a: A, b: B, meta?: Meta) => boolean
-  : <A, B>(a: A, b: B, meta: Meta) => boolean;
-
-export type EqualityComparatorCreator<Meta> = (
-  fn: EqualityComparator<Meta>,
-) => InternalEqualityComparator<Meta>;
-
-export type NativeEqualityComparator = <A, B>(a: A, b: B) => boolean;
-
-export type TypeEqualityComparator<Type, Meta> = (
-  a: Type,
-  b: Type,
-  isEqual: InternalEqualityComparator<Meta>,
-  meta: Meta,
-) => boolean;
+import {
+  EqualityComparator,
+  InternalEqualityComparator,
+  TypeEqualityComparator,
+} from './types';
 
 /**
  * Default equality comparator pass-through, used as the standard `isEqual` creator for

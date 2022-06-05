@@ -5,34 +5,18 @@ import { areMapsEqual, areMapsEqualCircular } from './maps';
 import { areObjectsEqual, areObjectsEqualCircular } from './objects';
 import { areRegExpsEqual } from './regexps';
 import { areSetsEqual, areSetsEqualCircular } from './sets';
-import {
-  createDefaultIsNestedEqual,
-  EqualityComparator,
-  merge,
-  sameValueZeroEqual,
-} from './utils';
+import { createDefaultIsNestedEqual, merge, sameValueZeroEqual } from './utils';
 
-import type { CreateComparatorCreatorOptions } from './comparator';
+import type {
+  BaseCircularMeta,
+  CreateComparatorCreatorOptions,
+  EqualityComparator,
+  GetComparatorOptions,
+} from './types';
+
+export * from './types';
 
 export { sameValueZeroEqual };
-
-export type { CreateComparatorCreatorOptions } from './comparator';
-export type {
-  EqualityComparator,
-  EqualityComparatorCreator,
-  InternalEqualityComparator,
-  NativeEqualityComparator,
-  TypeEqualityComparator,
-} from './utils';
-
-export interface BaseCircularMeta
-  extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
-  set(key: object, value: any): BaseCircularMeta;
-}
-
-export type GetComparatorOptions<Meta> = (
-  defaultOptions: CreateComparatorCreatorOptions<Meta>,
-) => Partial<CreateComparatorCreatorOptions<Meta>>;
 
 const DEFAULT_CONFIG: CreateComparatorCreatorOptions<undefined> = Object.freeze(
   {

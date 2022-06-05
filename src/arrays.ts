@@ -1,6 +1,6 @@
 import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from './utils';
+import type { InternalEqualityComparator } from './types';
 
 /**
  * Whether the arrays are equal in value.

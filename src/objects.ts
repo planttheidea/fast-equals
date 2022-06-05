@@ -1,6 +1,6 @@
 import { createIsCircular } from './utils';
 
-import type { InternalEqualityComparator } from './utils';
+import type { InternalEqualityComparator } from './types';
 
 interface Dictionary<Value> {
   [key: string]: Value;
