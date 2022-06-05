@@ -126,10 +126,12 @@ export function createCustomEqual<Meta>(
 export function createCustomCircularEqual<Meta extends BaseCircularMeta>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta> {
-  return createComparator<Meta>(
+  const comparator = createComparator<Meta>(
     merge(
       DEFAULT_CIRCULAR_CONFIG,
       getComparatorOptions(DEFAULT_CIRCULAR_CONFIG as any),
     ),
   );
+
+  return (a: any, b: any, meta: any = new WeakMap()) => comparator(a, b, meta);
 }
