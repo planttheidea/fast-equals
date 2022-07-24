@@ -56,3 +56,10 @@ export function createCustomEqual<Meta = undefined>(
 export function createCustomEqual<Meta = WeakMap<any, any>>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta>;
+
+export function createCustomCircularEqual<Meta = undefined>(
+  getComparatorOptions: GetComparatorOptions<Meta>,
+): EqualityComparator<Meta>;
+export function createCustomCircularEqual<Meta = WeakMap<any, any>>(
+  getComparatorOptions: GetComparatorOptions<Meta>,
+): EqualityComparator<Meta>;
