@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 4.0.2
+
+- [#85](https://github.com/planttheidea/fast-equals/issues/85) - `createCustomCircularEqual` typing is incorrect
+
 ## 4.0.1
 
 - [#81](https://github.com/planttheidea/fast-equals/issues/81) - Fix typing issues related to importing in `index.d.ts` file
