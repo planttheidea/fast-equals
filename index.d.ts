@@ -53,6 +53,6 @@ export function sameValueZeroEqual<A, B>(a: A, b: B): boolean;
 export function createCustomEqual<Meta = undefined>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta>;
-export function createCustomEqual<Meta = WeakMap<any, any>>(
+export function createCustomCircularEqual<Meta = WeakMap<any, any>>(
   getComparatorOptions: GetComparatorOptions<Meta>,
 ): EqualityComparator<Meta>;
