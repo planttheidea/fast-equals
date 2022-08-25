@@ -106,7 +106,7 @@ export function createComparator<Meta>({
       // The exception for value comparison is `Promise`-like contracts. These should be
       // treated the same as standard `Promise` objects, which means strict equality.
       return isPromiseLike(a) || isPromiseLike(b)
-        ? a === b
+        ? false
         : areObjectsEqual(a, b, isEqual, meta);
     }
 
@@ -117,18 +117,18 @@ export function createComparator<Meta>({
       return sameValueZeroEqual(a.valueOf(), b.valueOf());
     }
 
-    // If not matching any tags that require a specific type of comparison, then use strict
-    // equality. This is for a few reasons:
-    //   - For types that cannot be introspected (`Promise`, `WeakMap`, etc.), this is the only
+    // If not matching any tags that require a specific type of comparison, then we hard-code false because
+    // the only thing remaining is strict equality, which has already been compared. This is for a few reasons:
+    //   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
     //     comparison that can be made.
     //   - For types that can be introspected, but rarely have requirements to be compared
     //     (`ArrayBuffer`, `DataView`, etc.), the cost is avoided to prioritize the common
-    //     use-cases.
-    //   - For types that can be introspected, but do not have an objective definition of what
-    //     equality is (`Error`, etc.), the subjective decision was to be conservative.
+    //     use-cases (may be included in a future release, if requested enough).
+    //   - For types that can be introspected but do not have an objective definition of what
+    //     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
     // In all cases, these decisions should be reevaluated based on changes to the language and
     // common development practices.
-    return a === b;
+    return false;
   }
 
   return comparator as EqualityComparator<Meta>;
