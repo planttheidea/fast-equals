@@ -210,7 +210,7 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 - [Explicit property check](./recipes/explicit-property-check.md)
 - [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
-- [Strict property descriptor comparison](./recipes/strict-equality-checks.md)
+- [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 
 ### `createCustomCircularEqual`
 
