@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 4.0.3
+
+- Remove unnecessary second strict equality check for objects in edge-case scenarios
+
 ## 4.0.2
 
 - [#85](https://github.com/planttheidea/fast-equals/issues/85) - `createCustomCircularEqual` typing is incorrect
