@@ -2,10 +2,8 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "declarationDir": "./dist/cjs/types",
-    "lib": ["ESNext", "DOM"],
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "outDir": "./dist/cjs",
-    "target": "ESNext"
+    "outDir": "./dist/cjs"
   }
 }

@@ -3,10 +3,8 @@
   "compilerOptions": {
     "declaration": false,
     "declarationMap": false,
-    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "./dist/esm",
-    "target": "ESNext"
+    "moduleResolution": "Node",
+    "outDir": "./dist/umd"
   }
 }

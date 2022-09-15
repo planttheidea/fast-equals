@@ -1,20 +1,5 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "checkJs": true,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
-    "noImplicitAny": true,
-    "noUncheckedIndexedAccess": true,
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es5"
-  },
+  "extends": "./tsconfig.base.json",
   "exclude": ["__tests__/__helpers__/testSuites.js"],
   "include": ["src/*", "DEV_ONLY/*", "__tests__/*"]
 }

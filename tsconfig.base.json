@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
+    "lib": ["ESNext", "DOM"],
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,
     "sourceMap": true,

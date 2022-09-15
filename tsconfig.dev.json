@@ -3,11 +3,9 @@
   "compilerOptions": {
     "declaration": false,
     "declarationMap": false,
-    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "NodeNext",
-    "outDir": "./dist/dev",
-    "target": "ESNext"
+    "outDir": "./dist/dev"
   },
   "include": ["DEV_ONLY/*", "src/*"]
 }

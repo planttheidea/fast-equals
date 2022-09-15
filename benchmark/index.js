@@ -7,7 +7,7 @@ const Table = require('cli-table3');
 
 const tests = require('../__tests__/__helpers__/testSuites');
 
-const fe = require('../dist/fast-equals.cjs');
+const fe = require('../dist/cjs');
 
 const equalPackages = {
   'assert.deepStrictEqual': (a, b) => {
