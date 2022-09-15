@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declarationDir": "./dist/umd/types",
+    "lib": ["ESNext", "DOM"],
+    "module": "UMD",
+    "moduleResolution": "Node",
+    "outDir": "./dist/umd",
+    "target": "ESNext"
+  }
+}

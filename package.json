@@ -7,6 +7,7 @@
   "description": "A blazing fast equality comparison, either shallow or deep",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^4.0.0",
     "@types/jest": "^28.1.8",
     "@types/lodash": "^4.14.184",
     "@types/node": "^18.7.13",

@@ -15,6 +15,5 @@
     "strict": true,
     "target": "es5"
   },
-  "exclude": ["__tests__/__helpers__/testSuites.js"],
-  "include": ["src/*", "DEV_ONLY/*", "__tests__/*"]
+  "include": ["src/*"]
 }

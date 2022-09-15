@@ -1,67 +1,43 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 import typescript from 'rollup-plugin-typescript2';
 
 import pkg from './package.json';
 
-const EXTERNALS = [
+const external = [
   ...Object.keys(pkg.dependencies || {}),
   ...Object.keys(pkg.peerDependencies || {}),
 ];
+const globals = external.reduce((globals, name) => {
+  globals[name] = name;
 
-const UMD_CONFIG = {
-  external: EXTERNALS,
-  input: 'src/index.ts',
-  output: {
-    file: pkg.browser,
-    format: 'umd',
-    globals: EXTERNALS.reduce((globals, name) => {
-      globals[name] = name;
+  return globals;
+}, {});
 
-      return globals;
-    }, {}),
-    name: pkg.name,
-    sourcemap: true,
+export default [
+  {
+    external,
+    input: 'src/index.ts',
+    output: {
+      file: pkg.browser.replace('.js', '.min.js'),
+      format: 'umd',
+      globals,
+      name: pkg.name,
+    },
+    plugins: [
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        preventAssignment: true,
+      }),
+      nodeResolve({
+        mainFields: ['module', 'jsnext:main', 'main'],
+      }),
+      typescript({
+        tsconfig: './tsconfig.minified.json',
+        typescript: require('typescript'),
+      }),
+      terser({ compress: { passes: 3 } }),
+    ],
   },
-  plugins: [
-    nodeResolve({
-      mainFields: ['module', 'jsnext:main', 'main'],
-    }),
-    typescript({
-      typescript: require('typescript'),
-    }),
-  ],
-};
-
-const FORMATTED_CONFIG = {
-  ...UMD_CONFIG,
-  output: [
-    {
-      ...UMD_CONFIG.output,
-      file: pkg.main,
-      format: 'cjs',
-    },
-    {
-      ...UMD_CONFIG.output,
-      file: pkg.module,
-      format: 'es',
-    },
-    {
-      ...UMD_CONFIG.output,
-      file: pkg.browser.replace('.js', '.mjs'),
-      format: 'es',
-    },
-  ],
-};
-
-const MINIFIED_CONFIG = {
-  ...UMD_CONFIG,
-  output: {
-    ...UMD_CONFIG.output,
-    file: pkg.browser.replace('.js', '.min.js'),
-    sourcemap: false,
-  },
-  plugins: [...UMD_CONFIG.plugins, terser({ compress: { passes: 3 } })],
-};
-
-export default [UMD_CONFIG, FORMATTED_CONFIG, MINIFIED_CONFIG];
+];

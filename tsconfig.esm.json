@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declarationDir": "./dist/esm/types",
+    "lib": ["ESNext", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist/esm",
+    "target": "ESNext"
+  }
+}
