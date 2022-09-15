@@ -20,10 +20,11 @@ export default [
     external,
     input: 'src/index.ts',
     output: {
-      file: pkg.browser.replace('.js', '.min.js'),
+      file: './dist/minified/index.js',
       format: 'umd',
       globals,
       name: pkg.name,
+      sourcemap: true,
     },
     plugins: [
       replace({
