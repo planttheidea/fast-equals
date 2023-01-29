@@ -3,13 +3,7 @@ export interface BaseCircularMeta
   set(key: object, value: any): any;
 }
 
-export interface DefaultCache {
-  [key: string]: any;
-
-  readonly __c: undefined;
-  readonly compare: InternalEqualityComparator;
-  readonly strict: boolean;
-}
+export type Cache = CircularCache | DefaultCache;
 
 export interface CircularCache {
   [key: string]: any;
@@ -19,16 +13,28 @@ export interface CircularCache {
   readonly strict: boolean;
 }
 
-export type Cache = CircularCache | DefaultCache;
+export type CreateCache = (defaultCache: Cache) => Partial<Cache>;
 
-export interface CreateComparatorCreatorOptions {
+export interface DefaultCache {
+  [key: string]: any;
+
+  readonly __c: undefined;
+  readonly compare: InternalEqualityComparator;
+  readonly strict: boolean;
+}
+
+export interface Dictionary<Value = any> {
+  [key: string | symbol]: Value;
+  $$typeof?: any;
+}
+
+export interface ComparatorOptions {
   areArraysEqual: TypeEqualityComparator<any[]>;
   areDatesEqual: TypeEqualityComparator<Date>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>>;
   areObjectsEqual: TypeEqualityComparator<Dictionary>;
   areRegExpsEqual: TypeEqualityComparator<RegExp>;
   areSetsEqual: TypeEqualityComparator<Set<any>>;
-  createIsNestedEqual: EqualityComparatorCreator;
 }
 
 export type EqualityComparator = <A, B>(a: A, b: B, cache: Cache) => boolean;
@@ -37,10 +43,9 @@ export type EqualityComparatorCreator = (
   fn: EqualityComparator,
 ) => InternalEqualityComparator;
 
-export interface Dictionary<Value = any> {
-  [key: string | symbol]: Value;
-  $$typeof?: any;
-}
+export type CreateComparatorOptions = (
+  defaultOptions: ComparatorOptions,
+) => Partial<ComparatorOptions>;
 
 export type InternalEqualityComparator = (
   a: any,

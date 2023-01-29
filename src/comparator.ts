@@ -1,7 +1,7 @@
 import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 import type {
   Cache,
-  CreateComparatorCreatorOptions,
+  ComparatorOptions,
   EqualityComparator,
 } from './internalTypes';
 
@@ -24,7 +24,7 @@ export function createComparator({
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-}: CreateComparatorCreatorOptions): EqualityComparator {
+}: ComparatorOptions): EqualityComparator {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */

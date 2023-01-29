@@ -10,7 +10,9 @@ import {
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
 
-export function createDefaultComparator(compare: EqualityComparator) {
+export function createDefaultComparator(
+  compare: EqualityComparator,
+): InternalEqualityComparator {
   return function (
     a: any,
     b: any,

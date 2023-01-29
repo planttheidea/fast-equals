@@ -7,7 +7,12 @@ import {
   areRegExpsEqual,
   areSetsEqual,
 } from './equals';
-import type { CreateComparatorCreatorOptions } from './internalTypes';
+import type {
+  CreateComparatorOptions,
+  ComparatorOptions,
+  EqualityComparator,
+  CreateCache,
+} from './internalTypes';
 import {
   createDefaultComparator,
   createDefaultIsNestedEqual,
@@ -17,7 +22,7 @@ import {
 
 export { sameValueZeroEqual };
 
-const DEFAULT_CONFIG: CreateComparatorCreatorOptions = Object.freeze({
+const DEFAULT_CONFIG: ComparatorOptions = Object.freeze({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
@@ -32,7 +37,7 @@ const areMapsEqualCircular = createIsCircular(areMapsEqual);
 const areObjectsEqualCircular = createIsCircular(areObjectsEqual);
 const areSetsEqualCircular = createIsCircular(areSetsEqual);
 
-const DEFAULT_CIRCULAR_CONFIG: CreateComparatorCreatorOptions = Object.freeze({
+const DEFAULT_CIRCULAR_CONFIG: ComparatorOptions = Object.freeze({
   areArraysEqual: areArraysEqualCircular,
   areDatesEqual,
   areMapsEqual: areMapsEqualCircular,
@@ -92,42 +97,67 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
   });
 }
 
-// /**
-//  * Create a custom equality comparison method.
-//  *
-//  * This can be done to create very targeted comparisons in extreme hot-path scenarios
-//  * where the standard methods are not performant enough, but can also be used to provide
-//  * support for legacy environments that do not support expected features like
-//  * `RegExp.prototype.flags` out of the box.
-//  */
-// export function createCustomEqual<Meta = undefined>(
-//   getComparatorOptions: GetComparatorOptions,
-// ): EqualityComparator {
-//   return createComparator(
-//     merge(DEFAULT_CONFIG, getComparatorOptions(DEFAULT_CONFIG as any)),
-//   );
-// }
+/**
+ * Create a custom equality comparison method.
+ *
+ * This can be done to create very targeted comparisons in extreme hot-path scenarios
+ * where the standard methods are not performant enough, but can also be used to provide
+ * support for legacy environments that do not support expected features like
+ * `RegExp.prototype.flags` out of the box.
+ */
+export function createCustomEqual(
+  createComparatorOptions: CreateComparatorOptions,
+  createCache: CreateCache,
+): EqualityComparator {
+  const options = createComparatorOptions(DEFAULT_CONFIG);
+  const isEqualCustom = createComparator({ ...DEFAULT_CONFIG, ...options });
+  const isEqualCustomComparator = createDefaultComparator(isEqualCustom);
 
-// /**
-//  * Create a custom equality comparison method that handles circular references. This is very
-//  * similar to `createCustomEqual`, with the only difference being that `meta` expects to be
-//  * populated with a `WeakMap`-like contract.
-//  *
-//  * This can be done to create very targeted comparisons in extreme hot-path scenarios
-//  * where the standard methods are not performant enough, but can also be used to provide
-//  * support for legacy environments that do not support expected features like
-//  * `WeakMap` out of the box.
-//  */
-// export function createCustomCircularEqual<
-//   Meta extends BaseCircularMeta = WeakMap<any, any>,
-// >(getComparatorOptions: GetComparatorOptions): EqualityComparator {
-//   const comparator = createComparator(
-//     merge(
-//       DEFAULT_CIRCULAR_CONFIG,
-//       getComparatorOptions(DEFAULT_CIRCULAR_CONFIG as any),
-//     ),
-//   );
+  const defaultCache = {
+    __c: undefined,
+    compare: isEqualCustomComparator,
+    strict: false,
+  };
 
-//   return ((a: any, b: any, meta: any = new WeakMap()) =>
-//     comparator(a, b, meta)) as EqualityComparator;
-// }
+  const cache = createCache(defaultCache);
+
+  return function isEqual<A, B>(a: A, b: B): boolean {
+    return isEqualCustom(a, b, { ...defaultCache, ...cache });
+  };
+}
+
+/**
+ * Create a custom equality comparison method that handles circular references. This is very
+ * similar to `createCustomEqual`, with the only difference being that `meta` expects to be
+ * populated with a `WeakMap`-like contract.
+ *
+ * This can be done to create very targeted comparisons in extreme hot-path scenarios
+ * where the standard methods are not performant enough, but can also be used to provide
+ * support for legacy environments that do not support expected features like
+ * `WeakMap` out of the box.
+ */
+export function createCustomCircularEqual(
+  createComparatorOptions: CreateComparatorOptions,
+  createCache: CreateCache,
+): <A, B>(a: A, b: B) => boolean {
+  const options = createComparatorOptions(DEFAULT_CIRCULAR_CONFIG);
+  const isEqualCircularCustom = createComparator({
+    ...DEFAULT_CIRCULAR_CONFIG,
+    ...options,
+  });
+  const isEqualCircularCustomComparator = createDefaultComparator(
+    isEqualCircularCustom,
+  );
+
+  const defaultCache = {
+    __c: new WeakMap(),
+    compare: isEqualCircularCustomComparator,
+    strict: true,
+  };
+
+  const cache = createCache(defaultCache);
+
+  return function isEqual<A, B>(a: A, b: B): boolean {
+    return isEqualCircularCustom(a, b, { ...defaultCache, ...cache });
+  };
+}
