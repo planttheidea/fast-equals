@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const assertDeepStrictEqual = require('assert').deepStrictEqual;
+import { deepStrictEqual as assertDeepStrictEqual } from 'assert';
+import { createSuite } from 'benchee';
+import Table from 'cli-table3';
+import tests from '../__tests__/__helpers__/testSuites.js';
 
-const { createSuite } = require('benchee');
-const Table = require('cli-table3');
-
-const tests = require('../__tests__/__helpers__/testSuites');
-
-const fe = require('../dist/fast-equals.cjs');
+import deepEql from 'deep-eql';
+import deepEqual from 'deep-equal';
+import fastDeepEqual from 'fast-deep-equal';
+import * as fe from '../dist/esm/index.mjs';
+import isEqualLodash from 'lodash/isEqual.js';
+import nanoEqual from 'nano-equal';
+import reactFastCompare from 'react-fast-compare';
+import shallowEqualFuzzy from 'shallow-equal-fuzzy';
+import { isEqual as isEqualUnderscore } from 'underscore';
 
 const equalPackages = {
   'assert.deepStrictEqual': (a, b) => {
@@ -17,16 +23,16 @@ const equalPackages = {
       return false;
     }
   },
-  'deep-eql': require('deep-eql'),
-  'deep-equal': require('deep-equal'),
-  'fast-deep-equal': require('fast-deep-equal'),
+  'deep-eql': deepEql,
+  'deep-equal': deepEqual,
+  'fast-deep-equal': fastDeepEqual,
   'fast-equals': fe.deepEqual,
   'fast-equals (circular)': fe.circularDeepEqual,
-  'lodash.isEqual': require('lodash').isEqual,
-  'nano-equal': require('nano-equal'),
-  'react-fast-compare': require('react-fast-compare'),
-  'shallow-equal-fuzzy': require('shallow-equal-fuzzy'),
-  'underscore.isEqual': require('underscore').isEqual,
+  'lodash.isEqual': isEqualLodash,
+  'nano-equal': nanoEqual,
+  'react-fast-compare': reactFastCompare,
+  'shallow-equal-fuzzy': shallowEqualFuzzy,
+  'underscore.isEqual': isEqualUnderscore,
 };
 
 const filteredEquivalentTests = ['maps', 'sets', 'promises'];

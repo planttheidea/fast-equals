@@ -1,5 +1,6 @@
 import {
   Cache,
+  CircularCache,
   Dictionary,
   EqualityComparator,
   InternalEqualityComparator,
@@ -9,13 +10,27 @@ import {
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
 
+export function createDefaultComparator(compare: EqualityComparator) {
+  return function (
+    a: any,
+    b: any,
+    _indexOrKeyA: any,
+    _indexOrKeyB: any,
+    _parentA: any,
+    _parentB: any,
+    cache: Cache,
+  ) {
+    return compare(a, b, cache);
+  };
+}
+
 /**
  * Default equality comparator pass-through, used as the standard `isEqual` creator for
  * use inside the built comparator.
  */
-export function createDefaultIsNestedEqual<Meta>(
-  comparator: EqualityComparator<Meta>,
-): InternalEqualityComparator<Meta> {
+export function createDefaultIsNestedEqual(
+  comparator: EqualityComparator,
+): InternalEqualityComparator {
   return function isEqual<A, B>(
     a: A,
     b: B,
@@ -23,7 +38,7 @@ export function createDefaultIsNestedEqual<Meta>(
     _indexOrKeyB: any,
     _parentA: any,
     _parentB: any,
-    cache: Cache<Meta>,
+    cache: Cache,
   ) {
     return comparator(a, b, cache);
   };
@@ -35,27 +50,27 @@ export function createDefaultIsNestedEqual<Meta>(
  * stack overflows.
  */
 export function createIsCircular<
-  AreItemsEqual extends TypeEqualityComparator<any, any>,
+  AreItemsEqual extends TypeEqualityComparator<any>,
 >(areItemsEqual: AreItemsEqual): AreItemsEqual {
-  return function isCircular(a: any, b: any, cache: Cache<WeakMap<any, any>>) {
+  return function isCircular(a: any, b: any, cache: CircularCache) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
       return areItemsEqual(a, b, cache);
     }
 
-    const cachedA = cache.meta.get(a);
-    const cachedB = cache.meta.get(b);
+    const cachedA = cache.__c.get(a);
+    const cachedB = cache.__c.get(b);
 
     if (cachedA && cachedB) {
       return cachedA === b && cachedB === a;
     }
 
-    cache.meta.set(a, b);
-    cache.meta.set(b, a);
+    cache.__c.set(a, b);
+    cache.__c.set(b, a);
 
     const result = areItemsEqual(a, b, cache);
 
-    cache.meta.delete(a);
-    cache.meta.delete(b);
+    cache.__c.delete(a);
+    cache.__c.delete(b);
 
     return result;
   } as AreItemsEqual;

@@ -1,9 +1,10 @@
-const React = require('react');
+import React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const fn = () => {};
 const promise = Promise.resolve('foo');
 
-module.exports = [
+export default [
   {
     description: 'primitives',
     tests: [
@@ -199,6 +200,7 @@ module.exports = [
         description: 'function and different function are not equal',
         shallowEqual: false,
         value1: fn,
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         value2: () => {},
       },
     ],

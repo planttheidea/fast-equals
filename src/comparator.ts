@@ -17,18 +17,18 @@ const STRING_TAG = '[object String]';
 
 const { toString } = Object.prototype;
 
-export function createComparator<Meta>({
+export function createComparator({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-}: CreateComparatorCreatorOptions<Meta>): EqualityComparator<Meta> {
+}: CreateComparatorCreatorOptions): EqualityComparator {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
-  function comparator(a: any, b: any, cache: Cache<Meta>): boolean {
+  function comparator(a: any, b: any, cache: Cache): boolean {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;
@@ -128,5 +128,5 @@ export function createComparator<Meta>({
     return false;
   }
 
-  return comparator as EqualityComparator<Meta>;
+  return comparator;
 }

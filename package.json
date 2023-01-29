@@ -83,7 +83,7 @@
     "url": "git+https://github.com/planttheidea/fast-equals.git"
   },
   "scripts": {
-    "benchmark": "npm run dist && node benchmark/index.js",
+    "benchmark": "npm run build:esm && node benchmark/index.js",
     "build": "npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:min",
     "build:cjs": "rimraf dist/cjs && NODE_ENV=production rollup -c build/rollup/config.cjs.js && tsc -p ./build/tsconfig/cjs.json",
     "build:esm": "rimraf dist/esm && NODE_ENV=production rollup -c build/rollup/config.esm.js && tsc -p ./build/tsconfig/esm.json",
