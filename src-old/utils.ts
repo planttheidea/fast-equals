@@ -1,13 +1,8 @@
 import {
-  Cache,
-  Dictionary,
   EqualityComparator,
   InternalEqualityComparator,
   TypeEqualityComparator,
-} from './internalTypes';
-
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
-const { hasOwnProperty } = Object.prototype;
+} from '../index.d';
 
 /**
  * Default equality comparator pass-through, used as the standard `isEqual` creator for
@@ -23,9 +18,9 @@ export function createDefaultIsNestedEqual<Meta>(
     _indexOrKeyB: any,
     _parentA: any,
     _parentB: any,
-    cache: Cache<Meta>,
+    meta: Meta,
   ) {
-    return comparator(a, b, cache);
+    return comparator(a, b, meta);
   };
 }
 
@@ -37,42 +32,55 @@ export function createDefaultIsNestedEqual<Meta>(
 export function createIsCircular<
   AreItemsEqual extends TypeEqualityComparator<any, any>,
 >(areItemsEqual: AreItemsEqual): AreItemsEqual {
-  return function isCircular(a: any, b: any, cache: Cache<WeakMap<any, any>>) {
+  return function isCircular(
+    a: any,
+    b: any,
+    isEqual: InternalEqualityComparator<WeakMap<any, any>>,
+    cache: WeakMap<any, any>,
+  ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
-      return areItemsEqual(a, b, cache);
+      return areItemsEqual(a, b, isEqual, cache);
     }
 
-    const cachedA = cache.meta.get(a);
-    const cachedB = cache.meta.get(b);
+    const cachedA = cache.get(a);
+    const cachedB = cache.get(b);
 
     if (cachedA && cachedB) {
       return cachedA === b && cachedB === a;
     }
 
-    cache.meta.set(a, b);
-    cache.meta.set(b, a);
+    cache.set(a, b);
+    cache.set(b, a);
 
-    const result = areItemsEqual(a, b, cache);
+    const result = areItemsEqual(a, b, isEqual, cache);
 
-    cache.meta.delete(a);
-    cache.meta.delete(b);
+    cache.delete(a);
+    cache.delete(b);
 
     return result;
   } as AreItemsEqual;
 }
 
-export function getStrictProperties(
-  object: Dictionary,
-): Array<string | symbol> {
-  return (getOwnPropertyNames(object) as Array<string | symbol>).concat(
-    getOwnPropertySymbols(object),
-  );
-}
+/**
+ * Targeted shallow merge of two objects.
+ *
+ * @NOTE
+ * This exists as a tinier compiled version of the `__assign` helper that
+ * `tsc` injects in case of `Object.assign` not being present.
+ */
+export function merge<A extends object, B extends object>(a: A, b: B): A & B {
+  const merged: Record<string, any> = {};
 
-export const hasOwn =
-  Object.hasOwn ||
-  ((object: Dictionary, property: number | string | symbol) =>
-    hasOwnProperty.call(object, property));
+  for (const key in a) {
+    merged[key] = a[key];
+  }
+
+  for (const key in b) {
+    merged[key] = b[key];
+  }
+
+  return merged as A & B;
+}
 
 /**
  * Whether the value is a plain object.

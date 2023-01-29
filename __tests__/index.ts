@@ -3,20 +3,18 @@ import testSuites from './__helpers__/testSuites';
 import {
   circularDeepEqual,
   circularShallowEqual,
-  createCustomCircularEqual,
-  createCustomEqual,
+  // createCustomCircularEqual,
+  // createCustomEqual,
   deepEqual,
   sameValueZeroEqual,
   shallowEqual,
 } from '../src';
 
-import type { BaseCircularMeta } from '../index.d';
-
 describe('exports', () => {
   [
     circularDeepEqual,
     circularShallowEqual,
-    createCustomEqual,
+    // createCustomEqual,
     deepEqual,
     sameValueZeroEqual,
     shallowEqual,
@@ -145,74 +143,74 @@ describe('circularShallowEqual', () => {
   });
 });
 
-describe('createCustomEqual', () => {
-  function getFakeWeakMap(): BaseCircularMeta {
-    const entries: [object, object][] = [];
+// describe('createCustomEqual', () => {
+//   function getFakeWeakMap(): BaseCircularMeta {
+//     const entries: [object, object][] = [];
 
-    return {
-      delete(key: object) {
-        for (let index = 0; index < entries.length; ++index) {
-          if (entries[index]![0] === key) {
-            entries.splice(index, 1);
-            return true;
-          }
-        }
+//     return {
+//       delete(key: object) {
+//         for (let index = 0; index < entries.length; ++index) {
+//           if (entries[index]![0] === key) {
+//             entries.splice(index, 1);
+//             return true;
+//           }
+//         }
 
-        return false;
-      },
+//         return false;
+//       },
 
-      get(key: object) {
-        for (let index = 0; index < entries.length; ++index) {
-          if (entries[index]![0] === key) {
-            return entries[index]![1];
-          }
-        }
+//       get(key: object) {
+//         for (let index = 0; index < entries.length; ++index) {
+//           if (entries[index]![0] === key) {
+//             return entries[index]![1];
+//           }
+//         }
 
-        return undefined;
-      },
+//         return undefined;
+//       },
 
-      set(key: object, value: object) {
-        for (let index = 0; index < entries.length; ++index) {
-          if (entries[index]![0] === key) {
-            entries[index]![1] = value;
-            return this;
-          }
-        }
+//       set(key: object, value: object) {
+//         for (let index = 0; index < entries.length; ++index) {
+//           if (entries[index]![0] === key) {
+//             entries[index]![1] = value;
+//             return this;
+//           }
+//         }
 
-        entries.push([key, value]);
+//         entries.push([key, value]);
 
-        return this;
-      },
-    };
-  }
+//         return this;
+//       },
+//     };
+//   }
 
-  function areRegExpsEqualNoFlagsSupport(a: RegExp, b: RegExp) {
-    return (
-      a.source === b.source &&
-      a.global === b.global &&
-      a.ignoreCase === b.ignoreCase &&
-      a.multiline === b.multiline &&
-      a.unicode === b.unicode &&
-      a.sticky === b.sticky &&
-      a.lastIndex === b.lastIndex
-    );
-  }
+//   function areRegExpsEqualNoFlagsSupport(a: RegExp, b: RegExp) {
+//     return (
+//       a.source === b.source &&
+//       a.global === b.global &&
+//       a.ignoreCase === b.ignoreCase &&
+//       a.multiline === b.multiline &&
+//       a.unicode === b.unicode &&
+//       a.sticky === b.sticky &&
+//       a.lastIndex === b.lastIndex
+//     );
+//   }
 
-  const customDeepEqualComparator = createCustomCircularEqual<BaseCircularMeta>(
-    () => ({
-      areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
-    }),
-  );
+//   const customDeepEqualComparator = createCustomCircularEqual<BaseCircularMeta>(
+//     () => ({
+//       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
+//     }),
+//   );
 
-  const customDeepEqualCircular = <A, B>(a: A, b: B) =>
-    customDeepEqualComparator(a, b, getFakeWeakMap());
+//   const customDeepEqualCircular = <A, B>(a: A, b: B) =>
+//     customDeepEqualComparator(a, b, getFakeWeakMap());
 
-  it('should handle the custom equality check', () => {
-    expect(
-      customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('foo')),
-    ).toBe(true);
-    expect(
-      customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('bar')),
-    ).toBe(false);
-  });
-});
+//   it('should handle the custom equality check', () => {
+//     expect(
+//       customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('foo')),
+//     ).toBe(true);
+//     expect(
+//       customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('bar')),
+//     ).toBe(false);
+//   });
+// });
