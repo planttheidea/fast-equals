@@ -1,29 +1,27 @@
 {
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
   "extends": ["plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
   },
+  "plugins": ["@typescript-eslint"],
   "rules": {
-    "max-len": 0,
-    "operator-linebreak": 0,
-    "no-plusplus": 0,
-    "no-proto": 0,
-    "no-self-compare": 0,
-    "no-underscore-dangle": 0,
-    "no-unused-vars": 0,
-    "valid-typeof": 0,
+    "prefer-rest-params": 0,
 
-    "import/extensions": 0,
-    "import/prefer-default-export": 0,
-
-    "@typescript-eslint/ban-types": 0,
-    "@typescript-eslint/no-empty-function": 0,
-    "@typescript-eslint/no-explicit-any": 0
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-non-null-assertion": 0
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

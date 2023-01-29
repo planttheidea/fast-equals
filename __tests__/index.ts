@@ -152,7 +152,7 @@ describe('createCustomEqual', () => {
     return {
       delete(key: object) {
         for (let index = 0; index < entries.length; ++index) {
-          if (entries[index][0] === key) {
+          if (entries[index]![0] === key) {
             entries.splice(index, 1);
             return true;
           }
@@ -163,16 +163,18 @@ describe('createCustomEqual', () => {
 
       get(key: object) {
         for (let index = 0; index < entries.length; ++index) {
-          if (entries[index][0] === key) {
-            return entries[index][1];
+          if (entries[index]![0] === key) {
+            return entries[index]![1];
           }
         }
+
+        return undefined;
       },
 
       set(key: object, value: object) {
         for (let index = 0; index < entries.length; ++index) {
-          if (entries[index][0] === key) {
-            entries[index][1] = value;
+          if (entries[index]![0] === key) {
+            entries[index]![1] = value;
             return this;
           }
         }

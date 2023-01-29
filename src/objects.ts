@@ -34,7 +34,7 @@ export function areObjectsEqual(
   // methods like `some` / `every` were not used to avoid incurring the garbage
   // cost of anonymous callbacks.
   while (index-- > 0) {
-    key = keysA[index];
+    key = keysA[index]!;
 
     if (key === OWNER) {
       const reactElementA = !!a.$$typeof;
