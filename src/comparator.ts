@@ -73,49 +73,48 @@ export function createComparator<Meta>({
     // type. This is reasonably performant in modern environments like v8 and
     // SpiderMonkey, and allows for cross-realm comparison when other checks like
     // `instanceof` do not.
-    const aTag = getTag(a);
+    const tag = getTag(a);
 
-    if (aTag !== getTag(b)) {
+    if (tag !== getTag(b)) {
       return false;
     }
 
-    if (aTag === DATE_TAG) {
-      // `getTime()` showed better results compared to alternatives like `valueOf()`
-      // or the unary `+` operator.
+    if (tag === DATE_TAG) {
       return areDatesEqual(a, b, state);
     }
 
-    if (aTag === REG_EXP_TAG) {
+    if (tag === REG_EXP_TAG) {
       return areRegExpsEqual(a, b, state);
     }
 
-    if (aTag === MAP_TAG) {
+    if (tag === MAP_TAG) {
       return areMapsEqual(a, b, state);
     }
 
-    if (aTag === SET_TAG) {
+    if (tag === SET_TAG) {
       return areSetsEqual(a, b, state);
     }
 
     // If a simple object tag, then we can prioritize a simple object comparison because
-    // it is likely a custom class. If an arguments tag, it should be treated as a standard
-    // object.
-    if (aTag === OBJECT_TAG) {
+    // it is likely a custom class.
+    if (tag === OBJECT_TAG) {
       // The exception for value comparison is `Promise`-like contracts. These should be
-      // treated the same as standard `Promise` objects, which means strict equality.
-      return isPromiseLike(a) || isPromiseLike(b)
-        ? false
-        : areObjectsEqual(a, b, state);
+      // treated the same as standard `Promise` objects, which means strict equality, and if
+      // it reaches this point then that strict equality comparison has already failed.
+      return (
+        !(isPromiseLike(a) || isPromiseLike(b)) && areObjectsEqual(a, b, state)
+      );
     }
 
-    if (aTag === ARGUMENTS_TAG) {
+    // If an arguments tag, it should be treated as a standard object.
+    if (tag === ARGUMENTS_TAG) {
       return areObjectsEqual(a, b, state);
     }
 
     // As the penultimate fallback, check if the values passed are primitive wrappers. This
     // is very rare in modern JS, which is why it is deprioritized compared to all other object
     // types.
-    if (aTag === BOOLEAN_TAG || aTag === NUMBER_TAG || aTag === STRING_TAG) {
+    if (tag === BOOLEAN_TAG || tag === NUMBER_TAG || tag === STRING_TAG) {
       return arePrimitiveWrappersEqual(a, b, state);
     }
 

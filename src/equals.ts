@@ -30,7 +30,7 @@ export function areArraysEqual(a: any[], b: any[], state: State<any>) {
  * to allow for overrides.
  */
 export function areDatesEqual(a: Date, b: Date): boolean {
-  return sameValueZeroEqual(a.valueOf(), b.valueOf());
+  return sameValueZeroEqual(a.getTime(), b.getTime());
 }
 
 /**
