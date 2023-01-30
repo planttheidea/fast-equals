@@ -15,7 +15,7 @@ const OBJECT_TAG = '[object Object]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
 
-const { toString } = Object.prototype;
+const getTag = Object.prototype.toString.call.bind(Object.prototype.toString);
 
 export function createComparator<Meta>({
   areArraysEqual,
@@ -73,9 +73,9 @@ export function createComparator<Meta>({
     // type. This is reasonably performant in modern environments like v8 and
     // SpiderMonkey, and allows for cross-realm comparison when other checks like
     // `instanceof` do not.
-    const aTag = toString.call(a);
+    const aTag = getTag(a);
 
-    if (aTag !== toString.call(b)) {
+    if (aTag !== getTag(b)) {
       return false;
     }
 
