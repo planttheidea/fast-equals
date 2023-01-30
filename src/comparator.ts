@@ -1,8 +1,8 @@
 import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
 import type {
-  Cache,
-  ComparatorOptions,
+  ComparatorConfig,
   EqualityComparator,
+  State,
 } from './internalTypes';
 
 const ARGUMENTS_TAG = '[object Arguments]';
@@ -17,18 +17,18 @@ const STRING_TAG = '[object String]';
 
 const { toString } = Object.prototype;
 
-export function createComparator({
+export function createComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-}: ComparatorOptions): EqualityComparator {
+}: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
-  function comparator(a: any, b: any, cache: Cache): boolean {
+  function comparator(a: any, b: any, state: State<Meta>): boolean {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;
@@ -55,7 +55,7 @@ export function createComparator({
     // comparisons are rare, and will be handled in the ultimate fallback, so
     // we can avoid the `toString.call()` cost unless necessary.
     if (isPlainObject(a) && isPlainObject(b)) {
-      return areObjectsEqual(a, b, cache);
+      return areObjectsEqual(a, b, state);
     }
 
     // `isArray()` works on subclasses and is cross-realm, so we can again avoid
@@ -65,7 +65,7 @@ export function createComparator({
     const bArray = Array.isArray(b);
 
     if (aArray || bArray) {
-      return aArray === bArray && areArraysEqual(a, b, cache);
+      return aArray === bArray && areArraysEqual(a, b, state);
     }
 
     // Since this is a custom object, use the classic `toString.call()` to get its
@@ -81,19 +81,19 @@ export function createComparator({
     if (aTag === DATE_TAG) {
       // `getTime()` showed better results compared to alternatives like `valueOf()`
       // or the unary `+` operator.
-      return areDatesEqual(a, b, cache);
+      return areDatesEqual(a, b, state);
     }
 
     if (aTag === REG_EXP_TAG) {
-      return areRegExpsEqual(a, b, cache);
+      return areRegExpsEqual(a, b, state);
     }
 
     if (aTag === MAP_TAG) {
-      return areMapsEqual(a, b, cache);
+      return areMapsEqual(a, b, state);
     }
 
     if (aTag === SET_TAG) {
-      return areSetsEqual(a, b, cache);
+      return areSetsEqual(a, b, state);
     }
 
     // If a simple object tag, then we can prioritize a simple object comparison because
@@ -104,7 +104,7 @@ export function createComparator({
       // treated the same as standard `Promise` objects, which means strict equality.
       return isPromiseLike(a) || isPromiseLike(b)
         ? false
-        : areObjectsEqual(a, b, cache);
+        : areObjectsEqual(a, b, state);
     }
 
     // As the penultimate fallback, check if the values passed are primitive wrappers. This

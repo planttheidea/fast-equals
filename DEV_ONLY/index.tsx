@@ -9,7 +9,7 @@ import {
   shallowEqual,
 } from '../src';
 
-import type { BaseCircularMeta } from '../index.d';
+import type { State } from '../src/internalTypes';
 
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';
@@ -230,20 +230,26 @@ const object4 = {
   zero: 0,
 };
 
-const doesNotEverEqualOne = createCustomEqual<undefined>((defaultOptions) => {
-  return {
-    ...defaultOptions,
-    createIsNestedEqual(comparator) {
-      return (a: any, b: any) => {
-        if (typeof a === 'number' || typeof b === 'number') {
-          return a !== 1 && b !== 1;
-        }
+const doesNotEverEqualOne = createCustomEqual<undefined>(
+  () => ({}),
+  (comparator) => ({
+    equals(
+      a: any,
+      b: any,
+      _keyA,
+      _keyB,
+      _parentA,
+      _parentB,
+      state: State<undefined>,
+    ) {
+      if (typeof a === 'number' || typeof b === 'number') {
+        return a !== 1 && b !== 1;
+      }
 
-        return Object.keys(a).every((key) => comparator(a[key], b[key]));
-      };
+      return Object.keys(a).every((key) => comparator(a[key], b[key], state));
     },
-  };
-});
+  }),
+);
 
 console.log('true', doesNotEverEqualOne(object1, object2));
 console.log('false', doesNotEverEqualOne(object3, object4));
@@ -289,49 +295,13 @@ console.groupEnd();
 
 console.group('custom circular');
 
-interface CustomCircularCache extends BaseCircularMeta {
+interface CustomCircularMeta {
   customMethod(value: any): void;
   customValue: string;
 }
 
-function getCustomCircularCache(): CustomCircularCache {
-  const entries: [object, object][] = [];
-
+function getCustomCircularCache(): CustomCircularMeta {
   return {
-    delete(key: object) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index]![0] === key) {
-          entries.splice(index, 1);
-          return true;
-        }
-      }
-
-      return false;
-    },
-
-    get(key: object) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index]![0] === key) {
-          return entries[index]![1];
-        }
-      }
-
-      return undefined;
-    },
-
-    set(key: object, value: object) {
-      for (let index = 0; index < entries.length; ++index) {
-        if (entries[index]![0] === key) {
-          entries[index]![1] = value;
-          return this;
-        }
-      }
-
-      entries.push([key, value]);
-
-      return this;
-    },
-
     customMethod(value) {
       console.log('hello', value);
     },
@@ -351,17 +321,19 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
   );
 }
 
-const customDeepEqualCircularHandler =
-  createCustomCircularEqual<CustomCircularCache>((defaultOptions) => ({
-    areObjectsEqual(a, b, isEqual, cache) {
-      cache.customMethod(cache.customValue);
+const customDeepEqualCircular = createCustomCircularEqual<CustomCircularMeta>(
+  (defaultOptions) => ({
+    areObjectsEqual(a, b, state) {
+      state.meta.customMethod(state.meta.customValue);
 
-      return defaultOptions.areObjectsEqual(a, b, isEqual, cache);
+      return defaultOptions.areObjectsEqual(a, b, state);
     },
     areRegExpsEqual,
-  }));
-const customDeepEqualCircular = (a: any, b: any) =>
-  customDeepEqualCircularHandler(a, b, getCustomCircularCache());
+  }),
+  () => ({
+    meta: getCustomCircularCache(),
+  }),
+);
 
 console.log(
   'true',
@@ -380,11 +352,15 @@ console.groupEnd();
 
 console.group('targeted custom');
 
-const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>(() => ({
-  createIsNestedEqual:
-    (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, meta) =>
-      a === meta || b === meta || deepEqual(a, b, meta),
-}));
+const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>(
+  () => ({}),
+  (compare) => ({
+    equals(a, b, _keyA, _keyB, _parentA, _parentB, state) {
+      return a === state.meta || b === state.meta || compare(a, b, state);
+    },
+    meta: 'bar',
+  }),
+);
 
 console.log(
   'shallow',

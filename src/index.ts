@@ -4,98 +4,170 @@ import {
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
+  areObjectsEqualStrict,
   areRegExpsEqual,
   areSetsEqual,
 } from './equals';
 import type {
-  CreateComparatorOptions,
-  ComparatorOptions,
-  EqualityComparator,
-  CreateCache,
+  CircularState,
+  ComparatorConfig,
+  CreateCustomComparatorConfig,
+  CreateState,
+  DefaultState,
+  InternalEqualityComparator,
 } from './internalTypes';
 import {
-  createDefaultComparator,
-  createDefaultIsNestedEqual,
+  combineComparators,
+  createInternalComparator,
   createIsCircular,
   sameValueZeroEqual,
 } from './utils';
 
 export { sameValueZeroEqual };
 
-const DEFAULT_CONFIG: ComparatorOptions = Object.freeze({
-  areArraysEqual,
-  areDatesEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-  createIsNestedEqual: createDefaultIsNestedEqual,
-});
+interface DefaultEqualCreatorOptions<Meta> {
+  comparator?: InternalEqualityComparator<Meta>;
+  circular?: boolean;
+  strict?: boolean;
+}
 
-const areArraysEqualCircular = createIsCircular(areArraysEqual);
-const areMapsEqualCircular = createIsCircular(areMapsEqual);
-const areObjectsEqualCircular = createIsCircular(areObjectsEqual);
-const areSetsEqualCircular = createIsCircular(areSetsEqual);
+function createComparatorConfig<Meta>({
+  circular,
+  strict,
+}: DefaultEqualCreatorOptions<Meta>) {
+  const config: ComparatorConfig<Meta> = {
+    areArraysEqual,
+    areDatesEqual,
+    areMapsEqual,
+    areObjectsEqual,
+    areRegExpsEqual,
+    areSetsEqual,
+  };
 
-const DEFAULT_CIRCULAR_CONFIG: ComparatorOptions = Object.freeze({
-  areArraysEqual: areArraysEqualCircular,
-  areDatesEqual,
-  areMapsEqual: areMapsEqualCircular,
-  areObjectsEqual: areObjectsEqualCircular,
-  areRegExpsEqual,
-  areSetsEqual: areSetsEqualCircular,
-  createIsNestedEqual: createDefaultIsNestedEqual,
-});
+  if (strict) {
+    config.areArraysEqual = areObjectsEqual;
+    config.areMapsEqual = combineComparators(areMapsEqual, areObjectsEqual);
+    config.areObjectsEqual = areObjectsEqualStrict;
+    config.areSetsEqual = combineComparators(areSetsEqual, areObjectsEqual);
+  }
 
-const isEqual = createComparator(DEFAULT_CONFIG);
-const isEqualCircular = createComparator(DEFAULT_CIRCULAR_CONFIG);
+  if (circular) {
+    config.areArraysEqual = createIsCircular(config.areArraysEqual);
+    config.areMapsEqual = createIsCircular(config.areMapsEqual);
+    config.areObjectsEqual = createIsCircular(config.areObjectsEqual);
+    config.areSetsEqual = createIsCircular(config.areSetsEqual);
+  }
 
-const isEqualComparator = createDefaultComparator(isEqual);
-const isEqualCircularComparator = createDefaultComparator(isEqualCircular);
+  return config;
+}
+
+function createDefaultEqualCreator(
+  options: DefaultEqualCreatorOptions<undefined> = {},
+) {
+  const config = createComparatorConfig(options);
+  const isEqual = createComparator(config);
+  const isEqualComparator =
+    options.comparator || createInternalComparator(isEqual);
+  const strict = !!options.strict;
+
+  if (options.circular) {
+    return function equals<A, B>(a: A, b: B): boolean {
+      return isEqual(a, b, {
+        cache: new WeakMap(),
+        equals: isEqualComparator,
+        meta: undefined,
+        strict,
+      });
+    };
+  }
+
+  const state = Object.freeze({
+    cache: undefined,
+    equals: isEqualComparator,
+    meta: undefined,
+    strict,
+  });
+
+  return function equals<A, B>(a: A, b: B): boolean {
+    return isEqual(a, b, state);
+  };
+}
+
+function createCustomEqualCreator(
+  options: DefaultEqualCreatorOptions<any> = {},
+) {
+  return function createCustomEqual<Meta>(
+    createCustomConfig: CreateCustomComparatorConfig<Meta>,
+    createState?: CreateState<Meta>,
+  ) {
+    const config = createComparatorConfig(options);
+    const customConfig = createCustomConfig(config);
+    const isEqualCustom = createComparator({ ...config, ...customConfig });
+    const isEqualCustomComparator = createInternalComparator(isEqualCustom);
+    const strict = !!options.strict;
+
+    if (createState) {
+      return function isEqual<A, B>(a: A, b: B, metaOverride?: Meta): boolean {
+        const customState = createState(isEqualCustom);
+
+        return isEqualCustom(a, b, {
+          cache: customState.cache || new WeakMap(),
+          equals: customState.equals || isEqualCustomComparator,
+          meta: metaOverride !== undefined ? metaOverride : customState.meta,
+          strict:
+            customState.strict !== undefined ? customState.strict : strict,
+        });
+      };
+    }
+
+    if (options.circular) {
+      return function equals<A, B>(a: A, b: B): boolean {
+        return isEqualCustom(a, b, {
+          cache: new WeakMap(),
+          equals: isEqualCustomComparator,
+          meta: undefined as Meta,
+          strict,
+        } as CircularState<Meta>);
+      };
+    }
+
+    const state = Object.freeze({
+      cache: undefined,
+      equals: isEqualCustomComparator,
+      meta: undefined,
+      strict,
+    });
+
+    return function equals<A, B>(a: A, b: B): boolean {
+      return isEqualCustom(a, b, state as DefaultState<Meta>);
+    };
+  };
+}
 
 /**
  * Whether the items passed are deeply-equal in value.
  */
-export function deepEqual<A, B>(a: A, b: B): boolean {
-  return isEqual(a, b, {
-    __c: undefined,
-    compare: isEqualComparator,
-    strict: false,
-  });
-}
+export const deepEqual = createDefaultEqualCreator();
 
 /**
  * Whether the items passed are deeply-equal in value, including circular references.
  */
-export function circularDeepEqual<A, B>(a: A, b: B): boolean {
-  return isEqualCircular(a, b, {
-    __c: new WeakMap(),
-    compare: isEqualCircularComparator,
-    strict: false,
-  });
-}
+export const circularDeepEqual = createDefaultEqualCreator({ circular: true });
 
 /**
  * Whether the items passed are shallowly-equal in value.
  */
-export function shallowEqual<A, B>(a: A, b: B): boolean {
-  return isEqual(a, b, {
-    __c: undefined,
-    compare: sameValueZeroEqual,
-    strict: false,
-  });
-}
+export const shallowEqual = createDefaultEqualCreator({
+  comparator: sameValueZeroEqual,
+});
 
 /**
  * Whether the items passed are shallowly-equal in value, including circular references.
  */
-export function circularShallowEqual<A, B>(a: A, b: B): boolean {
-  return isEqualCircular(a, b, {
-    __c: new WeakMap(),
-    compare: sameValueZeroEqual,
-    strict: false,
-  });
-}
+export const circularShallowEqual = createDefaultEqualCreator({
+  comparator: sameValueZeroEqual,
+  circular: true,
+});
 
 /**
  * Create a custom equality comparison method.
@@ -105,26 +177,7 @@ export function circularShallowEqual<A, B>(a: A, b: B): boolean {
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual(
-  createComparatorOptions: CreateComparatorOptions,
-  createCache: CreateCache,
-): EqualityComparator {
-  const options = createComparatorOptions(DEFAULT_CONFIG);
-  const isEqualCustom = createComparator({ ...DEFAULT_CONFIG, ...options });
-  const isEqualCustomComparator = createDefaultComparator(isEqualCustom);
-
-  const defaultCache = {
-    __c: undefined,
-    compare: isEqualCustomComparator,
-    strict: false,
-  };
-
-  const cache = createCache(defaultCache);
-
-  return function isEqual<A, B>(a: A, b: B): boolean {
-    return isEqualCustom(a, b, { ...defaultCache, ...cache });
-  };
-}
+export const createCustomEqual = createCustomEqualCreator();
 
 /**
  * Create a custom equality comparison method that handles circular references. This is very
@@ -136,28 +189,6 @@ export function createCustomEqual(
  * support for legacy environments that do not support expected features like
  * `WeakMap` out of the box.
  */
-export function createCustomCircularEqual(
-  createComparatorOptions: CreateComparatorOptions,
-  createCache: CreateCache,
-): <A, B>(a: A, b: B) => boolean {
-  const options = createComparatorOptions(DEFAULT_CIRCULAR_CONFIG);
-  const isEqualCircularCustom = createComparator({
-    ...DEFAULT_CIRCULAR_CONFIG,
-    ...options,
-  });
-  const isEqualCircularCustomComparator = createDefaultComparator(
-    isEqualCircularCustom,
-  );
-
-  const defaultCache = {
-    __c: new WeakMap(),
-    compare: isEqualCircularCustomComparator,
-    strict: true,
-  };
-
-  const cache = createCache(defaultCache);
-
-  return function isEqual<A, B>(a: A, b: B): boolean {
-    return isEqualCircularCustom(a, b, { ...defaultCache, ...cache });
-  };
-}
+export const createCustomCircularEqual = createCustomEqualCreator({
+  circular: true,
+});

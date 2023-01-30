@@ -1,25 +1,21 @@
-export interface BaseCircularMeta
+export interface BaseCircular
   extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
   set(key: object, value: any): any;
 }
 
-export type Cache = CircularCache | DefaultCache;
+export type State<Meta> = CircularState<Meta> | DefaultState<Meta>;
 
-export interface CircularCache {
-  [key: string]: any;
-
-  readonly __c: WeakMap<any, any>;
-  readonly compare: InternalEqualityComparator;
+export interface CircularState<Meta> {
+  readonly cache: BaseCircular;
+  readonly equals: InternalEqualityComparator<Meta>;
+  meta: Meta;
   readonly strict: boolean;
 }
 
-export type CreateCache = (defaultCache: Cache) => Partial<Cache>;
-
-export interface DefaultCache {
-  [key: string]: any;
-
-  readonly __c: undefined;
-  readonly compare: InternalEqualityComparator;
+export interface DefaultState<Meta> {
+  readonly cache: undefined;
+  readonly equals: InternalEqualityComparator<Meta>;
+  meta: Meta;
   readonly strict: boolean;
 }
 
@@ -28,37 +24,50 @@ export interface Dictionary<Value = any> {
   $$typeof?: any;
 }
 
-export interface ComparatorOptions {
-  areArraysEqual: TypeEqualityComparator<any[]>;
-  areDatesEqual: TypeEqualityComparator<Date>;
-  areMapsEqual: TypeEqualityComparator<Map<any, any>>;
-  areObjectsEqual: TypeEqualityComparator<Dictionary>;
-  areRegExpsEqual: TypeEqualityComparator<RegExp>;
-  areSetsEqual: TypeEqualityComparator<Set<any>>;
+export interface ComparatorConfig<Meta> {
+  areArraysEqual: TypeEqualityComparator<any, Meta>;
+  areDatesEqual: TypeEqualityComparator<any, Meta>;
+  areMapsEqual: TypeEqualityComparator<any, Meta>;
+  areObjectsEqual: TypeEqualityComparator<any, Meta>;
+  areRegExpsEqual: TypeEqualityComparator<any, Meta>;
+  areSetsEqual: TypeEqualityComparator<any, Meta>;
 }
 
-export type EqualityComparator = <A, B>(a: A, b: B, cache: Cache) => boolean;
+export type CreateCustomComparatorConfig<Meta> = (
+  config: ComparatorConfig<Meta>,
+) => Partial<ComparatorConfig<Meta>>;
 
-export type EqualityComparatorCreator = (
-  fn: EqualityComparator,
-) => InternalEqualityComparator;
+export type CreateState<Meta> = (
+  comparator: EqualityComparator<Meta>,
+) => Partial<State<Meta>>;
 
-export type CreateComparatorOptions = (
-  defaultOptions: ComparatorOptions,
-) => Partial<ComparatorOptions>;
+export type EqualityComparator<Meta> = <A, B>(
+  a: A,
+  b: B,
+  state: State<Meta>,
+) => boolean;
+export type AnyEqualityComparator<Meta> = (
+  a: any,
+  b: any,
+  state: State<Meta>,
+) => boolean;
 
-export type InternalEqualityComparator = (
+export type EqualityComparatorCreator<Meta> = (
+  fn: EqualityComparator<Meta>,
+) => InternalEqualityComparator<Meta>;
+
+export type InternalEqualityComparator<Meta> = (
   a: any,
   b: any,
   indexOrKeyA: any,
   indexOrKeyB: any,
   parentA: any,
   parentB: any,
-  cache: Cache,
+  state: State<Meta>,
 ) => boolean;
 
-export type TypeEqualityComparator<Type> = (
+export type TypeEqualityComparator<Type, Meta = undefined> = (
   a: Type,
   b: Type,
-  cache: Cache,
+  state: State<Meta>,
 ) => boolean;

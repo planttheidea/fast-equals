@@ -34,6 +34,7 @@ describe('isPlainObject', () => {
 
 describe('isPromiseLike', () => {
   it('should return true when the object is thenable', () => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const a = { then() {} };
 
     expect(isPromiseLike(a)).toBe(true);

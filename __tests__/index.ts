@@ -8,7 +8,7 @@ import {
   sameValueZeroEqual,
   shallowEqual,
 } from '../src';
-import { BaseCircularMeta } from 'internalTypes';
+import { BaseCircular } from '../src/internalTypes';
 
 describe('exports', () => {
   [
@@ -144,7 +144,7 @@ describe('circularShallowEqual', () => {
 });
 
 describe('createCustomCircularEqual', () => {
-  function getFakeWeakMap(): BaseCircularMeta {
+  function getFakeWeakMap(): BaseCircular {
     const entries: [object, object][] = [];
 
     return {
@@ -201,8 +201,7 @@ describe('createCustomCircularEqual', () => {
       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
     }),
     () => ({
-      // @ts-expect-error - Foo
-      __c: getFakeWeakMap(),
+      cache: getFakeWeakMap(),
     }),
   );
 

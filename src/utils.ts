@@ -1,28 +1,23 @@
 import {
-  Cache,
-  CircularCache,
+  AnyEqualityComparator,
+  BaseCircular,
+  CircularState,
   Dictionary,
   EqualityComparator,
   InternalEqualityComparator,
+  State,
   TypeEqualityComparator,
 } from './internalTypes';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
 
-export function createDefaultComparator(
-  compare: EqualityComparator,
-): InternalEqualityComparator {
-  return function (
-    a: any,
-    b: any,
-    _indexOrKeyA: any,
-    _indexOrKeyB: any,
-    _parentA: any,
-    _parentB: any,
-    cache: Cache,
-  ) {
-    return compare(a, b, cache);
+export function combineComparators<Meta>(
+  comparatorA: AnyEqualityComparator<Meta>,
+  comparatorB: AnyEqualityComparator<Meta>,
+) {
+  return function isEqual<A, B>(a: A, b: B, state: State<Meta>) {
+    return comparatorA(a, b, state) && comparatorB(a, b, state);
   };
 }
 
@@ -30,49 +25,55 @@ export function createDefaultComparator(
  * Default equality comparator pass-through, used as the standard `isEqual` creator for
  * use inside the built comparator.
  */
-export function createDefaultIsNestedEqual(
-  comparator: EqualityComparator,
-): InternalEqualityComparator {
-  return function isEqual<A, B>(
-    a: A,
-    b: B,
+export function createInternalComparator<Meta>(
+  compare: EqualityComparator<Meta>,
+): InternalEqualityComparator<Meta> {
+  return function (
+    a: any,
+    b: any,
     _indexOrKeyA: any,
     _indexOrKeyB: any,
     _parentA: any,
     _parentB: any,
-    cache: Cache,
+    state: State<Meta>,
   ) {
-    return comparator(a, b, cache);
+    return compare(a, b, state);
   };
 }
 
 /**
- * Wrap the provided `areItemsEqual` method to manage the circular cache, allowing
+ * Wrap the provided `areItemsEqual` method to manage the circular state, allowing
  * for circular references to be safely included in the comparison without creating
  * stack overflows.
  */
 export function createIsCircular<
-  AreItemsEqual extends TypeEqualityComparator<any>,
+  AreItemsEqual extends TypeEqualityComparator<any, any>,
 >(areItemsEqual: AreItemsEqual): AreItemsEqual {
-  return function isCircular(a: any, b: any, cache: CircularCache) {
+  return function isCircular(
+    a: any,
+    b: any,
+    state: CircularState<BaseCircular>,
+  ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
-      return areItemsEqual(a, b, cache);
+      return areItemsEqual(a, b, state);
     }
 
-    const cachedA = cache.__c.get(a);
-    const cachedB = cache.__c.get(b);
+    const { cache } = state;
+
+    const cachedA = cache.get(a);
+    const cachedB = cache.get(b);
 
     if (cachedA && cachedB) {
       return cachedA === b && cachedB === a;
     }
 
-    cache.__c.set(a, b);
-    cache.__c.set(b, a);
+    cache.set(a, b);
+    cache.set(b, a);
 
-    const result = areItemsEqual(a, b, cache);
+    const result = areItemsEqual(a, b, state);
 
-    cache.__c.delete(a);
-    cache.__c.delete(b);
+    cache.delete(a);
+    cache.delete(b);
 
     return result;
   } as AreItemsEqual;

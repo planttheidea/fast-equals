@@ -1,13 +1,15 @@
 import { createComparator } from '../src/comparator';
-import { areArraysEqual, areArraysEqualCircular } from '../src/arrays';
-import { areDatesEqual } from '../src/dates';
-import { areMapsEqual, areMapsEqualCircular } from '../src/maps';
-import { areObjectsEqual, areObjectsEqualCircular } from '../src/objects';
-import { areRegExpsEqual } from '../src/regexps';
-import { areSetsEqual, areSetsEqualCircular } from '../src/sets';
-import { createDefaultIsNestedEqual, sameValueZeroEqual } from '../src/utils';
+import {
+  areArraysEqual,
+  areDatesEqual,
+  areMapsEqual,
+  areObjectsEqual,
+  areRegExpsEqual,
+  areSetsEqual,
+} from '../src/equals';
+import { createInternalComparator, createIsCircular } from '../src/utils';
 
-import type { EqualityComparatorCreator } from '../index.d';
+import type { InternalEqualityComparator, State } from '../src/internalTypes';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,
@@ -16,89 +18,53 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-  createIsNestedEqual: createDefaultIsNestedEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   ...STANDARD_COMPARATOR_OPTIONS,
-  areArraysEqual: areArraysEqualCircular,
-  areMapsEqual: areMapsEqualCircular,
-  areObjectsEqual: areObjectsEqualCircular,
-  areSetsEqual: areSetsEqualCircular,
+  areArraysEqual: createIsCircular(areArraysEqual),
+  areMapsEqual: createIsCircular(areMapsEqual),
+  areObjectsEqual: createIsCircular(areObjectsEqual),
+  areSetsEqual: createIsCircular(areSetsEqual),
 };
 
 describe('createComparator', () => {
   [
     {
-      createMeta: () => {},
+      createState: <Meta>(
+        equals: InternalEqualityComparator<undefined>,
+        meta?: Meta,
+      ) => ({
+        cache: undefined,
+        equals,
+        meta,
+        strict: false,
+      }),
       name: 'standard',
       options: STANDARD_COMPARATOR_OPTIONS,
     },
     {
-      createMeta: () => new WeakMap(),
+      createState: <Meta>(
+        equals: InternalEqualityComparator<undefined>,
+        meta?: Meta,
+      ) => ({
+        cache: new WeakMap(),
+        equals,
+        meta: meta,
+        strict: false,
+      }),
       name: 'circular',
       options: CIRCULAR_COMPARATOR_OPTIONS,
     },
-  ].forEach(({ createMeta, name, options }) => {
+  ].forEach(({ createState, name, options }) => {
     describe(name, () => {
       it('should default to a deep-equal setup when no equality comparator is provided', () => {
         const comparator = createComparator(options);
-        const meta = createMeta();
+        const meta = createState(createInternalComparator(comparator));
 
         const a = { foo: { bar: 'baz' } };
         const b = { foo: { bar: 'baz' } };
 
         expect(comparator(a, b, meta)).toBe(true);
-      });
-
-      it('should use the custom comparator when one is provided', () => {
-        const comparator = createComparator({
-          ...options,
-          createIsNestedEqual: () => sameValueZeroEqual,
-        });
-        const meta = createMeta();
-
-        const a = { foo: { bar: 'baz' } };
-        const b = { foo: { bar: 'baz' } };
-
-        expect(comparator(a, b, meta)).toBe(false);
-      });
-
-      it('should access Maps A and B values with keys', () => {
-        const mapA = new Map([
-          [{ foo: 'bar' }, 1],
-          [{ foo: 'baz' }, 2],
-        ]);
-        const mapB = new Map([
-          [{ foo: 'baz' }, 2],
-          [{ foo: 'bar' }, 1],
-        ]);
-
-        const createIsNestedEqual: EqualityComparatorCreator<undefined> =
-          (deepEqual) =>
-          (
-            a: any,
-            b: any,
-            indexOrKeyA: any,
-            indexOrKeyB: any,
-            parentA: any,
-            parentB: any,
-            meta: any,
-          ) => {
-            if (typeof a === 'number' && typeof b === 'number') {
-              // Ignores key equality comparison
-              expect(parentA.get(indexOrKeyA)).toBe(a);
-              expect(parentB.get(indexOrKeyB)).toBe(b);
-            }
-
-            return deepEqual(a, b, meta);
-          };
-        const comparator = createComparator({
-          ...options,
-          createIsNestedEqual,
-        });
-        const meta = createMeta();
-
-        comparator(mapA, mapB, meta);
       });
 
       it('should provide correct iteration index when comparing Map keys', () => {
@@ -111,8 +77,8 @@ describe('createComparator', () => {
           ['foo', 'bar'],
         ]);
 
-        const createIsNestedEqual: EqualityComparatorCreator<undefined> =
-          (deepEqual) =>
+        const comparator = createComparator(options);
+        const state = createState(
           (
             a: any,
             b: any,
@@ -120,7 +86,7 @@ describe('createComparator', () => {
             indexOrKeyB: any,
             parentA: any,
             parentB: any,
-            meta: any,
+            state: State<undefined>,
           ) => {
             if (
               typeof indexOrKeyA === 'number' &&
@@ -131,15 +97,11 @@ describe('createComparator', () => {
               expect(indexOrKeyB).toBe(Array.from(parentB.keys()).indexOf(b));
             }
 
-            return deepEqual(a, b, meta);
-          };
-        const comparator = createComparator({
-          ...options,
-          createIsNestedEqual,
-        });
-        const meta = createMeta();
+            return comparator(a, b, state);
+          },
+        );
 
-        comparator(mapA, mapB, meta);
+        comparator(mapA, mapB, state);
       });
     });
   });
@@ -147,27 +109,17 @@ describe('createComparator', () => {
   describe('custom', () => {
     it('should call the custom comparator with the correct params', () => {
       const customComparatorMock = jest.fn();
-      const createIsNestedEqual: EqualityComparatorCreator<undefined> =
-        (deepEqual) =>
-        (
-          ...args: [
-            a: any,
-            b: any,
-            indexOrKeyA: any,
-            indexOrKeyB: any,
-            parentA: any,
-            parentB: any,
-            meta: any,
-          ]
-        ) => {
+      const comparator = createComparator(STANDARD_COMPARATOR_OPTIONS);
+      const state: State<'META'> = {
+        cache: undefined,
+        equals(...args) {
           customComparatorMock(...args);
           const [a, b, , , , , meta] = args;
-          return deepEqual(a, b, meta);
-        };
-      const comparator = createComparator({
-        ...STANDARD_COMPARATOR_OPTIONS,
-        createIsNestedEqual,
-      });
+          return comparator(a, b, meta);
+        },
+        meta: 'META',
+        strict: false,
+      };
 
       const a = {
         foo: {
@@ -185,9 +137,9 @@ describe('createComparator', () => {
       };
 
       const expectedParams: any = [
-        [a.foo, b.foo, 'foo', 'foo', a, b, 'META'],
-        [a.foo.oof, b.foo.oof, 'oof', 'oof', a.foo, b.foo, 'META'],
-        ['y', 'y', 0, 0, a.foo.oof, b.foo.oof, 'META'], // called with the keys of a Map
+        [a.foo, b.foo, 'foo', 'foo', a, b, state],
+        [a.foo.oof, b.foo.oof, 'oof', 'oof', a.foo, b.foo, state],
+        ['y', 'y', 0, 0, a.foo.oof, b.foo.oof, state], // called with the keys of a Map
         [
           a.foo.oof.get('y'),
           b.foo.oof.get('y'),
@@ -195,16 +147,16 @@ describe('createComparator', () => {
           'y',
           a.foo.oof,
           b.foo.oof,
-          'META',
+          state,
         ],
-        [a.foo.baz, b.foo.baz, 'baz', 'baz', a.foo, b.foo, 'META'],
-        ['x', 'x', 'x', 'x', a.foo.baz, b.foo.baz, 'META'],
-        [a.foo.bar, b.foo.bar, 'bar', 'bar', a.foo, b.foo, 'META'],
-        [a.foo.bar[1], b.foo.bar[1], 1, 1, a.foo.bar, b.foo.bar, 'META'],
-        [a.foo.bar[0], b.foo.bar[0], 0, 0, a.foo.bar, b.foo.bar, 'META'],
+        [a.foo.baz, b.foo.baz, 'baz', 'baz', a.foo, b.foo, state],
+        ['x', 'x', 'x', 'x', a.foo.baz, b.foo.baz, state],
+        [a.foo.bar, b.foo.bar, 'bar', 'bar', a.foo, b.foo, state],
+        [a.foo.bar[1], b.foo.bar[1], 1, 1, a.foo.bar, b.foo.bar, state],
+        [a.foo.bar[0], b.foo.bar[0], 0, 0, a.foo.bar, b.foo.bar, state],
       ];
 
-      comparator(a, b, 'META');
+      comparator(a, b, state);
       expect(customComparatorMock.mock.calls).toEqual(expectedParams);
     });
   });
