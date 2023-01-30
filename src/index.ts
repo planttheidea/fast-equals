@@ -5,6 +5,7 @@ import {
   areMapsEqual,
   areObjectsEqual,
   areObjectsEqualStrict,
+  arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
 } from './equals';
@@ -40,6 +41,7 @@ function createComparatorConfig<Meta>({
     areDatesEqual,
     areMapsEqual,
     areObjectsEqual,
+    arePrimitiveWrappersEqual,
     areRegExpsEqual,
     areSetsEqual,
   };

@@ -1,4 +1,4 @@
-import { isPlainObject, isPromiseLike, sameValueZeroEqual } from './utils';
+import { isPlainObject, isPromiseLike } from './utils';
 import type {
   ComparatorConfig,
   EqualityComparator,
@@ -22,6 +22,7 @@ export function createComparator<Meta>({
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
+  arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
 }: ComparatorConfig<Meta>): EqualityComparator<Meta> {
@@ -99,7 +100,7 @@ export function createComparator<Meta>({
     // If a simple object tag, then we can prioritize a simple object comparison because
     // it is likely a custom class. If an arguments tag, it should be treated as a standard
     // object.
-    if (aTag === OBJECT_TAG || aTag === ARGUMENTS_TAG) {
+    if (aTag === OBJECT_TAG) {
       // The exception for value comparison is `Promise`-like contracts. These should be
       // treated the same as standard `Promise` objects, which means strict equality.
       return isPromiseLike(a) || isPromiseLike(b)
@@ -107,11 +108,15 @@ export function createComparator<Meta>({
         : areObjectsEqual(a, b, state);
     }
 
+    if (aTag === ARGUMENTS_TAG) {
+      return areObjectsEqual(a, b, state);
+    }
+
     // As the penultimate fallback, check if the values passed are primitive wrappers. This
     // is very rare in modern JS, which is why it is deprioritized compared to all other object
     // types.
     if (aTag === BOOLEAN_TAG || aTag === NUMBER_TAG || aTag === STRING_TAG) {
-      return sameValueZeroEqual(a.valueOf(), b.valueOf());
+      return arePrimitiveWrappersEqual(a, b, state);
     }
 
     // If not matching any tags that require a specific type of comparison, then we hard-code false because

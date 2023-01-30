@@ -4,6 +4,7 @@ import {
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
+  arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
 } from '../src/equals';
@@ -16,6 +17,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areDatesEqual,
   areMapsEqual,
   areObjectsEqual,
+  arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
 };

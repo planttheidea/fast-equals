@@ -29,6 +29,7 @@ export interface ComparatorConfig<Meta> {
   areDatesEqual: TypeEqualityComparator<any, Meta>;
   areMapsEqual: TypeEqualityComparator<any, Meta>;
   areObjectsEqual: TypeEqualityComparator<any, Meta>;
+  arePrimitiveWrappersEqual: TypeEqualityComparator<any, Meta>;
   areRegExpsEqual: TypeEqualityComparator<any, Meta>;
   areSetsEqual: TypeEqualityComparator<any, Meta>;
 }

@@ -150,6 +150,17 @@ export const areObjectsEqual = createAreObjectsEqual(Object.keys);
 export const areObjectsEqualStrict = createAreObjectsEqual(getStrictProperties);
 
 /**
+ * Whether the primitive wrappers passed are equal in value.
+ *
+ * @NOTE
+ * This is a standalone function instead of done inline in the comparator
+ * to allow for overrides.
+ */
+export function arePrimitiveWrappersEqual(a: Date, b: Date): boolean {
+  return sameValueZeroEqual(a.valueOf(), b.valueOf());
+}
+
+/**
  * Whether the regexps passed are equal in value.
  *
  * @NOTE
