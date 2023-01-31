@@ -2,7 +2,6 @@
 
 import {
   createCustomEqual,
-  createCustomCircularEqual,
   circularDeepEqual,
   circularShallowEqual,
   deepEqual,
@@ -230,9 +229,8 @@ const object4 = {
   zero: 0,
 };
 
-const doesNotEverEqualOne = createCustomEqual<undefined>(
-  () => ({}),
-  (comparator) => ({
+const doesNotEverEqualOne = createCustomEqual<undefined>({
+  createState: (comparator) => ({
     equals(
       a: any,
       b: any,
@@ -249,7 +247,7 @@ const doesNotEverEqualOne = createCustomEqual<undefined>(
       return Object.keys(a).every((key) => comparator(a[key], b[key], state));
     },
   }),
-);
+});
 
 console.log('true', doesNotEverEqualOne(object1, object2));
 console.log('false', doesNotEverEqualOne(object3, object4));
@@ -321,8 +319,9 @@ function areRegExpsEqual(a: RegExp, b: RegExp) {
   );
 }
 
-const customDeepEqualCircular = createCustomCircularEqual<CustomCircularMeta>(
-  (defaultOptions) => ({
+const customDeepEqualCircular = createCustomEqual<CustomCircularMeta>({
+  circular: true,
+  createCustomConfig: (defaultOptions) => ({
     areObjectsEqual(a, b, state) {
       state.meta.customMethod(state.meta.customValue);
 
@@ -330,10 +329,10 @@ const customDeepEqualCircular = createCustomCircularEqual<CustomCircularMeta>(
     },
     areRegExpsEqual,
   }),
-  () => ({
+  createState: () => ({
     meta: getCustomCircularCache(),
   }),
-);
+});
 
 console.log(
   'true',
@@ -352,15 +351,14 @@ console.groupEnd();
 
 console.group('targeted custom');
 
-const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>(
-  () => ({}),
-  (compare) => ({
+const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>({
+  createState: (compare) => ({
     equals(a, b, _keyA, _keyB, _parentA, _parentB, state) {
       return a === state.meta || b === state.meta || compare(a, b, state);
     },
     meta: 'bar',
   }),
-);
+});
 
 console.log(
   'shallow',

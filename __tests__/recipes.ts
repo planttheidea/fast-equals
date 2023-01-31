@@ -1,8 +1,4 @@
-import {
-  createCustomCircularEqual,
-  createCustomEqual,
-  sameValueZeroEqual,
-} from '../src/index';
+import { createCustomEqual, sameValueZeroEqual } from '../src/index';
 
 import type {
   BaseCircular,
@@ -25,11 +21,15 @@ describe('recipes', () => {
         );
       };
 
-      const deepEqual = createCustomEqual(() => ({ areRegExpsEqual }));
-      const shallowEqual = createCustomEqual(() => ({
-        areRegExpsEqual,
-        createIsNestedEqual: () => sameValueZeroEqual,
-      }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areRegExpsEqual }),
+      });
+      const shallowEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areRegExpsEqual,
+          createIsNestedEqual: () => sameValueZeroEqual,
+        }),
+      });
 
       it('should verify the regexps correctly', () => {
         const a = /foo/gi;
@@ -60,9 +60,11 @@ describe('recipes', () => {
         areObjectsEqual,
       ) as TypeEqualityComparator<SpecialObject>;
 
-      const isSpecialObjectEqual = createCustomEqual(() => ({
-        areObjectsEqual: spy,
-      }));
+      const isSpecialObjectEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areObjectsEqual: spy,
+        }),
+      });
 
       it('should verify the special object', () => {
         const a: SpecialObject = { foo: 'foo', bar: { baz: 123 } };
@@ -88,7 +90,7 @@ describe('recipes', () => {
           b === state.meta.value,
       });
 
-      const deepEqual = createCustomEqual(() => ({}), createState);
+      const deepEqual = createCustomEqual({ createState });
 
       it('should verify the object itself', () => {
         const a = { bar: 'bar' };
@@ -149,7 +151,9 @@ describe('recipes', () => {
         );
       };
 
-      const deepEqual = createCustomEqual(() => ({ areObjectsEqual }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areObjectsEqual }),
+      });
 
       it('should verify the object with non-standard properties', () => {
         const a = createObjectWithDifferentPropertyTypes('bar');
@@ -195,7 +199,9 @@ describe('recipes', () => {
         });
       };
 
-      const deepEqual = createCustomEqual(() => ({ areObjectsEqual }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areObjectsEqual }),
+      });
 
       it('should verify the object property descriptors', () => {
         const symbol = Symbol('property');
@@ -296,7 +302,7 @@ describe('recipes', () => {
         };
       }
 
-      const customDeepCircularHandler = createCustomCircularEqual(() => ({}));
+      const customDeepCircularHandler = createCustomEqual({ circular: true });
 
       const circularDeepEqual = <A, B>(a: A, b: B) =>
         customDeepCircularHandler(a, b, getCache());

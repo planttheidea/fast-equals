@@ -2,7 +2,6 @@ import testSuites from './__helpers__/testSuites';
 import {
   circularDeepEqual,
   circularShallowEqual,
-  createCustomCircularEqual,
   createCustomEqual,
   deepEqual,
   sameValueZeroEqual,
@@ -196,14 +195,15 @@ describe('createCustomCircularEqual', () => {
     );
   }
 
-  const customDeepEqualCircular = createCustomCircularEqual(
-    () => ({
+  const customDeepEqualCircular = createCustomEqual({
+    circular: true,
+    createCustomConfig: () => ({
       areRegExpsEqual: areRegExpsEqualNoFlagsSupport,
     }),
-    () => ({
+    createState: () => ({
       cache: getFakeWeakMap(),
     }),
-  );
+  });
 
   it('should handle the custom equality check', () => {
     expect(

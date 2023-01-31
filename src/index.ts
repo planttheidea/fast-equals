@@ -32,6 +32,12 @@ interface DefaultEqualCreatorOptions<Meta> {
   strict?: boolean;
 }
 
+interface CustomEqualCreatorOptions<Meta>
+  extends DefaultEqualCreatorOptions<Meta> {
+  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
+  createState?: CreateState<Meta>;
+}
+
 function createComparatorConfig<Meta>({
   circular,
   strict,
@@ -95,61 +101,15 @@ function createDefaultEqualCreator(
   };
 }
 
-function createCustomEqualCreator(
-  options: DefaultEqualCreatorOptions<any> = {},
-) {
-  return function createCustomEqual<Meta>(
-    createCustomConfig: CreateCustomComparatorConfig<Meta>,
-    createState?: CreateState<Meta>,
-  ) {
-    const config = createComparatorConfig(options);
-    const customConfig = createCustomConfig(config);
-    const isEqualCustom = createComparator({ ...config, ...customConfig });
-    const isEqualCustomComparator = createInternalComparator(isEqualCustom);
-    const strict = !!options.strict;
-
-    if (createState) {
-      return function isEqual<A, B>(a: A, b: B, metaOverride?: Meta): boolean {
-        const customState = createState(isEqualCustom);
-
-        return isEqualCustom(a, b, {
-          cache: customState.cache || new WeakMap(),
-          equals: customState.equals || isEqualCustomComparator,
-          meta: metaOverride !== undefined ? metaOverride : customState.meta,
-          strict:
-            customState.strict !== undefined ? customState.strict : strict,
-        });
-      };
-    }
-
-    if (options.circular) {
-      return function equals<A, B>(a: A, b: B): boolean {
-        return isEqualCustom(a, b, {
-          cache: new WeakMap(),
-          equals: isEqualCustomComparator,
-          meta: undefined as Meta,
-          strict,
-        } as CircularState<Meta>);
-      };
-    }
-
-    const state = Object.freeze({
-      cache: undefined,
-      equals: isEqualCustomComparator,
-      meta: undefined,
-      strict,
-    });
-
-    return function equals<A, B>(a: A, b: B): boolean {
-      return isEqualCustom(a, b, state as DefaultState<Meta>);
-    };
-  };
-}
-
 /**
  * Whether the items passed are deeply-equal in value.
  */
 export const deepEqual = createDefaultEqualCreator();
+
+/**
+ * Whether the items passed are deeply-equal in value based on strict comparison.
+ */
+export const strictDeepEqual = createDefaultEqualCreator({ strict: true });
 
 /**
  * Whether the items passed are deeply-equal in value, including circular references.
@@ -157,10 +117,27 @@ export const deepEqual = createDefaultEqualCreator();
 export const circularDeepEqual = createDefaultEqualCreator({ circular: true });
 
 /**
+ * Whether the items passed are deeply-equal in value, including circular references,
+ * based on strict comparison.
+ */
+export const strictCircularDeepEqual = createDefaultEqualCreator({
+  circular: true,
+  strict: true,
+});
+
+/**
  * Whether the items passed are shallowly-equal in value.
  */
 export const shallowEqual = createDefaultEqualCreator({
   comparator: sameValueZeroEqual,
+});
+
+/**
+ * Whether the items passed are shallowly-equal in value based on strict comparison
+ */
+export const strictShallowEqual = createDefaultEqualCreator({
+  comparator: sameValueZeroEqual,
+  strict: true,
 });
 
 /**
@@ -172,6 +149,16 @@ export const circularShallowEqual = createDefaultEqualCreator({
 });
 
 /**
+ * Whether the items passed are shallowly-equal in value, including circular references,
+ * based on strict comparison.
+ */
+export const strictCircularShallowEqual = createDefaultEqualCreator({
+  comparator: sameValueZeroEqual,
+  circular: true,
+  strict: true,
+});
+
+/**
  * Create a custom equality comparison method.
  *
  * This can be done to create very targeted comparisons in extreme hot-path scenarios
@@ -179,18 +166,52 @@ export const circularShallowEqual = createDefaultEqualCreator({
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export const createCustomEqual = createCustomEqualCreator();
+export function createCustomEqual<Meta>(
+  options: CustomEqualCreatorOptions<Meta> = {},
+) {
+  const { createCustomConfig, createState } = options;
 
-/**
- * Create a custom equality comparison method that handles circular references. This is very
- * similar to `createCustomEqual`, with the only difference being that `meta` expects to be
- * populated with a `WeakMap`-like contract.
- *
- * This can be done to create very targeted comparisons in extreme hot-path scenarios
- * where the standard methods are not performant enough, but can also be used to provide
- * support for legacy environments that do not support expected features like
- * `WeakMap` out of the box.
- */
-export const createCustomCircularEqual = createCustomEqualCreator({
-  circular: true,
-});
+  const baseConfig = createComparatorConfig(options);
+  const config = createCustomConfig
+    ? Object.assign({}, baseConfig, createCustomConfig(baseConfig))
+    : baseConfig;
+  const isEqualCustom = createComparator(config);
+  const isEqualCustomComparator = createInternalComparator(isEqualCustom);
+  const strict = !!options.strict;
+
+  if (createState) {
+    return function isEqual<A, B>(a: A, b: B, metaOverride?: Meta): boolean {
+      const customState = createState(isEqualCustom);
+
+      return isEqualCustom(a, b, {
+        cache: customState.cache || new WeakMap(),
+        equals: customState.equals || isEqualCustomComparator,
+        // @ts-expect-error - inferred `Meta` may be undefined, which is okay
+        meta: metaOverride !== undefined ? metaOverride : customState.meta,
+        strict: customState.strict !== undefined ? customState.strict : strict,
+      });
+    };
+  }
+
+  if (options.circular) {
+    return function equals<A, B>(a: A, b: B): boolean {
+      return isEqualCustom(a, b, {
+        cache: new WeakMap(),
+        equals: isEqualCustomComparator,
+        meta: undefined as Meta,
+        strict,
+      } as CircularState<Meta>);
+    };
+  }
+
+  const state = Object.freeze({
+    cache: undefined,
+    equals: isEqualCustomComparator,
+    meta: undefined,
+    strict,
+  });
+
+  return function equals<A, B>(a: A, b: B): boolean {
+    return isEqualCustom(a, b, state as DefaultState<Meta>);
+  };
+}
