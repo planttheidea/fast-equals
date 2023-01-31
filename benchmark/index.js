@@ -16,13 +16,7 @@ import { isEqual as isEqualUnderscore } from 'underscore';
 import { Bench } from 'tinybench';
 
 const packages = {
-  'assert.deepStrictEqual': (a, b) => {
-    try {
-      return assertDeepStrictEqual(a, b);
-    } catch (e) {
-      return false;
-    }
-  },
+  'assert.deepStrictEqual': assertDeepStrictEqual,
   'deep-eql': deepEql,
   'deep-equal': deepEqual,
   'fast-deep-equal': fastDeepEqual,
