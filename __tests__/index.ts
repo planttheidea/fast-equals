@@ -250,31 +250,96 @@ describe('circular', () => {
 describe('strict', () => {
   describe('strictDeepEqual', () => {
     it('issue 93 - should handle symbol properties', () => {
-      const symbol = Symbol('foo');
+      const symbol = Symbol('key');
 
-      const object1 = { [symbol]: 'bar' };
-      const object2 = { [symbol]: 'bar' };
-      const object3 = { [symbol]: 'baz' };
+      const a = { [symbol]: { value: 'bar' } };
+      const b = { [symbol]: { value: 'bar' } };
+      const c = { [symbol]: { value: 'baz' } };
 
-      expect(strictDeepEqual(object1, object2)).toBe(true);
-      expect(strictDeepEqual(object1, object3)).toBe(false);
-      expect(strictDeepEqual(object2, object3)).toBe(false);
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(false);
     });
 
+    it('should handle hidden properties', () => {
+      const a = {};
+      const b = {};
+      const c = {};
+
+      Object.defineProperty(a, 'key', {
+        configurable: false,
+        enumerable: false,
+        value: { value: 'bar' },
+        writable: false,
+      });
+      Object.defineProperty(b, 'key', {
+        configurable: false,
+        enumerable: false,
+        value: { value: 'bar' },
+        writable: false,
+      });
+      Object.defineProperty(c, 'key', {
+        configurable: false,
+        enumerable: false,
+        value: { value: 'baz' },
+        writable: false,
+      });
+
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(false);
+    });
+
+    type WithCustomProperty<Type> = Type & {
+      key: { value: string };
+    };
+
     it('should handle keys on arrays', () => {
-      type CustomArray = string[] & { key: string };
+      type CustomArray = WithCustomProperty<string[]>;
 
-      const array1 = ['foo', 'bar'] as CustomArray;
-      const array2 = ['foo', 'bar'] as CustomArray;
-      const array3 = ['foo', 'bar'] as CustomArray;
+      const a = ['foo', 'bar'] as CustomArray;
+      const b = ['foo', 'bar'] as CustomArray;
+      const c = ['foo', 'bar'] as CustomArray;
 
-      array1.key = 'baz';
-      array2.key = 'baz';
-      array3.key = 'quz';
+      a.key = { value: 'baz' };
+      b.key = { value: 'baz' };
+      c.key = { value: 'quz' };
 
-      expect(strictDeepEqual(array1, array2)).toBe(true);
-      expect(strictDeepEqual(array1, array3)).toBe(false);
-      expect(strictDeepEqual(array2, array3)).toBe(false);
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(false);
+    });
+
+    it('should handle keys on maps', () => {
+      type CustomMap = WithCustomProperty<Map<string, string>>;
+
+      const a = new Map([['foo', 'bar']]) as CustomMap;
+      const b = new Map([['foo', 'bar']]) as CustomMap;
+      const c = new Map([['foo', 'bar']]) as CustomMap;
+
+      a.key = { value: 'baz' };
+      b.key = { value: 'baz' };
+      c.key = { value: 'quz' };
+
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(false);
+    });
+
+    it('should handle keys on sets', () => {
+      type CustomSet = WithCustomProperty<Set<string>>;
+
+      const a = new Set(['foo', 'bar']) as CustomSet;
+      const b = new Set(['foo', 'bar']) as CustomSet;
+      const c = new Set(['foo', 'bar']) as CustomSet;
+
+      a.key = { value: 'baz' };
+      b.key = { value: 'baz' };
+      c.key = { value: 'quz' };
+
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(false);
     });
   });
 

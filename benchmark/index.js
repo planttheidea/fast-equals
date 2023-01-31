@@ -16,12 +16,20 @@ import { isEqual as isEqualUnderscore } from 'underscore';
 import { Bench } from 'tinybench';
 
 const packages = {
-  'assert.deepStrictEqual': assertDeepStrictEqual,
+  'assert.deepStrictEqual': (a, b) => {
+    try {
+      return assertDeepStrictEqual(a, b);
+    } catch (e) {
+      return false;
+    }
+  },
   'deep-eql': deepEql,
   'deep-equal': deepEqual,
   'fast-deep-equal': fastDeepEqual,
   'fast-equals': fe.deepEqual,
   'fast-equals (circular)': fe.circularDeepEqual,
+  'fast-equals (strict)': fe.strictDeepEqual,
+  'fast-equals (strict circular)': fe.strictCircularDeepEqual,
   'lodash.isEqual': isEqualLodash,
   'nano-equal': nanoEqual,
   'react-fast-compare': reactFastCompare,
