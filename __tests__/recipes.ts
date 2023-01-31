@@ -254,12 +254,12 @@ describe('recipes', () => {
 
   describe('createCustomCircularEqual', () => {
     describe('legacy-circular-equal-support', () => {
-      interface Cache extends BaseCircular {
+      interface Meta {
         customMethod(): void;
         customValue: string;
       }
 
-      function getCache(): Cache {
+      function getCache(): BaseCircular {
         const entries: Array<[object, any]> = [];
 
         return {
@@ -294,18 +294,23 @@ describe('recipes', () => {
 
             return this;
           },
-
-          customMethod() {
-            console.log('hello!');
-          },
-          customValue: 'goodbye',
         };
       }
 
-      const customDeepCircularHandler = createCustomEqual({ circular: true });
+      const meta = {
+        customMethod() {
+          console.log('hello!');
+        },
+        customValue: 'goodbye',
+      };
 
-      const circularDeepEqual = <A, B>(a: A, b: B) =>
-        customDeepCircularHandler(a, b, getCache());
+      const circularDeepEqual = createCustomEqual<Meta>({
+        circular: true,
+        createState: () => ({
+          cache: getCache(),
+          meta,
+        }),
+      });
 
       it('should handle shared references between objects', () => {
         const x = [1];

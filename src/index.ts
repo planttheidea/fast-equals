@@ -15,7 +15,7 @@ import type {
   CreateCustomComparatorConfig,
   CreateState,
   DefaultState,
-  InternalEqualityComparator,
+  EqualityComparator,
 } from './internalTypes';
 import {
   combineComparators,
@@ -27,7 +27,7 @@ import {
 export { sameValueZeroEqual };
 
 interface DefaultEqualCreatorOptions<Meta> {
-  comparator?: InternalEqualityComparator<Meta>;
+  comparator?: EqualityComparator<Meta>;
   circular?: boolean;
   strict?: boolean;
 }
@@ -35,6 +35,7 @@ interface DefaultEqualCreatorOptions<Meta> {
 interface CustomEqualCreatorOptions<Meta>
   extends DefaultEqualCreatorOptions<Meta> {
   createCustomConfig?: CreateCustomComparatorConfig<Meta>;
+  createInternalComparator?: typeof createInternalComparator;
   createState?: CreateState<Meta>;
 }
 
@@ -169,14 +170,21 @@ export const strictCircularShallowEqual = createDefaultEqualCreator({
 export function createCustomEqual<Meta>(
   options: CustomEqualCreatorOptions<Meta> = {},
 ) {
-  const { createCustomConfig, createState } = options;
+  const {
+    comparator,
+    createInternalComparator: createCustomInternalComparator,
+    createCustomConfig,
+    createState,
+  } = options;
 
   const baseConfig = createComparatorConfig(options);
   const config = createCustomConfig
     ? Object.assign({}, baseConfig, createCustomConfig(baseConfig))
     : baseConfig;
-  const isEqualCustom = createComparator(config);
-  const isEqualCustomComparator = createInternalComparator(isEqualCustom);
+  const isEqualCustom = comparator || createComparator(config);
+  const isEqualCustomComparator = createCustomInternalComparator
+    ? createCustomInternalComparator(isEqualCustom)
+    : createInternalComparator(isEqualCustom);
   const strict = !!options.strict;
 
   if (createState) {
