@@ -35,21 +35,11 @@ const packages = {
   'underscore.isEqual': isEqualUnderscore,
 };
 
-const filteredEquivalentTests = ['maps', 'sets', 'promises'];
-
-/*
- * filter out Map and Set, as those do not pass with anything but lodash and falsely inflate the average ops/sec
- */
-const equivalentTests = tests.filter(({ description }) =>
-  filteredEquivalentTests.every((test) => !~description.indexOf(test)),
-);
-
 console.log('');
 
 const getPassedKey = (name, { description }) => `${name} - ${description}`;
 
 const iterations = 1000;
-const mixedTypesBench = new Bench({ iterations });
 const typesBenches = {};
 
 for (const name in packages) {
@@ -81,18 +71,6 @@ for (const name in packages) {
 
     passingTests[getPassedKey(name, testSuite)] = passed;
   }
-
-  mixedTypesBench.add(name, () => {
-    for (const testSuite of equivalentTests) {
-      for (const test of testSuite.tests) {
-        if (
-          test.description !== 'pseudo array and equivalent array are not equal'
-        ) {
-          fn(test.value1, test.value2);
-        }
-      }
-    }
-  });
 
   for (const testSuite of tests) {
     if (!typesBenches[testSuite.description]) {
@@ -136,8 +114,6 @@ async function run(name, bench) {
     })),
   );
 }
-
-await run('mixed types', mixedTypesBench);
 
 for (const type in typesBenches) {
   await run(type, typesBenches[type]);

@@ -30,7 +30,7 @@ export function createComparator<Meta>({
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
-  function comparator(a: any, b: any, state: State<Meta>): boolean {
+  return function comparator(a: any, b: any, state: State<Meta>): boolean {
     // If the items are strictly equal, no need to do a value comparison.
     if (a === b) {
       return true;
@@ -103,7 +103,8 @@ export function createComparator<Meta>({
       // treated the same as standard `Promise` objects, which means strict equality, and if
       // it reaches this point then that strict equality comparison has already failed.
       return (
-        !(typeof a.then === 'function' || typeof b.then === 'function') &&
+        typeof a.then !== 'function' &&
+        typeof b.then !== 'function' &&
         areObjectsEqual(a, b, state)
       );
     }
@@ -132,7 +133,5 @@ export function createComparator<Meta>({
     // In all cases, these decisions should be reevaluated based on changes to the language and
     // common development practices.
     return false;
-  }
-
-  return comparator;
+  };
 }
