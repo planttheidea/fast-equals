@@ -93,23 +93,6 @@ export const hasOwn =
     hasOwnProperty.call(object, property));
 
 /**
- * Whether the value is a plain object.
- *
- * @NOTE
- * This is a same-realm compariosn only.
- */
-export function isPlainObject(value: any): boolean {
-  return value.constructor === Object || value.constructor == null;
-}
-
-/**
- * When the value is `Promise`-like, aka "then-able".
- */
-export function isPromiseLike(value: any): boolean {
-  return typeof value.then === 'function';
-}
-
-/**
  * Whether the values passed are strictly equal or both NaN.
  */
 export function sameValueZeroEqual(a: any, b: any): boolean {

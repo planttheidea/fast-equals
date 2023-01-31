@@ -1,4 +1,3 @@
-import { isPlainObject, isPromiseLike } from './utils';
 import type {
   ComparatorConfig,
   EqualityComparator,
@@ -8,14 +7,16 @@ import type {
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
 const DATE_TAG = '[object Date]';
-const REG_EXP_TAG = '[object RegExp]';
 const MAP_TAG = '[object Map]';
 const NUMBER_TAG = '[object Number]';
 const OBJECT_TAG = '[object Object]';
+const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
 
-const getTag = Object.prototype.toString.call.bind(Object.prototype.toString);
+const getTag = Object.prototype.toString.call.bind(
+  Object.prototype.toString,
+) as (a: object) => string;
 
 export function createComparator<Meta>({
   areArraysEqual,
@@ -55,7 +56,7 @@ export function createComparator<Meta>({
     // `isPlainObject` only checks against the object's own realm. Cross-realm
     // comparisons are rare, and will be handled in the ultimate fallback, so
     // we can avoid the `toString.call()` cost unless necessary.
-    if (isPlainObject(a) && isPlainObject(b)) {
+    if (a.constructor === Object && b.constructor === Object) {
       return areObjectsEqual(a, b, state);
     }
 
@@ -102,7 +103,8 @@ export function createComparator<Meta>({
       // treated the same as standard `Promise` objects, which means strict equality, and if
       // it reaches this point then that strict equality comparison has already failed.
       return (
-        !(isPromiseLike(a) || isPromiseLike(b)) && areObjectsEqual(a, b, state)
+        !(typeof a.then === 'function' || typeof b.then === 'function') &&
+        areObjectsEqual(a, b, state)
       );
     }
 
