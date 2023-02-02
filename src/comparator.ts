@@ -14,6 +14,7 @@ const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
 
+const { isArray } = Array;
 const getTag = Object.prototype.toString.call.bind(
   Object.prototype.toString,
 ) as (a: object) => string;
@@ -63,8 +64,8 @@ export function createComparator<Meta>({
     // `isArray()` works on subclasses and is cross-realm, so we can again avoid
     // the `toString.call()` cost unless necessary by just checking if either
     // and then both are arrays.
-    const aArray = Array.isArray(a);
-    const bArray = Array.isArray(b);
+    const aArray = isArray(a);
+    const bArray = isArray(b);
 
     if (aArray || bArray) {
       return aArray === bArray && areArraysEqual(a, b, state);

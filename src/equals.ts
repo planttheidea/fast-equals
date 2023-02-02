@@ -43,49 +43,43 @@ export function areMapsEqual(
 ): boolean {
   let isValueEqual = a.size === b.size;
 
-  if (!isValueEqual) {
-    return false;
-  }
+  if (isValueEqual && a.size) {
+    // The use of `forEach()` is to avoid the transpilation cost of `for...of` comparisons, and
+    // the inability to control the performance of the resulting code. It also avoids excessive
+    // iteration compared to doing comparisons of `keys()` and `values()`. As a result, though,
+    // we cannot short-circuit the iterations; bookkeeping must be done to short-circuit the
+    // equality checks themselves.
 
-  if (!a.size) {
-    return true;
-  }
+    const matchedIndices: Record<number, true> = {};
 
-  // The use of `forEach()` is to avoid the transpilation cost of `for...of` comparisons, and
-  // the inability to control the performance of the resulting code. It also avoids excessive
-  // iteration compared to doing comparisons of `keys()` and `values()`. As a result, though,
-  // we cannot short-circuit the iterations; bookkeeping must be done to short-circuit the
-  // equality checks themselves.
+    let indexA = 0;
 
-  const matchedIndices: Record<number, true> = {};
-
-  let indexA = 0;
-
-  a.forEach((aValue, aKey) => {
-    if (!isValueEqual) {
-      return;
-    }
-
-    let hasMatch = false;
-    let matchIndexB = 0;
-
-    b.forEach((bValue, bKey) => {
-      if (
-        !hasMatch &&
-        !matchedIndices[matchIndexB] &&
-        (hasMatch =
-          state.equals(aKey, bKey, indexA, matchIndexB, a, b, state) &&
-          state.equals(aValue, bValue, aKey, bKey, a, b, state))
-      ) {
-        matchedIndices[matchIndexB] = true;
+    a.forEach((aValue, aKey) => {
+      if (!isValueEqual) {
+        return;
       }
 
-      matchIndexB++;
-    });
+      let hasMatch = false;
+      let matchIndexB = 0;
 
-    indexA++;
-    isValueEqual = hasMatch;
-  });
+      b.forEach((bValue, bKey) => {
+        if (
+          !hasMatch &&
+          !matchedIndices[matchIndexB] &&
+          (hasMatch =
+            state.equals(aKey, bKey, indexA, matchIndexB, a, b, state) &&
+            state.equals(aValue, bValue, aKey, bKey, a, b, state))
+        ) {
+          matchedIndices[matchIndexB] = true;
+        }
+
+        matchIndexB++;
+      });
+
+      indexA++;
+      isValueEqual = hasMatch;
+    });
+  }
 
   return isValueEqual;
 }
@@ -182,44 +176,38 @@ export function areSetsEqual(
 ): boolean {
   let isValueEqual = a.size === b.size;
 
-  if (!isValueEqual) {
-    return false;
-  }
+  if (isValueEqual && a.size) {
+    // The use of `forEach()` is to avoid the transpilation cost of `for...of` comparisons, and
+    // the inability to control the performance of the resulting code. It also avoids excessive
+    // iteration compared to doing comparisons of `keys()` and `values()`. As a result, though,
+    // we cannot short-circuit the iterations; bookkeeping must be done to short-circuit the
+    // equality checks themselves.
 
-  if (!a.size) {
-    return true;
-  }
+    const matchedIndices: Record<number, true> = {};
 
-  // The use of `forEach()` is to avoid the transpilation cost of `for...of` comparisons, and
-  // the inability to control the performance of the resulting code. It also avoids excessive
-  // iteration compared to doing comparisons of `keys()` and `values()`. As a result, though,
-  // we cannot short-circuit the iterations; bookkeeping must be done to short-circuit the
-  // equality checks themselves.
-
-  const matchedIndices: Record<number, true> = {};
-
-  a.forEach((aValue, aKey) => {
-    if (!isValueEqual) {
-      return;
-    }
-
-    let hasMatch = false;
-    let matchIndex = 0;
-
-    b.forEach((bValue, bKey) => {
-      if (
-        !hasMatch &&
-        !matchedIndices[matchIndex] &&
-        (hasMatch = state.equals(aValue, bValue, aKey, bKey, a, b, state))
-      ) {
-        matchedIndices[matchIndex] = true;
+    a.forEach((aValue, aKey) => {
+      if (!isValueEqual) {
+        return;
       }
 
-      matchIndex++;
-    });
+      let hasMatch = false;
+      let matchIndex = 0;
 
-    isValueEqual = hasMatch;
-  });
+      b.forEach((bValue, bKey) => {
+        if (
+          !hasMatch &&
+          !matchedIndices[matchIndex] &&
+          (hasMatch = state.equals(aValue, bValue, aKey, bKey, a, b, state))
+        ) {
+          matchedIndices[matchIndex] = true;
+        }
+
+        matchIndex++;
+      });
+
+      isValueEqual = hasMatch;
+    });
+  }
 
   return isValueEqual;
 }
