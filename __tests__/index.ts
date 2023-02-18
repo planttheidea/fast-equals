@@ -361,6 +361,17 @@ describe('strict', () => {
       expect(strictDeepEqual(a, c)).toBe(false);
       expect(strictDeepEqual(b, c)).toBe(false);
     });
+
+    it('issue 93 - should handle symbol keys', () => {
+      const obj1 = {
+        [Symbol.for('hi')]: 1,
+      };
+      const obj2 = {
+        [Symbol.for('hi')]: 2,
+      };
+
+      expect(strictDeepEqual(obj1, obj2)).toBe(false);
+    });
   });
 
   describe('createCustomEqual', () => {
