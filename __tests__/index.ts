@@ -290,6 +290,26 @@ describe('strict', () => {
       expect(strictDeepEqual(b, c)).toBe(false);
     });
 
+    it('should not be equal if property values are same but descriptors differ', () => {
+      const a = { value: 'bar' };
+      const b = {};
+      const c = {};
+
+      Object.defineProperty(b, 'key', {
+        configurable: false,
+        enumerable: false,
+        value: { value: 'bar' },
+        writable: false,
+      });
+      Object.defineProperty(c, 'key', {
+        value: { value: 'bar' },
+      });
+
+      expect(strictDeepEqual(a, b)).toBe(false);
+      expect(strictDeepEqual(a, c)).toBe(false);
+      expect(strictDeepEqual(b, c)).toBe(true);
+    });
+
     type WithCustomProperty<Type> = Type & {
       key: { value: string };
     };

@@ -3,6 +3,8 @@ import type { Dictionary, State } from './internalTypes';
 
 const OWNER = '_owner';
 
+const { getOwnPropertyDescriptor, keys } = Object;
+
 /**
  * Whether the arrays are equal in value.
  */
@@ -84,60 +86,112 @@ export function areMapsEqual(
   return isValueEqual;
 }
 
-function createAreObjectsEqual(
-  getProperties: (object: object) => Array<string | symbol>,
-) {
-  return function areObjectsEqual(
-    a: Dictionary,
-    b: Dictionary,
-    state: State<any>,
-  ): boolean {
-    const properties = getProperties(a);
-
-    let index = properties.length;
-
-    if (getProperties(b).length !== index) {
-      return false;
-    }
-
-    let property: string | symbol;
-
-    // Decrementing `while` showed faster results than either incrementing or
-    // decrementing `for` loop and than an incrementing `while` loop. Declarative
-    // methods like `some` / `every` were not used to avoid incurring the garbage
-    // cost of anonymous callbacks.
-    while (index-- > 0) {
-      property = properties[index]!;
-
-      if (
-        property === OWNER &&
-        (a.$$typeof || b.$$typeof) &&
-        a.$$typeof !== b.$$typeof
-      ) {
-        return false;
-      }
-
-      if (
-        !hasOwn(b, property) ||
-        !state.equals(a[property], b[property], property, property, a, b, state)
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-}
-
 /**
  * Whether the objects are equal in value.
  */
-export const areObjectsEqual = createAreObjectsEqual(Object.keys);
+export function areObjectsEqual(
+  a: Dictionary,
+  b: Dictionary,
+  state: State<any>,
+): boolean {
+  const properties = keys(a);
+
+  let index = properties.length;
+
+  if (keys(b).length !== index) {
+    return false;
+  }
+
+  let property: string | symbol;
+
+  // Decrementing `while` showed faster results than either incrementing or
+  // decrementing `for` loop and than an incrementing `while` loop. Declarative
+  // methods like `some` / `every` were not used to avoid incurring the garbage
+  // cost of anonymous callbacks.
+  while (index-- > 0) {
+    property = properties[index]!;
+
+    if (
+      property === OWNER &&
+      (a.$$typeof || b.$$typeof) &&
+      a.$$typeof !== b.$$typeof
+    ) {
+      return false;
+    }
+
+    if (
+      !hasOwn(b, property) ||
+      !state.equals(a[property], b[property], property, property, a, b, state)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 /**
  * Whether the objects are equal in value with strict property checking.
  */
-export const areObjectsEqualStrict = createAreObjectsEqual(getStrictProperties);
+export function areObjectsEqualStrict(
+  a: Dictionary,
+  b: Dictionary,
+  state: State<any>,
+): boolean {
+  const properties = getStrictProperties(a);
+
+  let index = properties.length;
+
+  if (getStrictProperties(b).length !== index) {
+    return false;
+  }
+
+  let property: string | symbol;
+  let descriptorA: ReturnType<typeof getOwnPropertyDescriptor>;
+  let descriptorB: ReturnType<typeof getOwnPropertyDescriptor>;
+
+  // Decrementing `while` showed faster results than either incrementing or
+  // decrementing `for` loop and than an incrementing `while` loop. Declarative
+  // methods like `some` / `every` were not used to avoid incurring the garbage
+  // cost of anonymous callbacks.
+  while (index-- > 0) {
+    property = properties[index]!;
+
+    if (
+      property === OWNER &&
+      (a.$$typeof || b.$$typeof) &&
+      a.$$typeof !== b.$$typeof
+    ) {
+      return false;
+    }
+
+    if (!hasOwn(b, property)) {
+      return false;
+    }
+
+    if (
+      !state.equals(a[property], b[property], property, property, a, b, state)
+    ) {
+      return false;
+    }
+
+    descriptorA = getOwnPropertyDescriptor(a, property);
+    descriptorB = getOwnPropertyDescriptor(b, property);
+
+    if (
+      (descriptorA || descriptorB) &&
+      (!descriptorA ||
+        !descriptorB ||
+        descriptorA.configurable !== descriptorB.configurable ||
+        descriptorA.enumerable !== descriptorB.enumerable ||
+        descriptorA.writable !== descriptorB.writable)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 /**
  * Whether the primitive wrappers passed are equal in value.
