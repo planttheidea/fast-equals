@@ -267,6 +267,23 @@ Creates a custom equality comparator that will be used on nested values in the o
 The signature is as follows:
 
 ```ts
+interface BaseCircular extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
+  set(key: object, value: any): any;
+}
+
+interface DefaultState<Meta> {
+  readonly cache: undefined | BaseCircular;
+  readonly equals: InternalEqualityComparator<Meta>;
+  meta: Meta;
+  readonly strict: boolean;
+}
+
+type EqualityComparator<Meta> = <A, B>(
+  a: A,
+  b: B,
+  state: State<Meta>,
+) => boolean;
+
 interface CreateComparatorCreatorOptions<Meta> {
   areArraysEqual: TypeEqualityComparator<any[], Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;

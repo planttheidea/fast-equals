@@ -1,5 +1,44 @@
 # fast-equals CHANGELOG
 
+## 5.0.0
+
+### Breaking changes
+
+#### `createCustomEqual` contract has changed
+
+To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details.
+
+#### `createCustomCircularEqual` has been removed
+
+You can create a custom circular equality comparator through `createCustomEqual` now by providing `circular: true` to the options.
+
+#### Deep links have changed
+
+If you were deep-linking into a specific asset type (ESM / CJS / UMD), they have changed location.
+
+**NOTE**: You may no longer need to deep-link, as [the build resolution has improved](#better-build-system-resolution).
+
+### Enhancements
+
+#### New "strict" comparators available
+
+The following new comparators are available:
+
+- `strictDeepEqual`
+- `strictShallowEqual`
+- `strictCircularDeepEqual`
+- `strictCircularShallowEqual`
+
+This will perform the same comparisons as their non-strict counterparts, but will verify additional properties (non-enumerable properties on objects, keyed objects on `Array` / `Map` / `Set`) and that the descriptors for the properties align.
+
+#### Better build system resolution
+
+The library now leverages the `exports` property in the `package.json` to provide builds specific to your method of consumption (ESM / CommonJS / UMD). There is still a minified UMD version available if you want to use it instead.
+
+#### `arePrimitiveWrappersEqual` added to `createCustomEqual` configuration
+
+If you want a custom comparator for primitive wrappers (`new Boolean()` / `new Number()` / `new String()`) it is now available.
+
 ## 4.0.3
 
 - Remove unnecessary second strict equality check for objects in edge-case scenarios
