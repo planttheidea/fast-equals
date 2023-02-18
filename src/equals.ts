@@ -109,16 +109,12 @@ function createAreObjectsEqual(
     while (index-- > 0) {
       property = properties[index]!;
 
-      if (property === OWNER) {
-        const reactElementA = !!a.$$typeof;
-        const reactElementB = !!b.$$typeof;
-
-        if (
-          (reactElementA || reactElementB) &&
-          reactElementA !== reactElementB
-        ) {
-          return false;
-        }
+      if (
+        property === OWNER &&
+        (a.$$typeof || b.$$typeof) &&
+        a.$$typeof !== b.$$typeof
+      ) {
+        return false;
       }
 
       if (
