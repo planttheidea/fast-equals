@@ -202,6 +202,7 @@ console.log(strictDeepEqual(array, ['foo'])); // false;
 
 Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. In this includes:
 
+- Checking `Symbol` properties on the object
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
