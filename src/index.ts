@@ -25,6 +25,7 @@ import {
 } from './utils';
 
 export { sameValueZeroEqual };
+export * from './internalTypes';
 
 interface DefaultEqualCreatorOptions<Meta> {
   comparator?: EqualityComparator<Meta>;

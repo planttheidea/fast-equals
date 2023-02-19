@@ -2,21 +2,30 @@ import type {
   CreateCustomComparatorConfig,
   CreateState,
   EqualityComparator,
+  InternalEqualityComparator,
 } from './src/internalTypes';
-import { createInternalComparator, sameValueZeroEqual } from './src/utils';
-export { sameValueZeroEqual };
 
 interface DefaultEqualCreatorOptions<Meta> {
   comparator?: EqualityComparator<Meta>;
   circular?: boolean;
   strict?: boolean;
 }
+
 interface CustomEqualCreatorOptions<Meta>
   extends DefaultEqualCreatorOptions<Meta> {
   createCustomConfig?: CreateCustomComparatorConfig<Meta>;
-  createInternalComparator?: typeof createInternalComparator;
+  createInternalComparator?: <Meta>(
+    compare: EqualityComparator<Meta>,
+  ) => InternalEqualityComparator<Meta>;
   createState?: CreateState<Meta>;
 }
+
+export * from './src/internalTypes';
+
+/**
+ * Whether the values passed are strictly equal or both NaN.
+ */
+export declare const sameValueZeroEqual: <A, B>(a: A, b: B) => boolean;
 
 /**
  * Whether the items passed are deeply-equal in value.
