@@ -72,3 +72,14 @@ export type TypeEqualityComparator<Type, Meta = undefined> = (
   b: Type,
   state: State<Meta>,
 ) => boolean;
+
+export interface CustomEqualCreatorOptions<Meta> {
+  circular?: boolean;
+  comparator?: EqualityComparator<Meta>;
+  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
+  createInternalComparator?: <Meta>(
+    compare: EqualityComparator<Meta>,
+  ) => InternalEqualityComparator<Meta>;
+  createState?: CreateState<Meta>;
+  strict?: boolean;
+}

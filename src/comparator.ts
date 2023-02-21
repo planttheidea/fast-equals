@@ -1,3 +1,14 @@
+import {
+  areArraysEqual as areArraysEqualDefault,
+  areDatesEqual as areDatesEqualDefault,
+  areMapsEqual as areMapsEqualDefault,
+  areObjectsEqual as areObjectsEqualDefault,
+  areObjectsEqualStrict as areObjectsEqualStrictDefault,
+  arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
+  areRegExpsEqual as areRegExpsEqualDefault,
+  areSetsEqual as areSetsEqualDefault,
+} from './equals';
+import { combineComparators, createIsCircular } from './utils';
 import type {
   ComparatorConfig,
   EqualityComparator,
@@ -19,6 +30,9 @@ const getTag = Object.prototype.toString.call.bind(
   Object.prototype.toString,
 ) as (a: object) => string;
 
+/**
+ * Create a comparator method based on the type-specific equality comparators passed.
+ */
 export function createComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
@@ -135,4 +149,45 @@ export function createComparator<Meta>({
     // common development practices.
     return false;
   };
+}
+
+/**
+ * Create the configuration object used for building comparators.
+ */
+export function createComparatorConfigBase<Meta>(
+  strict: boolean | undefined,
+): ComparatorConfig<Meta> {
+  return {
+    areArraysEqual: strict
+      ? areObjectsEqualStrictDefault
+      : areArraysEqualDefault,
+    areDatesEqual: areDatesEqualDefault,
+    areMapsEqual: strict
+      ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault)
+      : areMapsEqualDefault,
+    areObjectsEqual: strict
+      ? areObjectsEqualStrictDefault
+      : areObjectsEqualDefault,
+    arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
+    areRegExpsEqual: areRegExpsEqualDefault,
+    areSetsEqual: strict
+      ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault)
+      : areSetsEqualDefault,
+  };
+}
+
+export function createCircularComparatorConfig<Meta>(
+  config: ComparatorConfig<Meta>,
+): ComparatorConfig<Meta> {
+  const areArraysEqual = createIsCircular(config.areArraysEqual);
+  const areMapsEqual = createIsCircular(config.areMapsEqual);
+  const areObjectsEqual = createIsCircular(config.areObjectsEqual);
+  const areSetsEqual = createIsCircular(config.areSetsEqual);
+
+  return Object.assign({}, config, {
+    areArraysEqual,
+    areMapsEqual,
+    areObjectsEqual,
+    areSetsEqual,
+  });
 }

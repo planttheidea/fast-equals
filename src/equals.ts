@@ -26,10 +26,6 @@ export function areArraysEqual(a: any[], b: any[], state: State<any>) {
 
 /**
  * Whether the dates passed are equal in value.
- *
- * @NOTE
- * This is a standalone function instead of done inline in the comparator
- * to allow for overrides.
  */
 export function areDatesEqual(a: Date, b: Date): boolean {
   return sameValueZeroEqual(a.getTime(), b.getTime());
@@ -195,10 +191,6 @@ export function areObjectsEqualStrict(
 
 /**
  * Whether the primitive wrappers passed are equal in value.
- *
- * @NOTE
- * This is a standalone function instead of done inline in the comparator
- * to allow for overrides.
  */
 export function arePrimitiveWrappersEqual(a: Date, b: Date): boolean {
   return sameValueZeroEqual(a.valueOf(), b.valueOf());
@@ -206,11 +198,6 @@ export function arePrimitiveWrappersEqual(a: Date, b: Date): boolean {
 
 /**
  * Whether the regexps passed are equal in value.
- *
- * @NOTE
- * This is a standalone function instead of done inline in the comparator
- * to allow for overrides. An example of this would be supporting a
- * pre-ES2015 environment where the `flags` property is not available.
  */
 export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
   return a.source === b.source && a.flags === b.flags;

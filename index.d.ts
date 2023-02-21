@@ -1,24 +1,4 @@
-import type {
-  CreateCustomComparatorConfig,
-  CreateState,
-  EqualityComparator,
-  InternalEqualityComparator,
-} from './src/internalTypes';
-
-interface DefaultEqualCreatorOptions<Meta> {
-  comparator?: EqualityComparator<Meta>;
-  circular?: boolean;
-  strict?: boolean;
-}
-
-interface CustomEqualCreatorOptions<Meta>
-  extends DefaultEqualCreatorOptions<Meta> {
-  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
-  createInternalComparator?: <Meta>(
-    compare: EqualityComparator<Meta>,
-  ) => InternalEqualityComparator<Meta>;
-  createState?: CreateState<Meta>;
-}
+import type { CustomEqualCreatorOptions } from './src/internalTypes';
 
 export * from './src/internalTypes';
 

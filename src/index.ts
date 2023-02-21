@@ -1,128 +1,38 @@
-import { createComparator } from './comparator';
 import {
-  areArraysEqual,
-  areDatesEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  areObjectsEqualStrict,
-  arePrimitiveWrappersEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-} from './equals';
+  createCircularComparatorConfig,
+  createComparator,
+  createComparatorConfigBase,
+} from './comparator';
 import type {
   CircularState,
-  ComparatorConfig,
-  CreateCustomComparatorConfig,
-  CreateState,
+  CustomEqualCreatorOptions,
   DefaultState,
-  EqualityComparator,
 } from './internalTypes';
-import {
-  combineComparators,
-  createInternalComparator,
-  createIsCircular,
-  sameValueZeroEqual,
-} from './utils';
+import { createInternalComparator, sameValueZeroEqual } from './utils';
 
 export { sameValueZeroEqual };
 export * from './internalTypes';
 
-interface DefaultEqualCreatorOptions<Meta> {
-  comparator?: EqualityComparator<Meta>;
-  circular?: boolean;
-  strict?: boolean;
-}
-
-interface CustomEqualCreatorOptions<Meta>
-  extends DefaultEqualCreatorOptions<Meta> {
-  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
-  createInternalComparator?: typeof createInternalComparator;
-  createState?: CreateState<Meta>;
-}
-
-function createComparatorConfig<Meta>({
-  circular,
-  strict,
-}: DefaultEqualCreatorOptions<Meta>) {
-  const config: ComparatorConfig<Meta> = {
-    areArraysEqual,
-    areDatesEqual,
-    areMapsEqual,
-    areObjectsEqual,
-    arePrimitiveWrappersEqual,
-    areRegExpsEqual,
-    areSetsEqual,
-  };
-
-  if (strict) {
-    config.areArraysEqual = areObjectsEqual;
-    config.areMapsEqual = combineComparators(areMapsEqual, areObjectsEqual);
-    config.areObjectsEqual = areObjectsEqualStrict;
-    config.areSetsEqual = combineComparators(areSetsEqual, areObjectsEqual);
-  }
-
-  if (circular) {
-    config.areArraysEqual = createIsCircular(config.areArraysEqual);
-    config.areMapsEqual = createIsCircular(config.areMapsEqual);
-    config.areObjectsEqual = createIsCircular(config.areObjectsEqual);
-    config.areSetsEqual = createIsCircular(config.areSetsEqual);
-  }
-
-  return config;
-}
-
-function createDefaultEqualCreator(
-  options: DefaultEqualCreatorOptions<undefined> = {},
-) {
-  const config = createComparatorConfig(options);
-  const isEqual = createComparator(config);
-  const isEqualComparator =
-    options.comparator || createInternalComparator(isEqual);
-  const strict = !!options.strict;
-
-  if (options.circular) {
-    return function equals<A, B>(a: A, b: B): boolean {
-      return isEqual(a, b, {
-        cache: new WeakMap(),
-        equals: isEqualComparator,
-        meta: undefined,
-        strict,
-      });
-    };
-  }
-
-  const state = Object.freeze({
-    cache: undefined,
-    equals: isEqualComparator,
-    meta: undefined,
-    strict,
-  });
-
-  return function equals<A, B>(a: A, b: B): boolean {
-    return isEqual(a, b, state);
-  };
-}
-
 /**
  * Whether the items passed are deeply-equal in value.
  */
-export const deepEqual = createDefaultEqualCreator();
+export const deepEqual = createCustomEqual();
 
 /**
  * Whether the items passed are deeply-equal in value based on strict comparison.
  */
-export const strictDeepEqual = createDefaultEqualCreator({ strict: true });
+export const strictDeepEqual = createCustomEqual({ strict: true });
 
 /**
  * Whether the items passed are deeply-equal in value, including circular references.
  */
-export const circularDeepEqual = createDefaultEqualCreator({ circular: true });
+export const circularDeepEqual = createCustomEqual({ circular: true });
 
 /**
  * Whether the items passed are deeply-equal in value, including circular references,
  * based on strict comparison.
  */
-export const strictCircularDeepEqual = createDefaultEqualCreator({
+export const strictCircularDeepEqual = createCustomEqual({
   circular: true,
   strict: true,
 });
@@ -130,14 +40,14 @@ export const strictCircularDeepEqual = createDefaultEqualCreator({
 /**
  * Whether the items passed are shallowly-equal in value.
  */
-export const shallowEqual = createDefaultEqualCreator({
+export const shallowEqual = createCustomEqual({
   comparator: sameValueZeroEqual,
 });
 
 /**
  * Whether the items passed are shallowly-equal in value based on strict comparison
  */
-export const strictShallowEqual = createDefaultEqualCreator({
+export const strictShallowEqual = createCustomEqual({
   comparator: sameValueZeroEqual,
   strict: true,
 });
@@ -145,7 +55,7 @@ export const strictShallowEqual = createDefaultEqualCreator({
 /**
  * Whether the items passed are shallowly-equal in value, including circular references.
  */
-export const circularShallowEqual = createDefaultEqualCreator({
+export const circularShallowEqual = createCustomEqual({
   comparator: sameValueZeroEqual,
   circular: true,
 });
@@ -154,7 +64,7 @@ export const circularShallowEqual = createDefaultEqualCreator({
  * Whether the items passed are shallowly-equal in value, including circular references,
  * based on strict comparison.
  */
-export const strictCircularShallowEqual = createDefaultEqualCreator({
+export const strictCircularShallowEqual = createCustomEqual({
   comparator: sameValueZeroEqual,
   circular: true,
   strict: true,
@@ -178,14 +88,19 @@ export function createCustomEqual<Meta>(
     createState,
   } = options;
 
-  const baseConfig = createComparatorConfig(options);
-  const config = createCustomConfig
+  const baseConfig = createComparatorConfigBase<Meta>(options.strict);
+  const combinedConfig = createCustomConfig
     ? Object.assign({}, baseConfig, createCustomConfig(baseConfig))
     : baseConfig;
-  const isEqualCustom = comparator || createComparator(config);
-  const isEqualCustomComparator = createCustomInternalComparator
-    ? createCustomInternalComparator(isEqualCustom)
-    : createInternalComparator(isEqualCustom);
+  const config = options.circular
+    ? createCircularComparatorConfig(combinedConfig)
+    : combinedConfig;
+  const isEqualCustom = createComparator(config);
+  const isEqualCustomComparator =
+    comparator ||
+    (createCustomInternalComparator
+      ? createCustomInternalComparator(isEqualCustom)
+      : createInternalComparator(isEqualCustom));
   const strict = !!options.strict;
 
   if (createState) {

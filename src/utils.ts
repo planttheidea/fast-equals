@@ -12,6 +12,9 @@ import {
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
 
+/**
+ * Combine two comparators into a single comparators.
+ */
 export function combineComparators<Meta>(
   comparatorA: AnyEqualityComparator<Meta>,
   comparatorB: AnyEqualityComparator<Meta>,
@@ -79,6 +82,10 @@ export function createIsCircular<
   } as AreItemsEqual;
 }
 
+/**
+ * Get the properties to strictly examine, which include both own properties that are
+ * not enumerable and symbol properties.
+ */
 export function getStrictProperties(
   object: Dictionary,
 ): Array<string | symbol> {
@@ -87,6 +94,9 @@ export function getStrictProperties(
   );
 }
 
+/**
+ * Whether the object contains the property passed as an own property.
+ */
 export const hasOwn =
   Object.hasOwn ||
   ((object: Dictionary, property: number | string | symbol) =>
