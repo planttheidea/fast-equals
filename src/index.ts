@@ -1,8 +1,4 @@
-import {
-  createCircularComparatorConfig,
-  createComparator,
-  createComparatorConfigBase,
-} from './comparator';
+import { createComparator, createComparatorConfig } from './comparator';
 import type {
   CircularState,
   CustomEqualCreatorOptions,
@@ -82,26 +78,20 @@ export function createCustomEqual<Meta>(
   options: CustomEqualCreatorOptions<Meta> = {},
 ) {
   const {
+    circular,
     comparator,
     createInternalComparator: createCustomInternalComparator,
-    createCustomConfig,
     createState,
+    strict: baseStrict = false,
   } = options;
 
-  const baseConfig = createComparatorConfigBase<Meta>(options.strict);
-  const combinedConfig = createCustomConfig
-    ? Object.assign({}, baseConfig, createCustomConfig(baseConfig))
-    : baseConfig;
-  const config = options.circular
-    ? createCircularComparatorConfig(combinedConfig)
-    : combinedConfig;
+  const config = createComparatorConfig<Meta>(options);
   const isEqualCustom = createComparator(config);
   const isEqualCustomComparator =
     comparator ||
     (createCustomInternalComparator
       ? createCustomInternalComparator(isEqualCustom)
       : createInternalComparator(isEqualCustom));
-  const baseStrict = !!options.strict;
 
   if (createState) {
     return function isEqual<A, B>(
@@ -110,7 +100,7 @@ export function createCustomEqual<Meta>(
       metaOverride?: Meta | undefined,
     ): boolean {
       const {
-        cache = options.circular ? new WeakMap() : undefined,
+        cache = circular ? new WeakMap() : undefined,
         equals = isEqualCustomComparator,
         meta,
         strict = baseStrict,
@@ -125,7 +115,7 @@ export function createCustomEqual<Meta>(
     };
   }
 
-  if (options.circular) {
+  if (circular) {
     return function equals<A, B>(a: A, b: B): boolean {
       return isEqualCustom(a, b, {
         cache: new WeakMap(),
