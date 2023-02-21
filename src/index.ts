@@ -101,19 +101,27 @@ export function createCustomEqual<Meta>(
     (createCustomInternalComparator
       ? createCustomInternalComparator(isEqualCustom)
       : createInternalComparator(isEqualCustom));
-  const strict = !!options.strict;
+  const baseStrict = !!options.strict;
 
   if (createState) {
-    return function isEqual<A, B>(a: A, b: B, metaOverride?: Meta): boolean {
-      const customState = createState(isEqualCustom);
+    return function isEqual<A, B>(
+      a: A,
+      b: B,
+      metaOverride?: Meta | undefined,
+    ): boolean {
+      const {
+        cache = options.circular ? new WeakMap() : undefined,
+        equals = isEqualCustomComparator,
+        meta,
+        strict = baseStrict,
+      } = createState!(isEqualCustom);
 
       return isEqualCustom(a, b, {
-        cache: customState.cache || new WeakMap(),
-        equals: customState.equals || isEqualCustomComparator,
-        // @ts-expect-error - inferred `Meta` may be undefined, which is okay
-        meta: metaOverride !== undefined ? metaOverride : customState.meta,
-        strict: customState.strict !== undefined ? customState.strict : strict,
-      });
+        cache,
+        equals,
+        meta: metaOverride !== undefined ? metaOverride : meta,
+        strict,
+      } as CircularState<Meta>);
     };
   }
 
@@ -123,7 +131,7 @@ export function createCustomEqual<Meta>(
         cache: new WeakMap(),
         equals: isEqualCustomComparator,
         meta: undefined as Meta,
-        strict,
+        strict: baseStrict,
       } as CircularState<Meta>);
     };
   }
@@ -132,7 +140,7 @@ export function createCustomEqual<Meta>(
     cache: undefined,
     equals: isEqualCustomComparator,
     meta: undefined,
-    strict,
+    strict: baseStrict,
   });
 
   return function equals<A, B>(a: A, b: B): boolean {
