@@ -69,8 +69,6 @@ export type InternalEqualityComparator<Meta> = (
 ) => boolean;
 
 export type TypedArray =
-  | BigInt64Array
-  | BigUint64Array
   | Float32Array
   | Float64Array
   | Int8Array
