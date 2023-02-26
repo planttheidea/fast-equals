@@ -31,11 +31,15 @@ The following new comparators are available:
 
 This will perform the same comparisons as their non-strict counterparts, but will verify additional properties (non-enumerable properties on objects, keyed objects on `Array` / `Map` / `Set`) and that the descriptors for the properties align.
 
+#### `TypedArray` support
+
+Support for comparing all typed array values is now supported, and you can provide a custom comparator via the new `areTypedArraysEqual` option in the `createCustomEqual` configuration.
+
 #### Better build system resolution
 
 The library now leverages the `exports` property in the `package.json` to provide builds specific to your method of consumption (ESM / CommonJS / UMD). There is still a minified UMD version available if you want to use it instead.
 
-#### `arePrimitiveWrappersEqual` added to `createCustomEqual` configuration
+#### `arePrimitiveWrappersEqual` option added to `createCustomEqual` configuration
 
 If you want a custom comparator for primitive wrappers (`new Boolean()` / `new Number()` / `new String()`) it is now available.
 

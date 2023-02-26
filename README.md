@@ -296,7 +296,7 @@ interface CreateComparatorCreatorOptions<Meta> {
   >;
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  areTypedArraysEqual: TypeEqualityComparatory<Big>
+  areTypedArraysEqual: TypeEqualityComparatory<TypedArray, Meta>;
 }
 
 interface CustomEqualCreatorOptions<Meta> {
