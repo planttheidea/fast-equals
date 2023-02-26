@@ -63,10 +63,6 @@ export function createComparator<Meta>({
       return a !== a && b !== b;
     }
 
-    if (state.strict && a.constructor !== b.constructor) {
-      return false;
-    }
-
     // Checks are listed in order of commonality of use-case:
     //   1. Common complex object types (plain object, array)
     //   2. Common data values (date, regexp)
@@ -81,6 +77,13 @@ export function createComparator<Meta>({
     // we can avoid the `toString.call()` cost unless necessary.
     if (a.constructor === Object && b.constructor === Object) {
       return areObjectsEqual(a, b, state);
+    }
+
+    // In strict mode, constructors should match. We placed this after the plain object check
+    // because the constructors must match to meet plain object requirements (must both be `Object`
+    // in the given Realm), so it slightly improves performance on a very common use-case.
+    if (state.strict && a.constructor !== b.constructor) {
+      return false;
     }
 
     // `isArray()` works on subclasses and is cross-realm, so we can again avoid

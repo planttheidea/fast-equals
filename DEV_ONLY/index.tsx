@@ -6,6 +6,8 @@ import {
   circularShallowEqual,
   deepEqual,
   shallowEqual,
+  strictDeepEqual,
+  strictShallowEqual,
 } from '../src';
 
 import type { State } from '../src/internalTypes';
@@ -459,3 +461,41 @@ console.log(
 );
 
 console.groupEnd();
+
+console.group('typed arrays');
+
+console.log(
+  'true - deep',
+  deepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
+);
+console.log(
+  'true - shallow',
+  shallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
+);
+
+console.log(
+  'true - strict deep',
+  strictDeepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
+);
+console.log(
+  'true - strict shallow',
+  strictShallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
+);
+
+console.log(
+  'true - deep (different types)',
+  deepEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
+);
+console.log(
+  'true - shallow (different types)',
+  shallowEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
+);
+
+console.log(
+  'false - strict deep (different types)',
+  strictDeepEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
+);
+console.log(
+  'false - strict shallow (different types)',
+  strictShallowEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
+);
