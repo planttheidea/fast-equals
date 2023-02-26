@@ -9,7 +9,7 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual,
 } from './equals';
-import { combineComparators, createIsCircular, isArrayBuffer } from './utils';
+import { combineComparators, createIsCircular } from './utils';
 import type {
   ComparatorConfig,
   CustomEqualCreatorOptions,
@@ -28,6 +28,10 @@ const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
 
 const { isArray } = Array;
+const isTypedArray =
+  typeof ArrayBuffer === 'function' && ArrayBuffer.isView
+    ? ArrayBuffer.isView
+    : null;
 const { assign } = Object;
 const getTag = Object.prototype.toString.call.bind(
   Object.prototype.toString,
@@ -96,11 +100,15 @@ export function createComparator<Meta>({
       return aArray === bArray && areArraysEqual(a, b, state);
     }
 
-    aArray = isArrayBuffer(a);
-    bArray = isArrayBuffer(b);
+    // Prioritize the `TypedArray` check because it does not require capturing the tag, which is a
+    // slower path.
+    if (isTypedArray) {
+      aArray = isTypedArray(a);
+      bArray = isTypedArray(b);
 
-    if (aArray || bArray) {
-      return aArray === bArray && areTypedArraysEqual(a, b, state);
+      if (aArray || bArray) {
+        return aArray === bArray && areTypedArraysEqual(a, b, state);
+      }
     }
 
     // Since this is a custom object, use the classic `toString.call()` to get its
