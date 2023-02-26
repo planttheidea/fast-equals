@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.64kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.75kB when minified and gzipped.
 
 Unlike most equality validation libraries, the following types are handled out-of-the-box:
 
@@ -162,6 +162,7 @@ console.log(circularShallowEqual(array, [array])); // false
 
 Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. In this includes:
 
+- Checking constructors match
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays

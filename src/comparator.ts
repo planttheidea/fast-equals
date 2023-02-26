@@ -63,6 +63,10 @@ export function createComparator<Meta>({
       return a !== a && b !== b;
     }
 
+    if (state.strict && a.constructor !== b.constructor) {
+      return false;
+    }
+
     // Checks are listed in order of commonality of use-case:
     //   1. Common complex object types (plain object, array)
     //   2. Common data values (date, regexp)
