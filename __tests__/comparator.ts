@@ -7,6 +7,7 @@ import {
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
+  areTypedArraysEqual,
 } from '../src/equals';
 import { createInternalComparator, createIsCircular } from '../src/utils';
 
@@ -20,6 +21,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
+  areTypedArraysEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   ...STANDARD_COMPARATOR_OPTIONS,

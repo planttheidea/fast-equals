@@ -7,6 +7,7 @@ import {
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
+  areTypedArraysEqual,
 } from './equals';
 import { combineComparators, createIsCircular } from './utils';
 import type {
@@ -19,12 +20,43 @@ import type {
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
 const DATE_TAG = '[object Date]';
+const BIG_INT_64_ARRAY_TAG = '[object BigInt64Array]';
+const BIG_UINT_64_ARRAY_TAG = '[object BigUint64Array]';
+const FLOAT_32_ARRAY_TAG = '[object Float32Array]';
+const FLOAT_64_ARRAY_TAG = '[object Float64Array]';
+const INT_8_ARRAY_TAG = '[object Int8Array]';
+const INT_16_ARRAY_TAG = '[object Int16Array]';
+const INT_32_ARRAY_TAG = '[object Int32Array]';
 const MAP_TAG = '[object Map]';
 const NUMBER_TAG = '[object Number]';
 const OBJECT_TAG = '[object Object]';
 const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
+const UINT_8_ARRAY_TAG = '[object Uint8Array]';
+const UINT_8_CLAMPED_ARRAY_TAG = '[object Uint8ClampedArray]';
+const UINT_16_ARRAY_TAG = '[object Uint16Array]';
+const UINT_32_ARRAY_TAG = '[object Uint32Array]';
+
+const PRIMITIVE_WRAPPER: Record<string, true | undefined> = {
+  [BOOLEAN_TAG]: true,
+  [NUMBER_TAG]: true,
+  [STRING_TAG]: true,
+};
+
+const TYPED_ARRAY: Record<string, true | undefined> = {
+  [BIG_INT_64_ARRAY_TAG]: true,
+  [BIG_UINT_64_ARRAY_TAG]: true,
+  [FLOAT_32_ARRAY_TAG]: true,
+  [FLOAT_64_ARRAY_TAG]: true,
+  [INT_8_ARRAY_TAG]: true,
+  [INT_16_ARRAY_TAG]: true,
+  [INT_32_ARRAY_TAG]: true,
+  [UINT_8_ARRAY_TAG]: true,
+  [UINT_8_CLAMPED_ARRAY_TAG]: true,
+  [UINT_16_ARRAY_TAG]: true,
+  [UINT_32_ARRAY_TAG]: true,
+};
 
 const { isArray } = Array;
 const { assign } = Object;
@@ -43,6 +75,7 @@ export function createComparator<Meta>({
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
   areSetsEqual,
+  areTypedArraysEqual,
 }: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -131,10 +164,14 @@ export function createComparator<Meta>({
       return areObjectsEqual(a, b, state);
     }
 
+    if (TYPED_ARRAY[tag]) {
+      return areTypedArraysEqual(a, b, state);
+    }
+
     // As the penultimate fallback, check if the values passed are primitive wrappers. This
     // is very rare in modern JS, which is why it is deprioritized compared to all other object
     // types.
-    if (tag === BOOLEAN_TAG || tag === NUMBER_TAG || tag === STRING_TAG) {
+    if (PRIMITIVE_WRAPPER[tag]) {
       return arePrimitiveWrappersEqual(a, b, state);
     }
 
@@ -177,6 +214,9 @@ export function createComparatorConfig<Meta>({
     areSetsEqual: strict
       ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault)
       : areSetsEqualDefault,
+    areTypedArraysEqual: strict
+      ? combineComparators(areTypedArraysEqual, areObjectsEqualStrictDefault)
+      : areTypedArraysEqual,
   };
 
   if (createCustomConfig) {

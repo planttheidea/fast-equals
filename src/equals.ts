@@ -1,5 +1,5 @@
 import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils';
-import type { Dictionary, State } from './internalTypes';
+import type { Dictionary, State, TypedArray } from './internalTypes';
 
 const OWNER = '_owner';
 
@@ -247,4 +247,20 @@ export function areSetsEqual(
   }
 
   return isValueEqual;
+}
+
+export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
+  let index = a.length;
+
+  if (b.length !== index) {
+    return false;
+  }
+
+  while (index-- > 0) {
+    if (a[index] !== b[index]) {
+      return false;
+    }
+  }
+
+  return true;
 }

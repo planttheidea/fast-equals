@@ -32,6 +32,7 @@ export interface ComparatorConfig<Meta> {
   arePrimitiveWrappersEqual: TypeEqualityComparator<any, Meta>;
   areRegExpsEqual: TypeEqualityComparator<any, Meta>;
   areSetsEqual: TypeEqualityComparator<any, Meta>;
+  areTypedArraysEqual: TypeEqualityComparator<any, Meta>;
 }
 
 export type CreateCustomComparatorConfig<Meta> = (
@@ -66,6 +67,19 @@ export type InternalEqualityComparator<Meta> = (
   parentB: any,
   state: State<Meta>,
 ) => boolean;
+
+export type TypedArray =
+  | BigInt64Array
+  | BigUint64Array
+  | Float32Array
+  | Float64Array
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | Uint16Array
+  | Uint32Array
+  | Uint8Array
+  | Uint8ClampedArray;
 
 export type TypeEqualityComparator<Type, Meta = undefined> = (
   a: Type,
