@@ -12,6 +12,9 @@ import {
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
 
+const SUPPORTS_ARRAY_BUFFER =
+  typeof ArrayBuffer === 'function' && Boolean(ArrayBuffer.isView);
+
 /**
  * Combine two comparators into a single comparators.
  */
@@ -101,6 +104,10 @@ export const hasOwn =
   Object.hasOwn ||
   ((object: Dictionary, property: number | string | symbol) =>
     hasOwnProperty.call(object, property));
+
+export function isArrayBuffer(value: any): value is ArrayBuffer {
+  return SUPPORTS_ARRAY_BUFFER && ArrayBuffer.isView(value);
+}
 
 /**
  * Whether the values passed are strictly equal or both NaN.

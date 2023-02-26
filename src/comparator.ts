@@ -9,7 +9,7 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual,
 } from './equals';
-import { combineComparators, createIsCircular } from './utils';
+import { combineComparators, createIsCircular, isArrayBuffer } from './utils';
 import type {
   ComparatorConfig,
   CustomEqualCreatorOptions,
@@ -20,43 +20,12 @@ import type {
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
 const DATE_TAG = '[object Date]';
-const BIG_INT_64_ARRAY_TAG = '[object BigInt64Array]';
-const BIG_UINT_64_ARRAY_TAG = '[object BigUint64Array]';
-const FLOAT_32_ARRAY_TAG = '[object Float32Array]';
-const FLOAT_64_ARRAY_TAG = '[object Float64Array]';
-const INT_8_ARRAY_TAG = '[object Int8Array]';
-const INT_16_ARRAY_TAG = '[object Int16Array]';
-const INT_32_ARRAY_TAG = '[object Int32Array]';
 const MAP_TAG = '[object Map]';
 const NUMBER_TAG = '[object Number]';
 const OBJECT_TAG = '[object Object]';
 const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
-const UINT_8_ARRAY_TAG = '[object Uint8Array]';
-const UINT_8_CLAMPED_ARRAY_TAG = '[object Uint8ClampedArray]';
-const UINT_16_ARRAY_TAG = '[object Uint16Array]';
-const UINT_32_ARRAY_TAG = '[object Uint32Array]';
-
-const PRIMITIVE_WRAPPER: Record<string, true | undefined> = {
-  [BOOLEAN_TAG]: true,
-  [NUMBER_TAG]: true,
-  [STRING_TAG]: true,
-};
-
-const TYPED_ARRAY: Record<string, true | undefined> = {
-  [BIG_INT_64_ARRAY_TAG]: true,
-  [BIG_UINT_64_ARRAY_TAG]: true,
-  [FLOAT_32_ARRAY_TAG]: true,
-  [FLOAT_64_ARRAY_TAG]: true,
-  [INT_8_ARRAY_TAG]: true,
-  [INT_16_ARRAY_TAG]: true,
-  [INT_32_ARRAY_TAG]: true,
-  [UINT_8_ARRAY_TAG]: true,
-  [UINT_8_CLAMPED_ARRAY_TAG]: true,
-  [UINT_16_ARRAY_TAG]: true,
-  [UINT_32_ARRAY_TAG]: true,
-};
 
 const { isArray } = Array;
 const { assign } = Object;
@@ -113,11 +82,18 @@ export function createComparator<Meta>({
     // `isArray()` works on subclasses and is cross-realm, so we can again avoid
     // the `toString.call()` cost unless necessary by just checking if either
     // and then both are arrays.
-    const aArray = isArray(a);
-    const bArray = isArray(b);
+    let aArray = isArray(a);
+    let bArray = isArray(b);
 
     if (aArray || bArray) {
       return aArray === bArray && areArraysEqual(a, b, state);
+    }
+
+    aArray = isArrayBuffer(a);
+    bArray = isArrayBuffer(b);
+
+    if (aArray || bArray) {
+      return aArray === bArray && areTypedArraysEqual(a, b, state);
     }
 
     // Since this is a custom object, use the classic `toString.call()` to get its
@@ -164,14 +140,10 @@ export function createComparator<Meta>({
       return areObjectsEqual(a, b, state);
     }
 
-    if (TYPED_ARRAY[tag]) {
-      return areTypedArraysEqual(a, b, state);
-    }
-
     // As the penultimate fallback, check if the values passed are primitive wrappers. This
     // is very rare in modern JS, which is why it is deprioritized compared to all other object
     // types.
-    if (PRIMITIVE_WRAPPER[tag]) {
+    if (tag === BOOLEAN_TAG || tag === NUMBER_TAG || tag === STRING_TAG) {
       return arePrimitiveWrappersEqual(a, b, state);
     }
 

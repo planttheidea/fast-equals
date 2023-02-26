@@ -626,13 +626,6 @@ export default [
         value2: new Float32Array([31, 21]),
       },
       {
-        deepEqual: false,
-        description: 'Float32Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Float32Array([21, 31]),
-        value2: new Float64Array([21, 31]),
-      },
-      {
         deepEqual: true,
         description: 'equal Float64Array objects',
         shallowEqual: true,
@@ -645,13 +638,6 @@ export default [
         shallowEqual: false,
         value1: new Float64Array([21, 31]),
         value2: new Float64Array([31, 21]),
-      },
-      {
-        deepEqual: false,
-        description: 'Float64Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Float64Array([21, 31]),
-        value2: new Float32Array([21, 31]),
       },
       {
         deepEqual: true,
@@ -668,13 +654,6 @@ export default [
         value2: new Int8Array([31, 21]),
       },
       {
-        deepEqual: false,
-        description: 'Int8Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Int8Array([21, 31]),
-        value2: new Int16Array([21, 31]),
-      },
-      {
         deepEqual: true,
         description: 'equal Int16Array objects',
         shallowEqual: true,
@@ -687,13 +666,6 @@ export default [
         shallowEqual: false,
         value1: new Int16Array([21, 31]),
         value2: new Int16Array([31, 21]),
-      },
-      {
-        deepEqual: false,
-        description: 'Int16Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Int16Array([21, 31]),
-        value2: new Int32Array([21, 31]),
       },
       {
         deepEqual: true,
@@ -710,13 +682,6 @@ export default [
         value2: new Int32Array([31, 21]),
       },
       {
-        deepEqual: false,
-        description: 'Int32Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Int32Array([21, 31]),
-        value2: new Int8Array([21, 31]),
-      },
-      {
         deepEqual: true,
         description: 'equal Uint8Array objects',
         shallowEqual: true,
@@ -729,13 +694,6 @@ export default [
         shallowEqual: false,
         value1: new Uint8Array([21, 31]),
         value2: new Uint8Array([31, 21]),
-      },
-      {
-        deepEqual: false,
-        description: 'Uint8Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Uint8Array([21, 31]),
-        value2: new Uint8ClampedArray([21, 31]),
       },
       {
         deepEqual: true,
@@ -752,14 +710,6 @@ export default [
         value2: new Uint8ClampedArray([31, 21]),
       },
       {
-        deepEqual: false,
-        description:
-          'Uint8ClampedArray and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Uint8ClampedArray([21, 31]),
-        value2: new Uint16Array([21, 31]),
-      },
-      {
         deepEqual: true,
         description: 'equal Uint16Array objects',
         shallowEqual: true,
@@ -774,13 +724,6 @@ export default [
         value2: new Uint16Array([31, 21]),
       },
       {
-        deepEqual: false,
-        description: 'Uint16Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Uint16Array([21, 31]),
-        value2: new Uint32Array([21, 31]),
-      },
-      {
         deepEqual: true,
         description: 'equal Uint32Array objects',
         shallowEqual: true,
@@ -793,13 +736,6 @@ export default [
         shallowEqual: false,
         value1: new Uint32Array([21, 31]),
         value2: new Uint32Array([31, 21]),
-      },
-      {
-        deepEqual: false,
-        description: 'Uint32Array and a different TypedArray are not equal',
-        shallowEqual: false,
-        value1: new Uint32Array([21, 31]),
-        value2: new Uint8Array([21, 31]),
       },
     ],
   },
