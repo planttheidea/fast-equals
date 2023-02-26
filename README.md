@@ -15,7 +15,7 @@ Unlike most equality validation libraries, the following types are handled out-o
 - `Promise` objects
 - `react` elements
 
-Starting with version `1.5.0`, circular objects are supported for both deep and shallow equality (see [`circularDeepEqual`](#circulardeepequal) and [`circularShallowEqual`](#circularshallowequal)). You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
+Circular object and strict comparisons are supported, as is creation of a custom equality comparator for specific use-cases.
 
 ## Table of contents
 
