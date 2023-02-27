@@ -67,6 +67,8 @@ export function createComparator<Meta>({
       return a !== a && b !== b;
     }
 
+    const constructor = a.constructor;
+
     // Checks are listed in order of commonality of use-case:
     //   1. Common complex object types (plain object, array)
     //   2. Common data values (date, regexp)
@@ -76,50 +78,57 @@ export function createComparator<Meta>({
     // when reviewing comparable libraries in the wild this order
     // appears to be generally consistent.
 
-    // `isPlainObject` only checks against the object's own realm. Cross-realm
-    // comparisons are rare, and will be handled in the ultimate fallback, so
-    // we can avoid the `toString.call()` cost unless necessary.
-    if (a.constructor === Object && b.constructor === Object) {
-      return areObjectsEqual(a, b, state);
-    }
-
     // In strict mode, constructors should match. We placed this after the plain object check
     // because the constructors must match to meet plain object requirements (must both be `Object`
     // in the given Realm), so it slightly improves performance on a very common use-case.
-    if (state.strict && a.constructor !== b.constructor) {
+    if (constructor !== b.constructor) {
       return false;
     }
 
-    // `isArray()` works on subclasses and is cross-realm, so we can again avoid
-    // the `toString.call()` cost unless necessary by just checking if either
-    // and then both are arrays.
-    let aArray = isArray(a);
-    let bArray = isArray(b);
-
-    if (aArray || bArray) {
-      return aArray === bArray && areArraysEqual(a, b, state);
+    // `isPlainObject` only checks against the object's own realm. Cross-realm
+    // comparisons are rare, and will be handled in the ultimate fallback, so
+    // we can avoid capturing the string tag.
+    if (constructor === Object) {
+      return areObjectsEqual(a, b, state);
     }
 
-    // Prioritize the `TypedArray` check because it does not require capturing the tag, which is a
-    // slower path.
-    if (isTypedArray) {
-      aArray = isTypedArray(a);
-      bArray = isTypedArray(b);
-
-      if (aArray || bArray) {
-        return aArray === bArray && areTypedArraysEqual(a, b, state);
-      }
+    // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
+    // the string tag.
+    if (isArray(a)) {
+      return areArraysEqual(a, b, state);
     }
 
-    // Since this is a custom object, use the classic `toString.call()` to get its
-    // type. This is reasonably performant in modern environments like v8 and
-    // SpiderMonkey, and allows for cross-realm comparison when other checks like
-    // `instanceof` do not.
+    // `isTypedArray()` works on all possible TypedArray classes, so we can avoid
+    // capturing the string tag.
+    if (isTypedArray !== null && isTypedArray(a)) {
+      return areTypedArraysEqual(a, b, state);
+    }
+
+    // Try to fast-path equality checks for other complex object types in the
+    // same realm to avoid capturing the string tag. Strict equality is used
+    // instead of `instanceof` because it is more performant for the common
+    // use-case. If someone is subclassing a native class, it will be handled
+    // with the string tag comparison.
+
+    if (constructor === Date) {
+      return areDatesEqual(a, b, state);
+    }
+
+    if (constructor === RegExp) {
+      return areRegExpsEqual(a, b, state);
+    }
+
+    if (constructor === Map) {
+      return areMapsEqual(a, b, state);
+    }
+
+    if (constructor === Set) {
+      return areSetsEqual(a, b, state);
+    }
+
+    // Since this is a custom object, capture the string tag to determing its type.
+    // This is reasonably performant in modern environments like v8 and SpiderMonkey.
     const tag = getTag(a);
-
-    if (tag !== getTag(b)) {
-      return false;
-    }
 
     if (tag === DATE_TAG) {
       return areDatesEqual(a, b, state);
@@ -137,11 +146,9 @@ export function createComparator<Meta>({
       return areSetsEqual(a, b, state);
     }
 
-    // If a simple object tag, then we can prioritize a simple object comparison because
-    // it is likely a custom class.
     if (tag === OBJECT_TAG) {
-      // The exception for value comparison is `Promise`-like contracts. These should be
-      // treated the same as standard `Promise` objects, which means strict equality, and if
+      // The exception for value comparison is custom `Promise`-like class instances. These should
+      // be treated the same as standard `Promise` objects, which means strict equality, and if
       // it reaches this point then that strict equality comparison has already failed.
       return (
         typeof a.then !== 'function' &&
@@ -202,7 +209,7 @@ export function createComparatorConfig<Meta>({
       ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault)
       : areSetsEqualDefault,
     areTypedArraysEqual: strict
-      ? combineComparators(areTypedArraysEqual, areObjectsEqualStrictDefault)
+      ? areObjectsEqualStrictDefault
       : areTypedArraysEqual,
   };
 
