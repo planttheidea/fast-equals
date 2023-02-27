@@ -269,24 +269,13 @@ Creates a custom equality comparator that will be used on nested values in the o
 The signature is as follows:
 
 ```ts
-interface BaseCircular extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
-  set(key: object, value: any): any;
+interface Cache<Key extends object, Value> {
+  delete(key: Key): boolean;
+  get(key: Key): Value | undefined;
+  set(key: Key, value: any): any;
 }
 
-interface DefaultState<Meta> {
-  readonly cache: undefined | BaseCircular;
-  readonly equals: InternalEqualityComparator<Meta>;
-  meta: Meta;
-  readonly strict: boolean;
-}
-
-type EqualityComparator<Meta> = <A, B>(
-  a: A,
-  b: B,
-  state: State<Meta>,
-) => boolean;
-
-interface CreateComparatorCreatorOptions<Meta> {
+interface ComparatorConfig<Meta> {
   areArraysEqual: TypeEqualityComparator<any[], Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
@@ -300,20 +289,25 @@ interface CreateComparatorCreatorOptions<Meta> {
   areTypedArraysEqual: TypeEqualityComparatory<TypedArray, Meta>;
 }
 
-interface CustomEqualCreatorOptions<Meta> {
+function createCustomEqual<Meta>(options: {
   circular?: boolean;
-  comparator?: EqualityComparator<Meta>;
-  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
-  createInternalComparator?: <Meta>(
-    compare: EqualityComparator<Meta>,
-  ) => InternalEqualityComparator<Meta>;
-  createState?: CreateState<Meta>;
+  createCustomConfig?: (
+    defaultConfig: ComparatorConfig<Meta>,
+  ) => Partial<ComparatorConfig<Meta>>;
+  createInternalComparator?: (
+    compare: <A, B>(a: A, b: B, state: State<Meta>) => boolean,
+  ) => (
+    a: any,
+    b: any,
+    indexOrKeyA: any,
+    indexOrKeyB: any,
+    parentA: any,
+    parentB: any,
+    state: State<Meta>,
+  ) => boolean;
+  createState?: () => { cache?: Cache; meta?: Meta };
   strict?: boolean;
-}
-
-function createCustomEqual(
-  options: CustomEqualCreatorOptions<Meta>,
-): <A, B>(a: A, b: B, metaOverride?: Meta) => boolean;
+}): <A, B>(a: A, b: B, metaOverride?: Meta) => boolean;
 ```
 
 Create a custom equality comparator. This allows complete control over building a bespoke equality method, in case your use-case requires a higher degree of performance, legacy environment support, or any other non-standard usage. The [recipes](#recipes) provide examples of use in different use-cases, but if you have a specific goal in mind and would like assistance feel free to [file an issue](https://github.com/planttheidea/fast-equals/issues).

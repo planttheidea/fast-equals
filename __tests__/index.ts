@@ -11,7 +11,6 @@ import {
   strictDeepEqual,
   strictShallowEqual,
 } from '../src';
-import { BaseCircular } from '../src/internalTypes';
 
 describe('exports', () => {
   [
@@ -168,7 +167,7 @@ describe('circular', () => {
   });
 
   describe('createCustomCircularEqual', () => {
-    function getFakeWeakMap(): BaseCircular {
+    function getFakeWeakMap() {
       const entries: [object, object][] = [];
 
       return {

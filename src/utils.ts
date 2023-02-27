@@ -1,10 +1,8 @@
 import {
   AnyEqualityComparator,
-  BaseCircular,
+  Cache,
   CircularState,
   Dictionary,
-  EqualityComparator,
-  InternalEqualityComparator,
   State,
   TypeEqualityComparator,
 } from './internalTypes';
@@ -25,26 +23,6 @@ export function combineComparators<Meta>(
 }
 
 /**
- * Default equality comparator pass-through, used as the standard `isEqual` creator for
- * use inside the built comparator.
- */
-export function createInternalComparator<Meta>(
-  compare: EqualityComparator<Meta>,
-): InternalEqualityComparator<Meta> {
-  return function (
-    a: any,
-    b: any,
-    _indexOrKeyA: any,
-    _indexOrKeyB: any,
-    _parentA: any,
-    _parentB: any,
-    state: State<Meta>,
-  ) {
-    return compare(a, b, state);
-  };
-}
-
-/**
  * Wrap the provided `areItemsEqual` method to manage the circular state, allowing
  * for circular references to be safely included in the comparison without creating
  * stack overflows.
@@ -55,7 +33,7 @@ export function createIsCircular<
   return function isCircular(
     a: any,
     b: any,
-    state: CircularState<BaseCircular>,
+    state: CircularState<Cache<any, any>>,
   ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
       return areItemsEqual(a, b, state);

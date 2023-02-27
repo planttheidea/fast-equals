@@ -1,22 +1,22 @@
-export interface BaseCircular
-  extends Pick<WeakMap<any, any>, 'delete' | 'get'> {
-  set(key: object, value: any): any;
+export interface Cache<Key extends object, Value> {
+  delete(key: Key): boolean;
+  get(key: Key): Value | undefined;
+  set(key: Key, value: any): any;
 }
 
-export type State<Meta> = CircularState<Meta> | DefaultState<Meta>;
-
-export interface CircularState<Meta> {
-  readonly cache: BaseCircular;
+export interface State<Meta> {
+  readonly cache: Cache<any, any> | undefined;
   readonly equals: InternalEqualityComparator<Meta>;
   meta: Meta;
   readonly strict: boolean;
 }
 
-export interface DefaultState<Meta> {
+export interface CircularState<Meta> extends State<Meta> {
+  readonly cache: Cache<any, any>;
+}
+
+export interface DefaultState<Meta> extends State<Meta> {
   readonly cache: undefined;
-  readonly equals: InternalEqualityComparator<Meta>;
-  meta: Meta;
-  readonly strict: boolean;
 }
 
 export interface Dictionary<Value = any> {
@@ -39,9 +39,10 @@ export type CreateCustomComparatorConfig<Meta> = (
   config: ComparatorConfig<Meta>,
 ) => Partial<ComparatorConfig<Meta>>;
 
-export type CreateState<Meta> = (
-  comparator: EqualityComparator<Meta>,
-) => Partial<State<Meta>>;
+export type CreateState<Meta> = () => {
+  cache?: Cache<any, any> | undefined;
+  meta?: Meta;
+};
 
 export type EqualityComparator<Meta> = <A, B>(
   a: A,
@@ -91,9 +92,8 @@ export type TypeEqualityComparator<Type, Meta = undefined> = (
 
 export interface CustomEqualCreatorOptions<Meta> {
   circular?: boolean;
-  comparator?: EqualityComparator<Meta>;
   createCustomConfig?: CreateCustomComparatorConfig<Meta>;
-  createInternalComparator?: <Meta>(
+  createInternalComparator?: (
     compare: EqualityComparator<Meta>,
   ) => InternalEqualityComparator<Meta>;
   createState?: CreateState<Meta>;

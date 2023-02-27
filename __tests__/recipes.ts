@@ -1,10 +1,6 @@
 import { createCustomEqual, sameValueZeroEqual } from '../src/index';
 
-import type {
-  BaseCircular,
-  CreateState,
-  TypeEqualityComparator,
-} from '../src/internalTypes';
+import type { CreateState, TypeEqualityComparator } from '../src/internalTypes';
 
 describe('recipes', () => {
   describe('createCustomEqual', () => {
@@ -81,15 +77,19 @@ describe('recipes', () => {
         value: string;
       }
 
-      const createState: CreateState<Meta> = (deepEqual) => ({
-        equals: (a, b, _keyA, _keyB, _parentA, _parentB, state) =>
-          deepEqual(a, b, state) ||
-          a === state.meta.value ||
-          b === state.meta.value,
-        meta: { value: 'baz' },
-      });
+      const createState: CreateState<Meta> = () => ({ meta: { value: 'baz' } });
 
-      const deepEqual = createCustomEqual({ createState });
+      const deepEqual = createCustomEqual<Meta>({
+        createInternalComparator:
+          (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+            return (
+              deepEqual(a, b, state) ||
+              a === state.meta.value ||
+              b === state.meta.value
+            );
+          },
+        createState,
+      });
 
       it('should verify the object itself', () => {
         const a = { bar: 'bar' };
@@ -258,11 +258,11 @@ describe('recipes', () => {
         customValue: string;
       }
 
-      function getCache(): BaseCircular {
+      function getCache() {
         const entries: Array<[object, any]> = [];
 
         return {
-          delete(key) {
+          delete(key: object) {
             for (let index = 0; index < entries.length; ++index) {
               if (entries[index]![0] === key) {
                 entries.splice(index, 1);
@@ -273,7 +273,7 @@ describe('recipes', () => {
             return false;
           },
 
-          get(key) {
+          get(key: object) {
             for (let index = 0; index < entries.length; ++index) {
               if (entries[index]![0] === key) {
                 return entries[index]![1];
@@ -281,7 +281,7 @@ describe('recipes', () => {
             }
           },
 
-          set(key, value) {
+          set(key: object, value: any) {
             for (let index = 0; index < entries.length; ++index) {
               if (entries[index]![0] === key) {
                 entries[index]![1] = value;

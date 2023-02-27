@@ -1,4 +1,7 @@
-import { createComparator } from '../src/comparator';
+import {
+  createEqualityComparator,
+  createInternalEqualityComparator,
+} from '../src/comparator';
 import {
   areArraysEqual,
   areDatesEqual,
@@ -9,7 +12,7 @@ import {
   areSetsEqual,
   areTypedArraysEqual,
 } from '../src/equals';
-import { createInternalComparator, createIsCircular } from '../src/utils';
+import { createIsCircular } from '../src/utils';
 
 import type { InternalEqualityComparator, State } from '../src/internalTypes';
 
@@ -31,7 +34,7 @@ const CIRCULAR_COMPARATOR_OPTIONS = {
   areSetsEqual: createIsCircular(areSetsEqual),
 };
 
-describe('createComparator', () => {
+describe('createEqualityComparator', () => {
   [
     {
       createState: <Meta>(
@@ -62,8 +65,8 @@ describe('createComparator', () => {
   ].forEach(({ createState, name, options }) => {
     describe(name, () => {
       it('should default to a deep-equal setup when no equality comparator is provided', () => {
-        const comparator = createComparator(options);
-        const meta = createState(createInternalComparator(comparator));
+        const comparator = createEqualityComparator(options);
+        const meta = createState(createInternalEqualityComparator(comparator));
 
         const a = { foo: { bar: 'baz' } };
         const b = { foo: { bar: 'baz' } };
@@ -81,7 +84,7 @@ describe('createComparator', () => {
           ['foo', 'bar'],
         ]);
 
-        const comparator = createComparator(options);
+        const comparator = createEqualityComparator(options);
         const state = createState(
           (
             a: any,
@@ -113,7 +116,7 @@ describe('createComparator', () => {
   describe('custom', () => {
     it('should call the custom comparator with the correct params', () => {
       const customComparatorMock = jest.fn();
-      const comparator = createComparator(STANDARD_COMPARATOR_OPTIONS);
+      const comparator = createEqualityComparator(STANDARD_COMPARATOR_OPTIONS);
       const state: State<'META'> = {
         cache: undefined,
         equals(...args) {

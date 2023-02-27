@@ -12,8 +12,10 @@ import {
 import { combineComparators, createIsCircular } from './utils';
 import type {
   ComparatorConfig,
+  CreateState,
   CustomEqualCreatorOptions,
   EqualityComparator,
+  InternalEqualityComparator,
   State,
 } from './internalTypes';
 
@@ -37,10 +39,18 @@ const getTag = Object.prototype.toString.call.bind(
   Object.prototype.toString,
 ) as (a: object) => string;
 
+interface CreateIsEqualOptions<Meta> {
+  circular: boolean;
+  comparator: EqualityComparator<Meta>;
+  createState: CreateState<Meta> | undefined;
+  equals: InternalEqualityComparator<Meta>;
+  strict: boolean;
+}
+
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
-export function createComparator<Meta>({
+export function createEqualityComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
   areMapsEqual,
@@ -192,7 +202,7 @@ export function createComparator<Meta>({
 /**
  * Create the configuration object used for building comparators.
  */
-export function createComparatorConfig<Meta>({
+export function createEqualityComparatorConfig<Meta>({
   circular,
   createCustomConfig,
   strict,
@@ -237,4 +247,71 @@ export function createComparatorConfig<Meta>({
   }
 
   return config;
+}
+
+/**
+ * Default equality comparator pass-through, used as the standard `isEqual` creator for
+ * use inside the built comparator.
+ */
+export function createInternalEqualityComparator<Meta>(
+  compare: EqualityComparator<Meta>,
+): InternalEqualityComparator<Meta> {
+  return function (
+    a: any,
+    b: any,
+    _indexOrKeyA: any,
+    _indexOrKeyB: any,
+    _parentA: any,
+    _parentB: any,
+    state: State<Meta>,
+  ) {
+    return compare(a, b, state);
+  };
+}
+
+/**
+ * Create the `isEqual` function used by the consuming application.
+ */
+export function createIsEqual<Meta>({
+  circular,
+  comparator,
+  createState,
+  equals,
+  strict,
+}: CreateIsEqualOptions<Meta>) {
+  if (createState) {
+    return function isEqual<A, B>(a: A, b: B): boolean {
+      const { cache = circular ? new WeakMap() : undefined, meta } =
+        createState!();
+
+      return comparator(a, b, {
+        cache,
+        equals,
+        meta,
+        strict,
+      } as State<Meta>);
+    };
+  }
+
+  if (circular) {
+    return function isEqual<A, B>(a: A, b: B): boolean {
+      return comparator(a, b, {
+        cache: new WeakMap(),
+        equals,
+        meta: undefined as Meta,
+        strict,
+      } as State<Meta>);
+    };
+  }
+
+  const state = {
+    cache: undefined,
+    equals,
+    meta: undefined,
+    strict,
+  } as State<Meta>;
+
+  return function isEqual<A, B>(a: A, b: B): boolean {
+    return comparator(a, b, state);
+  };
 }

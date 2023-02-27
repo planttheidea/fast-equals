@@ -10,8 +10,6 @@ import {
   strictShallowEqual,
 } from '../src';
 
-import type { State } from '../src/internalTypes';
-
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';
 document.body.style.margin = '0px';
@@ -232,23 +230,15 @@ const object4 = {
 };
 
 const doesNotEverEqualOne = createCustomEqual<undefined>({
-  createState: (comparator) => ({
-    equals(
-      a: any,
-      b: any,
-      _keyA,
-      _keyB,
-      _parentA,
-      _parentB,
-      state: State<undefined>,
-    ) {
+  createInternalComparator:
+    (comparator) =>
+    (a: any, b: any, _keyA, _keyB, _parentA, _parentB, state) => {
       if (typeof a === 'number' || typeof b === 'number') {
         return a !== 1 && b !== 1;
       }
 
       return Object.keys(a).every((key) => comparator(a[key], b[key], state));
     },
-  }),
 });
 
 console.log('true', doesNotEverEqualOne(object1, object2));
@@ -354,24 +344,22 @@ console.groupEnd();
 console.group('targeted custom');
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>({
-  createState: (compare) => ({
-    equals(a, b, _keyA, _keyB, _parentA, _parentB, state) {
+  createInternalComparator:
+    (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
       return a === state.meta || b === state.meta || compare(a, b, state);
     },
-    meta: 'bar',
-  }),
+  createState: () => ({ meta: 'bar' }),
 });
 
 console.log(
   'shallow',
-  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }, 'bar'),
+  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }),
 );
 console.log(
   'deep',
   isDeepEqualOrFooMatchesMeta(
     { nested: { foo: 'bar' } },
     { nested: { foo: 'baz' } },
-    'bar',
   ),
 );
 
