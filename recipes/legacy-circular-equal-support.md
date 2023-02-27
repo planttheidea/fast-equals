@@ -4,8 +4,9 @@ Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. A
 
 ```ts
 import { createCustomEqual, sameValueZeroEqual } from 'fast-equals';
+import type { Cache } from 'fast-equals';
 
-function getCache(): Cache {
+function getCache(): Cache<any, any> {
   const entries: Array<[object, any]> = [];
 
   return {

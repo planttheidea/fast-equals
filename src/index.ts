@@ -75,7 +75,7 @@ export const strictCircularShallowEqual = createCustomEqual({
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual<Meta>(
+export function createCustomEqual<Meta = undefined>(
   options: CustomEqualCreatorOptions<Meta> = {},
 ) {
   const {

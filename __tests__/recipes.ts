@@ -5,7 +5,7 @@ import type { CreateState, TypeEqualityComparator } from '../src/internalTypes';
 describe('recipes', () => {
   describe('createCustomEqual', () => {
     describe('legacy-regexp-support', () => {
-      const areRegExpsEqual: TypeEqualityComparator<RegExp> = (a, b) => {
+      const areRegExpsEqual = (a: RegExp, b: RegExp) => {
         return (
           a.source === b.source &&
           a.global === b.global &&

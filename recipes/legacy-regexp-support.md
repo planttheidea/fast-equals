@@ -4,9 +4,8 @@ Starting in `4.x.x`, `RegExp.prototype.flags` is expected to be available in the
 
 ```ts
 import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
-import type { TypeEqualityComparator } from 'fast-equals';
 
-const areRegExpsEqual: TypeEqualityComparator<RegExp, undefined> = (a, b) =>
+const areRegExpsEqual = (a: RegExp, b: RegExp) =>
   a.source === b.source &&
   a.global === b.global &&
   a.ignoreCase === b.ignoreCase &&

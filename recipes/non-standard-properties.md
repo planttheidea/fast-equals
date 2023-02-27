@@ -6,6 +6,8 @@ Sometimes, objects require a comparison that extend beyond its own keys, or even
 import { createCustomEqual } from 'fast-equals';
 import type { TypeEqualityComparator } from 'fast-equals';
 
+type AreObjectsEqual = TypeEqualityComparator<Record<any, any>, undefined>;
+
 class HiddenProperty {
   visible: boolean;
   #hidden: string;
@@ -21,8 +23,8 @@ class HiddenProperty {
 }
 
 function createAreObjectsEqual(
-  areObjectsEqual: TypeEqualityComparator<Record<any, any>, undefined>,
-): TypeEqualityComparator<Record<any, any>, undefined> {
+  areObjectsEqual: AreObjectsEqual,
+): AreObjectsEqual {
   return function (a, b, state) {
     if (!areObjectsEqual(a, b, state)) {
       return false;
