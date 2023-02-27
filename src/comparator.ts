@@ -63,7 +63,12 @@ export function createComparator<Meta>({
     // of them being equal but not strictly is if they are both `NaN`. Since
     // `NaN` is uniquely not equal to itself, we can use self-comparison of
     // both objects, which is faster than `isNaN()`.
-    if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
+    if (
+      a == null ||
+      b == null ||
+      typeof a !== 'object' ||
+      typeof b !== 'object'
+    ) {
       return a !== a && b !== b;
     }
 
