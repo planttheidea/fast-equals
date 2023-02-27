@@ -81,13 +81,12 @@ describe('recipes', () => {
         value: string;
       }
 
-      const mutableState: Meta = { value: 'baz' };
-
       const createState: CreateState<Meta> = (deepEqual) => ({
         equals: (a, b, _keyA, _keyB, _parentA, _parentB, state) =>
           deepEqual(a, b, state) ||
           a === state.meta.value ||
           b === state.meta.value,
+        meta: { value: 'baz' },
       });
 
       const deepEqual = createCustomEqual({ createState });
@@ -97,8 +96,8 @@ describe('recipes', () => {
         const b = { bar: 'bar' };
         const c = { bar: 'quz' };
 
-        expect(deepEqual(a, b, mutableState)).toBe(true);
-        expect(deepEqual(a, c, mutableState)).toBe(false);
+        expect(deepEqual(a, b)).toBe(true);
+        expect(deepEqual(a, c)).toBe(false);
       });
 
       it('should verify the object against meta', () => {
@@ -106,9 +105,9 @@ describe('recipes', () => {
         const b = { foo: 'bar', bar: 'baz' };
         const c = { foo: 'bar', bar: 'quz' };
 
-        expect(deepEqual(a, b, mutableState)).toBe(true);
-        expect(deepEqual(a, c, mutableState)).toBe(true);
-        expect(deepEqual(a, {}, mutableState)).toBe(false);
+        expect(deepEqual(a, b)).toBe(true);
+        expect(deepEqual(a, c)).toBe(true);
+        expect(deepEqual(a, {})).toBe(false);
       });
     });
 

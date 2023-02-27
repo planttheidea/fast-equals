@@ -3,6 +3,7 @@ import type {
   CircularState,
   CustomEqualCreatorOptions,
   DefaultState,
+  State,
 } from './internalTypes';
 import { createInternalComparator, sameValueZeroEqual } from './utils';
 
@@ -74,7 +75,7 @@ export const strictCircularShallowEqual = createCustomEqual({
  * support for legacy environments that do not support expected features like
  * `RegExp.prototype.flags` out of the box.
  */
-export function createCustomEqual<Meta>(
+export function createCustomEqual<Meta = undefined>(
   options: CustomEqualCreatorOptions<Meta> = {},
 ) {
   const {
@@ -94,11 +95,7 @@ export function createCustomEqual<Meta>(
       : createInternalComparator(isEqualCustom));
 
   if (createState) {
-    return function isEqual<A, B>(
-      a: A,
-      b: B,
-      metaOverride?: Meta | undefined,
-    ): boolean {
+    return function isEqual<A, B>(a: A, b: B): boolean {
       const {
         cache = circular ? new WeakMap() : undefined,
         equals = isEqualCustomComparator,
@@ -109,9 +106,9 @@ export function createCustomEqual<Meta>(
       return isEqualCustom(a, b, {
         cache,
         equals,
-        meta: metaOverride !== undefined ? metaOverride : meta,
+        meta,
         strict,
-      } as CircularState<Meta>);
+      } as State<Meta>);
     };
   }
 
@@ -126,14 +123,14 @@ export function createCustomEqual<Meta>(
     };
   }
 
-  const state = Object.freeze({
+  const state = {
     cache: undefined,
     equals: isEqualCustomComparator,
     meta: undefined,
     strict: baseStrict,
-  });
+  } as DefaultState<Meta>;
 
   return function equals<A, B>(a: A, b: B): boolean {
-    return isEqualCustom(a, b, state as DefaultState<Meta>);
+    return isEqualCustom(a, b, state);
   };
 }

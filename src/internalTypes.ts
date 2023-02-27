@@ -68,6 +68,10 @@ export type InternalEqualityComparator<Meta> = (
   state: State<Meta>,
 ) => boolean;
 
+// We explicitly check for primitive wrapper types
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type PrimitiveWrapper = Boolean | Number | String;
+
 export type TypedArray =
   | Float32Array
   | Float64Array

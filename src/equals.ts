@@ -1,5 +1,10 @@
 import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils';
-import type { Dictionary, State, TypedArray } from './internalTypes';
+import type {
+  Dictionary,
+  PrimitiveWrapper,
+  State,
+  TypedArray,
+} from './internalTypes';
 
 const OWNER = '_owner';
 
@@ -98,7 +103,7 @@ export function areObjectsEqual(
     return false;
   }
 
-  let property: string | symbol;
+  let property: string;
 
   // Decrementing `while` showed faster results than either incrementing or
   // decrementing `for` loop and than an incrementing `while` loop. Declarative
@@ -192,7 +197,10 @@ export function areObjectsEqualStrict(
 /**
  * Whether the primitive wrappers passed are equal in value.
  */
-export function arePrimitiveWrappersEqual(a: Date, b: Date): boolean {
+export function arePrimitiveWrappersEqual(
+  a: PrimitiveWrapper,
+  b: PrimitiveWrapper,
+): boolean {
   return sameValueZeroEqual(a.valueOf(), b.valueOf());
 }
 
@@ -249,6 +257,9 @@ export function areSetsEqual(
   return isValueEqual;
 }
 
+/**
+ * Whether the TypedArray instances are equal in value.
+ */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   let index = a.length;
 
