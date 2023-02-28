@@ -93,9 +93,8 @@ export function createEqualityComparator<Meta>({
     // when reviewing comparable libraries in the wild this order
     // appears to be generally consistent.
 
-    // In strict mode, constructors should match. We placed this after the plain object check
-    // because the constructors must match to meet plain object requirements (must both be `Object`
-    // in the given Realm), so it slightly improves performance on a very common use-case.
+    // Constructors should match, otherwise there is potential for false positives
+    // between class and subclass or custom object and POJO.
     if (constructor !== b.constructor) {
       return false;
     }
@@ -108,13 +107,13 @@ export function createEqualityComparator<Meta>({
     }
 
     // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
-    // the string tag.
+    // the string tag or doing an `instanceof` check.
     if (isArray(a)) {
       return areArraysEqual(a, b, state);
     }
 
     // `isTypedArray()` works on all possible TypedArray classes, so we can avoid
-    // capturing the string tag.
+    // capturing the string tag or comparing against all possible constructors.
     if (isTypedArray != null && isTypedArray(a)) {
       return areTypedArraysEqual(a, b, state);
     }

@@ -5,7 +5,7 @@ import tests from '../__tests__/__helpers__/testSuites.js';
 
 import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';
-import fastDeepEqual from 'fast-deep-equal';
+import fastDeepEqual from 'fast-deep-equal/es6/react.js';
 import * as fe from '../dist/esm/index.mjs';
 import isEqualLodash from 'lodash/isEqual.js';
 import sortBy from 'lodash/sortBy.js';

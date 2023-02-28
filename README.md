@@ -4,18 +4,21 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.74kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~1.74kB when minified and gzipped.
 
-Unlike most equality validation libraries, the following types are handled out-of-the-box:
+The following types are handled out-of-the-box:
 
-- `NaN`
+- Plain objects (including `react` elements and `Arguments`)
+- Arrays
+- Typed Arrays
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects
-- `react` elements
+- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
+- Custom class instances, including subclasses of native classes
 
-Circular object and strict comparisons are supported, as is creation of a custom equality comparator for specific use-cases.
+Methods are available for deep, shallow, or referential equality comparison. In addition, you can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition, or both. You can also customize any specific type comparison based on your application's use-cases.
 
 ## Table of contents
 
