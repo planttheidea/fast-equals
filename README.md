@@ -162,7 +162,6 @@ console.log(circularShallowEqual(array, [array])); // false
 
 Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. In this includes:
 
-- Checking constructors match
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays

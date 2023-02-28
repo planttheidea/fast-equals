@@ -4,6 +4,10 @@
 
 ### Breaking changes
 
+#### `constructor` equality now required
+
+To align with other implementations common in the community, but also to be more functionally correct, the two objects being compared now must have equal `constructor`s.
+
 #### `createCustomEqual` contract has changed
 
 To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details.
