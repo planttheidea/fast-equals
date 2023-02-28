@@ -10,7 +10,11 @@ To align with other implementations common in the community, but also to be more
 
 #### `createCustomEqual` contract has changed
 
-To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details.
+To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details, but froma high-level:
+
+- `meta` is no longer passed through to equality comparators, but rather a general `state` object which contains `meta`
+- `cache` now also lives on the `state` object, which allows for use of the `meta` property separate from but in parallel with the circular cache
+- `equals` is now on `state`, which prevents the need to pass through the separate `isEqual` method for the equality comparator
 
 #### `createCustomCircularEqual` has been removed
 
