@@ -8,6 +8,10 @@
 
 To align with other implementations common in the community, but also to be more functionally correct, the two objects being compared now must have equal `constructor`s.
 
+#### `Map` / `Set` comparisons no longer support IE11
+
+In previous verisons, `.forEach()` was used to ensure that support for `Symbol` was not required, as IE11 did not have `Symbol` and therefore both `Map` and `Set` did not have iterator-based methods such as `.values()` or `.entries()`. Since IE11 is no longer a supported browser, and support for those methods is present in all browsers and Node for quite a while, the comparison has moved to use these methods. This results in a ~20% performance increase.
+
 #### `createCustomEqual` contract has changed
 
 To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details, but froma high-level:
