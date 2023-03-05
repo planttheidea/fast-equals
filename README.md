@@ -330,7 +330,7 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 
 ## Benchmarks
 
-All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of memory using NodeJS version `12.19.1`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i9-11900H Ubuntu Linux 22.04 laptop with 64GB of memory using NodeJS version `16.14.2`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -341,19 +341,42 @@ All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of me
 - `react` elements
 - A mixed object with a combination of all the above types
 
-|                            | Operations / second |
-| -------------------------- | ------------------- |
-| **fast-equals**            | **153,880**         |
-| fast-deep-equal            | 144,035             |
-| react-fast-compare         | 130,324             |
-| nano-equal                 | 104,624             |
-| **fast-equals (circular)** | **97,610**          |
-| shallow-equal-fuzzy        | 83,946              |
-| underscore.isEqual         | 47,370              |
-| lodash.isEqual             | 25,053              |
-| deep-eql                   | 22,146              |
-| assert.deepStrictEqual     | 532                 |
-| deep-equal                 | 209                 |
+```bash
+Testing mixed objects equal...
+┌─────────┬─────────────────────────────────┬────────────────┐
+│ (index) │             Package             │    Ops/sec     │
+├─────────┼─────────────────────────────────┼────────────────┤
+│    0    │          'fast-equals'          │ 1249567.730326 │
+│    1    │        'fast-deep-equal'        │ 1182463.587514 │
+│    2    │      'react-fast-compare'       │ 1152487.319161 │
+│    3    │      'shallow-equal-fuzzy'      │ 1092360.712389 │
+│    4    │    'fast-equals (circular)'     │  676669.92003  │
+│    5    │      'underscore.isEqual'       │ 429430.837497  │
+│    6    │        'lodash.isEqual'         │ 237915.684734  │
+│    7    │     'fast-equals (strict)'      │  181386.38032  │
+│    8    │ 'fast-equals (strict circular)' │ 156779.745875  │
+│    9    │           'deep-eql'            │ 139155.099209  │
+│   10    │          'deep-equal'           │  1026.527229   │
+└─────────┴─────────────────────────────────┴────────────────┘
+
+Testing mixed objects not equal...
+┌─────────┬─────────────────────────────────┬────────────────┐
+│ (index) │             Package             │    Ops/sec     │
+├─────────┼─────────────────────────────────┼────────────────┤
+│    0    │          'fast-equals'          │ 3255824.097237 │
+│    1    │      'react-fast-compare'       │ 2654721.726058 │
+│    2    │        'fast-deep-equal'        │ 2582218.974752 │
+│    3    │    'fast-equals (circular)'     │ 2474303.26566  │
+│    4    │     'fast-equals (strict)'      │ 1088066.604881 │
+│    5    │ 'fast-equals (strict circular)' │ 949253.614181  │
+│    6    │          'nano-equal'           │ 939170.554148  │
+│    7    │      'underscore.isEqual'       │ 738852.197879  │
+│    8    │        'lodash.isEqual'         │ 307306.622212  │
+│    9    │           'deep-eql'            │ 156250.110401  │
+│   10    │    'assert.deepStrictEqual'     │  22839.454561  │
+│   11    │          'deep-equal'           │   4034.45114   │
+└─────────┴─────────────────────────────────┴────────────────┘
+```
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
