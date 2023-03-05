@@ -24,6 +24,10 @@ To better facilitate strict comparisons, but also to allow for `meta` use separa
 
 You can create a custom circular equality comparator through `createCustomEqual` now by providing `circular: true` to the options.
 
+#### Custom `meta` values are no longer passed at callsite
+
+To use `meta` properties for comparisons, they must be returned in a `createState` method.
+
 #### Deep links have changed
 
 If you were deep-linking into a specific asset type (ESM / CJS / UMD), they have changed location.
