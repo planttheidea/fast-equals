@@ -1,22 +1,11 @@
-import {
-  createCustomCircularEqual,
-  createCustomEqual,
-  sameValueZeroEqual,
-} from '../src/index';
+import { createCustomEqual, sameValueZeroEqual } from '../src/index';
 
-import type {
-  BaseCircularMeta,
-  EqualityComparatorCreator,
-  TypeEqualityComparator,
-} from '../index.d';
+import type { CreateState, TypeEqualityComparator } from '../src/internalTypes';
 
 describe('recipes', () => {
   describe('createCustomEqual', () => {
     describe('legacy-regexp-support', () => {
-      const areRegExpsEqual: TypeEqualityComparator<RegExp, undefined> = (
-        a,
-        b,
-      ) => {
+      const areRegExpsEqual = (a: RegExp, b: RegExp) => {
         return (
           a.source === b.source &&
           a.global === b.global &&
@@ -28,11 +17,15 @@ describe('recipes', () => {
         );
       };
 
-      const deepEqual = createCustomEqual(() => ({ areRegExpsEqual }));
-      const shallowEqual = createCustomEqual(() => ({
-        areRegExpsEqual,
-        createIsNestedEqual: () => sameValueZeroEqual,
-      }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areRegExpsEqual }),
+      });
+      const shallowEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areRegExpsEqual,
+          createIsNestedEqual: () => sameValueZeroEqual,
+        }),
+      });
 
       it('should verify the regexps correctly', () => {
         const a = /foo/gi;
@@ -55,18 +48,19 @@ describe('recipes', () => {
         };
       }
 
-      const areObjectsEqual: TypeEqualityComparator<
-        SpecialObject,
-        undefined
-      > = (a, b) => {
+      const areObjectsEqual: TypeEqualityComparator<SpecialObject> = (a, b) => {
         return a.foo === b.foo && a.bar.baz === b.bar.baz;
       };
 
-      const spy = jest.fn(areObjectsEqual) as typeof areObjectsEqual;
+      const spy = jest.fn(
+        areObjectsEqual,
+      ) as TypeEqualityComparator<SpecialObject>;
 
-      const isSpecialObjectEqual = createCustomEqual(() => ({
-        areObjectsEqual: spy,
-      }));
+      const isSpecialObjectEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areObjectsEqual: spy,
+        }),
+      });
 
       it('should verify the special object', () => {
         const a: SpecialObject = { foo: 'foo', bar: { baz: 123 } };
@@ -79,25 +73,31 @@ describe('recipes', () => {
     });
 
     describe('using-meta-in-comparison', () => {
-      interface MutableState {
-        state: string;
+      interface Meta {
+        value: string;
       }
 
-      const mutableState: MutableState = { state: 'baz' };
+      const createState: CreateState<Meta> = () => ({ meta: { value: 'baz' } });
 
-      const createIsNestedEqual: EqualityComparatorCreator<MutableState> =
-        (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, meta) =>
-          deepEqual(a, b, meta) || a === meta.state || b === meta.state;
-
-      const deepEqual = createCustomEqual(() => ({ createIsNestedEqual }));
+      const deepEqual = createCustomEqual<Meta>({
+        createInternalComparator:
+          (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+            return (
+              deepEqual(a, b, state) ||
+              a === state.meta.value ||
+              b === state.meta.value
+            );
+          },
+        createState,
+      });
 
       it('should verify the object itself', () => {
         const a = { bar: 'bar' };
         const b = { bar: 'bar' };
         const c = { bar: 'quz' };
 
-        expect(deepEqual(a, b, mutableState)).toBe(true);
-        expect(deepEqual(a, c, mutableState)).toBe(false);
+        expect(deepEqual(a, b)).toBe(true);
+        expect(deepEqual(a, c)).toBe(false);
       });
 
       it('should verify the object against meta', () => {
@@ -105,9 +105,9 @@ describe('recipes', () => {
         const b = { foo: 'bar', bar: 'baz' };
         const c = { foo: 'bar', bar: 'quz' };
 
-        expect(deepEqual(a, b, mutableState)).toBe(true);
-        expect(deepEqual(a, c, mutableState)).toBe(true);
-        expect(deepEqual(a, {}, mutableState)).toBe(false);
+        expect(deepEqual(a, b)).toBe(true);
+        expect(deepEqual(a, c)).toBe(true);
+        expect(deepEqual(a, {})).toBe(false);
       });
     });
 
@@ -128,10 +128,10 @@ describe('recipes', () => {
         return object;
       }
 
-      const areObjectsEqual: TypeEqualityComparator<
-        Record<any, any>,
-        undefined
-      > = (a, b) => {
+      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (
+        a,
+        b,
+      ) => {
         const propertiesA = [
           ...Object.getOwnPropertyNames(a),
           ...Object.getOwnPropertySymbols(a),
@@ -150,7 +150,9 @@ describe('recipes', () => {
         );
       };
 
-      const deepEqual = createCustomEqual(() => ({ areObjectsEqual }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areObjectsEqual }),
+      });
 
       it('should verify the object with non-standard properties', () => {
         const a = createObjectWithDifferentPropertyTypes('bar');
@@ -164,10 +166,10 @@ describe('recipes', () => {
     });
 
     describe('strict-property-descriptor-check', () => {
-      const areObjectsEqual: TypeEqualityComparator<
-        Record<any, any>,
-        undefined
-      > = (a, b) => {
+      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (
+        a,
+        b,
+      ) => {
         const propertiesA = [
           ...Object.getOwnPropertyNames(a),
           ...Object.getOwnPropertySymbols(a),
@@ -196,7 +198,9 @@ describe('recipes', () => {
         });
       };
 
-      const deepEqual = createCustomEqual(() => ({ areObjectsEqual }));
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({ areObjectsEqual }),
+      });
 
       it('should verify the object property descriptors', () => {
         const symbol = Symbol('property');
@@ -249,18 +253,18 @@ describe('recipes', () => {
 
   describe('createCustomCircularEqual', () => {
     describe('legacy-circular-equal-support', () => {
-      interface Cache extends BaseCircularMeta {
+      interface Meta {
         customMethod(): void;
         customValue: string;
       }
 
-      function getCache(): Cache {
+      function getCache() {
         const entries: Array<[object, any]> = [];
 
         return {
-          delete(key) {
+          delete(key: object) {
             for (let index = 0; index < entries.length; ++index) {
-              if (entries[index][0] === key) {
+              if (entries[index]![0] === key) {
                 entries.splice(index, 1);
                 return true;
               }
@@ -269,18 +273,18 @@ describe('recipes', () => {
             return false;
           },
 
-          get(key) {
+          get(key: object) {
             for (let index = 0; index < entries.length; ++index) {
-              if (entries[index][0] === key) {
-                return entries[index][1];
+              if (entries[index]![0] === key) {
+                return entries[index]![1];
               }
             }
           },
 
-          set(key, value) {
+          set(key: object, value: any) {
             for (let index = 0; index < entries.length; ++index) {
-              if (entries[index][0] === key) {
-                entries[index][1] = value;
+              if (entries[index]![0] === key) {
+                entries[index]![1] = value;
                 return this;
               }
             }
@@ -289,20 +293,23 @@ describe('recipes', () => {
 
             return this;
           },
-
-          customMethod() {
-            console.log('hello!');
-          },
-          customValue: 'goodbye',
         };
       }
 
-      const customDeepCircularHandler = createCustomCircularEqual<Cache>(
-        () => ({}),
-      );
+      const meta = {
+        customMethod() {
+          console.log('hello!');
+        },
+        customValue: 'goodbye',
+      };
 
-      const circularDeepEqual = <A, B>(a: A, b: B) =>
-        customDeepCircularHandler(a, b, getCache());
+      const circularDeepEqual = createCustomEqual<Meta>({
+        circular: true,
+        createState: () => ({
+          cache: getCache(),
+          meta,
+        }),
+      });
 
       it('should handle shared references between objects', () => {
         const x = [1];

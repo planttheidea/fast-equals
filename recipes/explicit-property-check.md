@@ -18,11 +18,9 @@ interface SpecialObject {
 const areObjectsEqual: TypeEqualityComparator<SpecialObject, undefined> = (
   a,
   b,
-) => {
-  return a.foo === b.foo && a.bar.baz === b.bar.baz;
-};
+) => a.foo === b.foo && a.bar.baz === b.bar.baz;
 
-const isSpecialObjectEqual = createCustomEqual(() => ({
-  areObjectsEqual,
-}));
+const isSpecialObjectEqual = createCustomEqual({
+  createCustomConfig: () => ({ areObjectsEqual }),
+});
 ```

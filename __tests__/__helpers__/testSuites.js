@@ -1,9 +1,10 @@
-const React = require('react');
+import React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const fn = () => {};
 const promise = Promise.resolve('foo');
 
-module.exports = [
+export default [
   {
     description: 'primitives',
     tests: [
@@ -199,6 +200,7 @@ module.exports = [
         description: 'function and different function are not equal',
         shallowEqual: false,
         value1: fn,
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         value2: () => {},
       },
     ],
@@ -603,6 +605,208 @@ module.exports = [
         shallowEqual: false,
         value1: React.createElement('div', {}, 'foo'),
         value2: React.createElement('div', {}, 'bar'),
+      },
+    ],
+  },
+  {
+    description: 'typed arrays',
+    tests: [
+      {
+        deepEqual: true,
+        description: 'equal Float32Array objects',
+        shallowEqual: true,
+        value1: new Float32Array([21, 31]),
+        value2: new Float32Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Float32Array objects (different value)',
+        shallowEqual: false,
+        value1: new Float32Array([21, 31]),
+        value2: new Float32Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Float32Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Float32Array([21, 31]),
+        value2: new Float64Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Float64Array objects',
+        shallowEqual: true,
+        value1: new Float64Array([21, 31]),
+        value2: new Float64Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Float64Array objects (different value)',
+        shallowEqual: false,
+        value1: new Float64Array([21, 31]),
+        value2: new Float64Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Float64Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Float64Array([21, 31]),
+        value2: new Int8Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Int8Array objects',
+        shallowEqual: true,
+        value1: new Int8Array([21, 31]),
+        value2: new Int8Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Int8Array objects (different value)',
+        shallowEqual: false,
+        value1: new Int8Array([21, 31]),
+        value2: new Int8Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Int8Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Int8Array([21, 31]),
+        value2: new Int16Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Int16Array objects',
+        shallowEqual: true,
+        value1: new Int16Array([21, 31]),
+        value2: new Int16Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Int16Array objects (different value)',
+        shallowEqual: false,
+        value1: new Int16Array([21, 31]),
+        value2: new Int16Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Int16Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Int16Array([21, 31]),
+        value2: new Int32Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Int32Array objects',
+        shallowEqual: true,
+        value1: new Int32Array([21, 31]),
+        value2: new Int32Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Int32Array objects (different value)',
+        shallowEqual: false,
+        value1: new Int32Array([21, 31]),
+        value2: new Int32Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Int32Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Int32Array([21, 31]),
+        value2: new Uint8Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Uint8Array objects',
+        shallowEqual: true,
+        value1: new Uint8Array([21, 31]),
+        value2: new Uint8Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Uint8Array objects (different value)',
+        shallowEqual: false,
+        value1: new Uint8Array([21, 31]),
+        value2: new Uint8Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Uint8Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Uint8Array([21, 31]),
+        value2: new Uint8ClampedArray([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Uint8ClampedArray objects',
+        shallowEqual: true,
+        value1: new Uint8ClampedArray([21, 31]),
+        value2: new Uint8ClampedArray([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Uint8ClampedArray objects (different value)',
+        shallowEqual: false,
+        value1: new Uint8ClampedArray([21, 31]),
+        value2: new Uint8ClampedArray([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Uint8ClampedArray objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Uint8ClampedArray([21, 31]),
+        value2: new Uint16Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Uint16Array objects',
+        shallowEqual: true,
+        value1: new Uint16Array([21, 31]),
+        value2: new Uint16Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Uint16Array objects (different value)',
+        shallowEqual: false,
+        value1: new Uint16Array([21, 31]),
+        value2: new Uint16Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Uint16Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Uint16Array([21, 31]),
+        value2: new Uint32Array([21, 31]),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Uint32Array objects',
+        shallowEqual: true,
+        value1: new Uint32Array([21, 31]),
+        value2: new Uint32Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Uint32Array objects (different value)',
+        shallowEqual: false,
+        value1: new Uint32Array([21, 31]),
+        value2: new Uint32Array([31, 21]),
+      },
+      {
+        deepEqual: false,
+        description:
+          'not equal Uint32Array objects (different TypedArray class)',
+        shallowEqual: false,
+        value1: new Uint32Array([21, 31]),
+        value2: new Float32Array([21, 31]),
       },
     ],
   },

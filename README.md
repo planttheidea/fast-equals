@@ -4,18 +4,21 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed. It has no dependencies, and is ~1.27kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~1.8kB when minified and gzipped.
 
-Unlike most equality validation libraries, the following types are handled out-of-the-box:
+The following types are handled out-of-the-box:
 
-- `NaN`
+- Plain objects (including `react` elements and `Arguments`)
+- Arrays
+- Typed Arrays
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects
-- `react` elements
+- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
+- Custom class instances, including subclasses of native classes
 
-Starting with version `1.5.0`, circular objects are supported for both deep and shallow equality (see [`circularDeepEqual`](#circulardeepequal) and [`circularShallowEqual`](#circularshallowequal)). You can also create a custom nested comparator, for specific scenarios ([see below](#createcustomequal)).
+Methods are available for deep, shallow, or referential equality comparison. In addition, you can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition, or both. You can also customize any specific type comparison based on your application's use-cases.
 
 ## Table of contents
 
@@ -30,10 +33,12 @@ Starting with version `1.5.0`, circular objects are supported for both deep and 
     - [sameValueZeroEqual](#samevaluezeroequal)
     - [circularDeepEqual](#circulardeepequal)
     - [circularShallowEqual](#circularshallowequal)
+    - [strictDeepEqual](#strictdeepequal)
+    - [strictShallowEqual](#strictshallowequal)
+    - [strictCircularDeepEqual](#strictcirculardeepequal)
+    - [strictCircularShallowEqual](#strictcircularshallowequal)
     - [createCustomEqual](#createcustomequal)
       - [Recipes](#recipes)
-    - [`createCustomCircularEqual`](#createcustomcircularequal)
-      - [Recipes](#recipes-1)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
 
@@ -47,13 +52,14 @@ console.log(deepEqual({ foo: 'bar' }, { foo: 'bar' })); // true
 
 ### Specific builds
 
-There are three builds, an ESM build for modern build systems / runtimes, a CommonJS build for traditional NodeJS environments, and a UMD build for legacy implementations. The ideal one will likely be chosen for you automatically, however if you want to use a specific build you can always import it directly:
+By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if you want to force use of a specific build, they can be located here:
 
-- ESM => `fast-equals/dist/fast-equals.esm.js`
-  - For older `nodejs` versions that do not allow ESM with file extensions other than `.mjs` => `fast-equals/dist/fast-equals.mjs`
-- CommonJS => `fast-equals/dist/fast-equals.cjs.js`
-- UMD => `fast-equals/dist/fast-equals.js`
-- Minified UMD => `fast-equals/dist/fast-equals.min.js`
+- ESM => `fast-equals/dist/esm/index.mjs`
+- CommonJS => `fast-equals/dist/cjs/index.cjs`
+- UMD => `fast-equals/dist/umd/index.js`
+- Minified UMD => `fast-equals/dist/min/index.js`
+
+If you are having issues loading a specific build type, [please file an issue](https://github.com/planttheidea/fast-equals/issues).
 
 ## Available methods
 
@@ -155,6 +161,110 @@ console.log(circularShallowEqual(array, ['foo', array])); // true
 console.log(circularShallowEqual(array, [array])); // false
 ```
 
+### strictDeepEqual
+
+Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. In this includes:
+
+- Checking symbol properties
+- Checking non-enumerable properties in object comparisons
+- Checking full descriptor of properties on the object to match
+- Checking non-index properties on arrays
+- Checking non-key properties on `Map` / `Set` objects
+
+```ts
+const array = [{ foo: 'bar' }];
+const otherArray = [{ foo: 'bar' }];
+
+array.bar = 'baz';
+otherArray.bar = 'baz';
+
+console.log(strictDeepEqual(array, otherArray)); // true;
+console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false;
+```
+
+### strictShallowEqual
+
+Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. In this includes:
+
+- Checking non-enumerable properties in object comparisons
+- Checking full descriptor of properties on the object to match
+- Checking non-index properties on arrays
+- Checking non-key properties on `Map` / `Set` objects
+
+```ts
+const array = ['foo'];
+const otherArray = ['foo'];
+
+array.bar = 'baz';
+otherArray.bar = 'baz';
+
+console.log(strictDeepEqual(array, otherArray)); // true;
+console.log(strictDeepEqual(array, ['foo'])); // false;
+```
+
+### strictCircularDeepEqual
+
+Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. In this includes:
+
+- Checking `Symbol` properties on the object
+- Checking non-enumerable properties in object comparisons
+- Checking full descriptor of properties on the object to match
+- Checking non-index properties on arrays
+- Checking non-key properties on `Map` / `Set` objects
+
+```ts
+function Circular(value) {
+  this.me = {
+    deeply: {
+      nested: {
+        reference: this,
+      },
+    },
+    value,
+  };
+}
+
+const first = new Circular('foo');
+
+Object.defineProperty(first, 'bar', {
+  enumerable: false,
+  value: 'baz',
+});
+
+const second = new Circular('foo');
+
+Object.defineProperty(second, 'bar', {
+  enumerable: false,
+  value: 'baz',
+});
+
+console.log(circularDeepEqual(first, second)); // true
+console.log(circularDeepEqual(first, new Circular('foo'))); // false
+```
+
+### strictCircularShallowEqual
+
+Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. In this includes:
+
+- Checking non-enumerable properties in object comparisons
+- Checking full descriptor of properties on the object to match
+- Checking non-index properties on arrays
+- Checking non-key properties on `Map` / `Set` objects
+
+```ts
+const array = ['foo'];
+const otherArray = ['foo'];
+
+array.push(array);
+otherArray.push(otherArray);
+
+array.bar = 'baz';
+otherArray.bar = 'baz';
+
+console.log(circularShallowEqual(array, otherArray)); // true
+console.log(circularShallowEqual(array, ['foo', array])); // false
+```
+
 ### createCustomEqual
 
 Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a factory method that receives the default options used internally, and allows you to override the defaults as needed. This is generally for extreme edge-cases, or supporting legacy environments.
@@ -162,43 +272,48 @@ Creates a custom equality comparator that will be used on nested values in the o
 The signature is as follows:
 
 ```ts
-type InternalEqualityComparator = (
-  a: any,
-  b: any,
-  indexOrKeyA: any,
-  indexOrKeyB: any,
-  parentA: any,
-  parentB: any,
-  meta: any,
-) => boolean;
+interface Cache<Key extends object, Value> {
+  delete(key: Key): boolean;
+  get(key: Key): Value | undefined;
+  set(key: Key, value: any): any;
+}
 
-type TypeEqualityComparator = <Type, Meta>(
-  a: Type,
-  b: Type,
-  isEqual: InternalEqualityComparator,
-  meta: Meta,
-) => boolean;
-
-interface CreateComparatorCreatorOptions<Meta> {
+interface ComparatorConfig<Meta> {
   areArraysEqual: TypeEqualityComparator<any[], Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
   areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
+  arePrimitiveWrappersEqual: TypeEqualityComparator<
+    boolean | string | number,
+    Meta
+  >;
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  createIsNestedEqual?: (
-    comparator: <A, B>(a: A, b: B, meta: Meta) => boolean,
-  ) => InternalEqualityComparator;
+  areTypedArraysEqual: TypeEqualityComparatory<TypedArray, Meta>;
 }
 
-function createCustomEqual(
-  getComparatorOptions: (
-    defaultOptions: CreateComparatorOptions,
-  ) => Partial<CreateComparatorOptions>,
-): EqualityComparator;
+function createCustomEqual<Meta>(options: {
+  circular?: boolean;
+  createCustomConfig?: (
+    defaultConfig: ComparatorConfig<Meta>,
+  ) => Partial<ComparatorConfig<Meta>>;
+  createInternalComparator?: (
+    compare: <A, B>(a: A, b: B, state: State<Meta>) => boolean,
+  ) => (
+    a: any,
+    b: any,
+    indexOrKeyA: any,
+    indexOrKeyB: any,
+    parentA: any,
+    parentB: any,
+    state: State<Meta>,
+  ) => boolean;
+  createState?: () => { cache?: Cache; meta?: Meta };
+  strict?: boolean;
+}): <A, B>(a: A, b: B, metaOverride?: Meta) => boolean;
 ```
 
-The `meta` parameter above is whatever you want it to be. It will be passed through to all equality checks, and is meant specifically for use with custom equality methods. For example, with the `circularDeepEqual` and `circularShallowEqual` methods, it is used to pass through a cache of processed objects. You also only need to return the override handlers; absent being provided, the defaults are used.
+Create a custom equality comparator. This allows complete control over building a bespoke equality method, in case your use-case requires a higher degree of performance, legacy environment support, or any other non-standard usage. The [recipes](#recipes) provide examples of use in different use-cases, but if you have a specific goal in mind and would like assistance feel free to [file an issue](https://github.com/planttheidea/fast-equals/issues).
 
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
 
@@ -211,20 +326,11 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 - [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
 - [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
-
-### `createCustomCircularEqual`
-
-Operates nearly identically to [`createCustomEqual`](#createcustomequal), with the difference being that the `meta` property expected by the comparator is expected to have a `WeakMap` contract. This is because it is used for caching accessed objects to avoid maximum stack exceeded errors. The most common use for this method is a simple way to support circular checks for references that do not have `WeakMap` natively.
-
-#### Recipes
-
-Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable to the problem you are solving, they can offer guidance of how to structure your solution.
-
 - [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
 
 ## Benchmarks
 
-All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of memory using NodeJS version `12.19.1`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i9-11900H Ubuntu Linux 22.04 laptop with 64GB of memory using NodeJS version `16.14.2`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -235,19 +341,42 @@ All benchmarks were performed on an i7-8650U Ubuntu Linux laptop with 24GB of me
 - `react` elements
 - A mixed object with a combination of all the above types
 
-|                            | Operations / second |
-| -------------------------- | ------------------- |
-| **fast-equals**            | **153,880**         |
-| fast-deep-equal            | 144,035             |
-| react-fast-compare         | 130,324             |
-| nano-equal                 | 104,624             |
-| **fast-equals (circular)** | **97,610**          |
-| shallow-equal-fuzzy        | 83,946              |
-| underscore.isEqual         | 47,370              |
-| lodash.isEqual             | 25,053              |
-| deep-eql                   | 22,146              |
-| assert.deepStrictEqual     | 532                 |
-| deep-equal                 | 209                 |
+```bash
+Testing mixed objects equal...
+┌─────────┬─────────────────────────────────┬────────────────┐
+│ (index) │             Package             │    Ops/sec     │
+├─────────┼─────────────────────────────────┼────────────────┤
+│    0    │          'fast-equals'          │ 1249567.730326 │
+│    1    │        'fast-deep-equal'        │ 1182463.587514 │
+│    2    │      'react-fast-compare'       │ 1152487.319161 │
+│    3    │      'shallow-equal-fuzzy'      │ 1092360.712389 │
+│    4    │    'fast-equals (circular)'     │  676669.92003  │
+│    5    │      'underscore.isEqual'       │ 429430.837497  │
+│    6    │        'lodash.isEqual'         │ 237915.684734  │
+│    7    │     'fast-equals (strict)'      │  181386.38032  │
+│    8    │ 'fast-equals (strict circular)' │ 156779.745875  │
+│    9    │           'deep-eql'            │ 139155.099209  │
+│   10    │          'deep-equal'           │  1026.527229   │
+└─────────┴─────────────────────────────────┴────────────────┘
+
+Testing mixed objects not equal...
+┌─────────┬─────────────────────────────────┬────────────────┐
+│ (index) │             Package             │    Ops/sec     │
+├─────────┼─────────────────────────────────┼────────────────┤
+│    0    │          'fast-equals'          │ 3255824.097237 │
+│    1    │      'react-fast-compare'       │ 2654721.726058 │
+│    2    │        'fast-deep-equal'        │ 2582218.974752 │
+│    3    │    'fast-equals (circular)'     │ 2474303.26566  │
+│    4    │     'fast-equals (strict)'      │ 1088066.604881 │
+│    5    │ 'fast-equals (strict circular)' │ 949253.614181  │
+│    6    │          'nano-equal'           │ 939170.554148  │
+│    7    │      'underscore.isEqual'       │ 738852.197879  │
+│    8    │        'lodash.isEqual'         │ 307306.622212  │
+│    9    │           'deep-eql'            │ 156250.110401  │
+│   10    │    'assert.deepStrictEqual'     │  22839.454561  │
+│   11    │          'deep-equal'           │   4034.45114   │
+└─────────┴─────────────────────────────────┴────────────────┘
+```
 
 Caveats that impact the benchmark (and accuracy of comparison):
 

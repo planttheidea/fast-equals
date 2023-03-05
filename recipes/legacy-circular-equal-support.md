@@ -1,16 +1,12 @@
 # Legacy environment support for circular equal comparators
 
-Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment, creating a custom comparator that uses a custom cache implementation with the same contract is a simple solution.
+Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment and polyfilling is not an option, creating a custom comparator that uses a custom cache implementation with the same contract is a simple solution.
 
 ```ts
-import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
+import { createCustomEqual, sameValueZeroEqual } from 'fast-equals';
+import type { Cache } from 'fast-equals';
 
-interface Cache extends BaseCircularMeta {
-  customMethod(): void;
-  customValue: string;
-}
-
-function getCache(): Cache {
+function getCache(): Cache<any, any> {
   const entries: Array<[object, any]> = [];
 
   return {
@@ -45,22 +41,35 @@ function getCache(): Cache {
 
       return this;
     },
-
-    customMethod() {
-      console.log('hello!');
-    },
-    customValue: 'goodbye',
   };
 }
 
-const customDeepCircularHandler = createCustomCircularEqual<Cache>(() => ({}));
+interface Meta {
+  customMethod(): void;
+  customValue: string;
+}
 
-const customDeepCircularHandler = createCustomCircularEqual<Cache>(() => ({
-  createIsNestedEqual: () => sameValueZeroEqual,
-}));
+const meta = {
+  customMethod() {
+    console.log('hello!');
+  },
+  customValue: 'goodbye',
+};
 
-const circularDeepEqual = <A, B>(a: A, b: B) =>
-  customDeepCircularHandler(a, b, getCache());
-const circularShallowEqual = <A, B>(a: A, b: B) =>
-  customShallowCircularHandler(a, b, getCache());
+const circularDeepEqual = createCustomEqual<Cache>({
+  circular: true,
+  createState: () => ({
+    cache: getCache(),
+    meta,
+  }),
+});
+
+const circularShallowEqual = createCustomEqual<Cache>({
+  circular: true,
+  comparator: sameValueZeroEqual,
+  createState: () => ({
+    cache: getCache(),
+    meta,
+  }),
+});
 ```

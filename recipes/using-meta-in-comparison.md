@@ -1,23 +1,20 @@
 # Using `meta` in comparison
 
-Sometimes a "pure" equality between two objects is insufficient, because the comparison relies on some external state. While these kinds of scenarios should generally be avoided, it is possible to handle them with a custom comparator that checks `meta` values.
+Sometimes a "pure" equality between two objects is insufficient, because the comparison relies on some external state. While these kinds of scenarios should generally be avoided, it is possible to handle them with a custom internal comparator that checks `meta` values.
 
 ```ts
 import { createCustomEqual } from 'fast-equals';
-import type {
-  EqualityComparator,
-  InternalEqualityComparator,
-} from 'fast-equals';
 
-interface MutableState {
-  state: string;
+interface Meta {
+  value: string;
 }
 
-const mutableState: MutableState = { state: 'baz' };
+const meta: Meta = { value: 'baz' };
 
-const createIsNestedEqual: EqualityComparatorCreator<MutableState> =
-  (deepEqual) => (a, b, keyA, keyB, parentA, parentB, meta) =>
-    deepEqual(a, b, meta) || a === meta.state || b === meta.state;
-
-const deepEqual = createCustomEqual(() => ({ createIsNestedEqual }));
+const deepEqual = createCustomEqual<Meta>({
+  createInternalComparator:
+    (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) =>
+      compare(a, b, state) || a === state.meta.value || b === state.meta.value,
+  createState: () => ({ meta }),
+});
 ```

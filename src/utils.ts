@@ -1,31 +1,29 @@
 import {
-  EqualityComparator,
-  InternalEqualityComparator,
+  AnyEqualityComparator,
+  Cache,
+  CircularState,
+  Dictionary,
+  State,
   TypeEqualityComparator,
-} from '../index.d';
+} from './internalTypes';
+
+const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
+const { hasOwnProperty } = Object.prototype;
 
 /**
- * Default equality comparator pass-through, used as the standard `isEqual` creator for
- * use inside the built comparator.
+ * Combine two comparators into a single comparators.
  */
-export function createDefaultIsNestedEqual<Meta>(
-  comparator: EqualityComparator<Meta>,
-): InternalEqualityComparator<Meta> {
-  return function isEqual<A, B>(
-    a: A,
-    b: B,
-    _indexOrKeyA: any,
-    _indexOrKeyB: any,
-    _parentA: any,
-    _parentB: any,
-    meta: Meta,
-  ) {
-    return comparator(a, b, meta);
+export function combineComparators<Meta>(
+  comparatorA: AnyEqualityComparator<Meta>,
+  comparatorB: AnyEqualityComparator<Meta>,
+) {
+  return function isEqual<A, B>(a: A, b: B, state: State<Meta>) {
+    return comparatorA(a, b, state) && comparatorB(a, b, state);
   };
 }
 
 /**
- * Wrap the provided `areItemsEqual` method to manage the circular cache, allowing
+ * Wrap the provided `areItemsEqual` method to manage the circular state, allowing
  * for circular references to be safely included in the comparison without creating
  * stack overflows.
  */
@@ -35,12 +33,13 @@ export function createIsCircular<
   return function isCircular(
     a: any,
     b: any,
-    isEqual: InternalEqualityComparator<WeakMap<any, any>>,
-    cache: WeakMap<any, any>,
+    state: CircularState<Cache<any, any>>,
   ) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
-      return areItemsEqual(a, b, isEqual, cache);
+      return areItemsEqual(a, b, state);
     }
+
+    const { cache } = state;
 
     const cachedA = cache.get(a);
     const cachedB = cache.get(b);
@@ -52,7 +51,7 @@ export function createIsCircular<
     cache.set(a, b);
     cache.set(b, a);
 
-    const result = areItemsEqual(a, b, isEqual, cache);
+    const result = areItemsEqual(a, b, state);
 
     cache.delete(a);
     cache.delete(b);
@@ -62,46 +61,28 @@ export function createIsCircular<
 }
 
 /**
- * Targeted shallow merge of two objects.
- *
- * @NOTE
- * This exists as a tinier compiled version of the `__assign` helper that
- * `tsc` injects in case of `Object.assign` not being present.
+ * Get the properties to strictly examine, which include both own properties that are
+ * not enumerable and symbol properties.
  */
-export function merge<A extends object, B extends object>(a: A, b: B): A & B {
-  const merged: Record<string, any> = {};
-
-  for (const key in a) {
-    merged[key] = a[key];
-  }
-
-  for (const key in b) {
-    merged[key] = b[key];
-  }
-
-  return merged as A & B;
+export function getStrictProperties(
+  object: Dictionary,
+): Array<string | symbol> {
+  return (getOwnPropertyNames(object) as Array<string | symbol>).concat(
+    getOwnPropertySymbols(object),
+  );
 }
 
 /**
- * Whether the value is a plain object.
- *
- * @NOTE
- * This is a same-realm compariosn only.
+ * Whether the object contains the property passed as an own property.
  */
-export function isPlainObject(value: any): boolean {
-  return value.constructor === Object || value.constructor == null;
-}
-
-/**
- * When the value is `Promise`-like, aka "then-able".
- */
-export function isPromiseLike(value: any): boolean {
-  return typeof value.then === 'function';
-}
+export const hasOwn =
+  Object.hasOwn ||
+  ((object: Dictionary, property: number | string | symbol) =>
+    hasOwnProperty.call(object, property));
 
 /**
  * Whether the values passed are strictly equal or both NaN.
  */
 export function sameValueZeroEqual(a: any, b: any): boolean {
-  return a === b || (a !== a && b !== b);
+  return a || b ? a === b : a === b || (a !== a && b !== b);
 }

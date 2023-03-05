@@ -1,5 +1,64 @@
 # fast-equals CHANGELOG
 
+## 5.0.0
+
+### Breaking changes
+
+#### `constructor` equality now required
+
+To align with other implementations common in the community, but also to be more functionally correct, the two objects being compared now must have equal `constructor`s.
+
+#### `Map` / `Set` comparisons no longer support IE11
+
+In previous verisons, `.forEach()` was used to ensure that support for `Symbol` was not required, as IE11 did not have `Symbol` and therefore both `Map` and `Set` did not have iterator-based methods such as `.values()` or `.entries()`. Since IE11 is no longer a supported browser, and support for those methods is present in all browsers and Node for quite a while, the comparison has moved to use these methods. This results in a ~20% performance increase.
+
+#### `createCustomEqual` contract has changed
+
+To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details, but froma high-level:
+
+- `meta` is no longer passed through to equality comparators, but rather a general `state` object which contains `meta`
+- `cache` now also lives on the `state` object, which allows for use of the `meta` property separate from but in parallel with the circular cache
+- `equals` is now on `state`, which prevents the need to pass through the separate `isEqual` method for the equality comparator
+
+#### `createCustomCircularEqual` has been removed
+
+You can create a custom circular equality comparator through `createCustomEqual` now by providing `circular: true` to the options.
+
+#### Custom `meta` values are no longer passed at callsite
+
+To use `meta` properties for comparisons, they must be returned in a `createState` method.
+
+#### Deep links have changed
+
+If you were deep-linking into a specific asset type (ESM / CJS / UMD), they have changed location.
+
+**NOTE**: You may no longer need to deep-link, as [the build resolution has improved](#better-build-system-resolution).
+
+### Enhancements
+
+#### New "strict" comparators available
+
+The following new comparators are available:
+
+- `strictDeepEqual`
+- `strictShallowEqual`
+- `strictCircularDeepEqual`
+- `strictCircularShallowEqual`
+
+This will perform the same comparisons as their non-strict counterparts, but will verify additional properties (non-enumerable properties on objects, keyed objects on `Array` / `Map` / `Set`) and that the descriptors for the properties align.
+
+#### `TypedArray` support
+
+Support for comparing all typed array values is now supported, and you can provide a custom comparator via the new `areTypedArraysEqual` option in the `createCustomEqual` configuration.
+
+#### Better build system resolution
+
+The library now leverages the `exports` property in the `package.json` to provide builds specific to your method of consumption (ESM / CommonJS / UMD). There is still a minified UMD version available if you want to use it instead.
+
+#### `arePrimitiveWrappersEqual` option added to `createCustomEqual` configuration
+
+If you want a custom comparator for primitive wrappers (`new Boolean()` / `new Number()` / `new String()`) it is now available.
+
 ## 4.0.3
 
 - Remove unnecessary second strict equality check for objects in edge-case scenarios
