@@ -88,8 +88,8 @@ for (const name in packages) {
       () => {
         for (const test of testSuite.tests) {
           if (
-            test.description !==
-            'pseudo array and equivalent array are not equal'
+            test.description !== 'pseudo array and equivalent array are not equal'
+            && test.description !== 'empty objects with `null` as prototype are equal'
           ) {
             fn(test.value1, test.value2);
           }

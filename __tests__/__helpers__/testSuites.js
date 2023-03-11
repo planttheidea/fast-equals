@@ -217,6 +217,13 @@ export default [
       },
       {
         deepEqual: true,
+        description: 'empty objects with `null` as prototype are equal',
+        shallowEqual: true,
+        value1: Object.create(null),
+        value2: Object.create(null),
+      },
+      {
+        deepEqual: true,
         description: 'equal objects (same properties "order")',
         shallowEqual: true,
         value1: {
@@ -392,6 +399,13 @@ export default [
           length: 2,
         },
         value2: [0, 1],
+      },
+      {
+        deepEqual: false,
+        description: 'different sparse arrays are not equal',
+        shallowEqual: false,
+        value1: new Array(10),
+        value2: new Array(100),
       },
     ],
   },
@@ -611,6 +625,20 @@ export default [
   {
     description: 'typed arrays',
     tests: [
+      {
+        deepEqual: true,
+        description: 'two empty arrays of the same class are equal',
+        shallowEqual: true,
+        value1: new Int32Array([]),
+        value2: new Int32Array([]),
+      },
+      {
+        deepEqual: false,
+        description: 'two empty arrays of the different class are not equal',
+        shallowEqual: false,
+        value1: new Int32Array([]),
+        value2: new Int16Array([]),
+      },
       {
         deepEqual: true,
         description: 'equal Float32Array objects',
