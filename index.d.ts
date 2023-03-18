@@ -46,9 +46,9 @@ export declare const strictCircularShallowEqual: <A, B>(a: A, b: B) => boolean;
  *
  * This can be done to create very targeted comparisons in extreme hot-path scenarios
  * where the standard methods are not performant enough, but can also be used to provide
- * support for legacy environments that do not support expected features like
- * `RegExp.prototype.flags` out of the box.
+ * support for legacy environments that cannot polyfill for modern features expected by
+ * `fast-equals`, such as `WeakMap` or `RegExp.prototype.flags`.
  */
-export declare function createCustomEqual<Meta>(
+export declare function createCustomEqual<Meta = undefined>(
   options?: CustomEqualCreatorOptions<Meta>,
-): <A, B>(a: A, b: B, metaOverride?: Meta) => boolean;
+): <A, B>(a: A, b: B) => boolean;
