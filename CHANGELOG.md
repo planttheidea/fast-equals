@@ -1,5 +1,11 @@
 # fast-equals CHANGELOG
 
+## 5.0.1
+
+### Bugfixes
+
+- Fix reference to `metaOverride` in typings and documentation (holdover from temporary API in v5 beta)
+
 ## 5.0.0
 
 ### Breaking changes
