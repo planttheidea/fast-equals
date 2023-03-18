@@ -310,7 +310,7 @@ function createCustomEqual<Meta>(options: {
   ) => boolean;
   createState?: () => { cache?: Cache; meta?: Meta };
   strict?: boolean;
-}): <A, B>(a: A, b: B, metaOverride?: Meta) => boolean;
+}): <A, B>(a: A, b: B) => boolean;
 ```
 
 Create a custom equality comparator. This allows complete control over building a bespoke equality method, in case your use-case requires a higher degree of performance, legacy environment support, or any other non-standard usage. The [recipes](#recipes) provide examples of use in different use-cases, but if you have a specific goal in mind and would like assistance feel free to [file an issue](https://github.com/planttheidea/fast-equals/issues).
