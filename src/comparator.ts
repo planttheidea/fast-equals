@@ -38,6 +38,7 @@ const { assign } = Object;
 const getTag = Object.prototype.toString.call.bind(
   Object.prototype.toString,
 ) as (a: object) => string;
+const getShortTag = (a: object): string | undefined => a != null ? (a as any)[Symbol.toStringTag] : undefined;
 
 interface CreateIsEqualOptions<Meta> {
   circular: boolean;
@@ -59,6 +60,7 @@ export function createEqualityComparator<Meta>({
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  unknownTagComparators,
 }: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -194,7 +196,8 @@ export function createEqualityComparator<Meta>({
     //     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
     // In all cases, these decisions should be reevaluated based on changes to the language and
     // common development practices.
-    return false;
+    const unknownTagComparator = unknownTagComparators[getShortTag(a) ?? tag];
+    return unknownTagComparator ? unknownTagComparator(a, b, state) : false;
   };
 }
 
@@ -225,6 +228,7 @@ export function createEqualityComparatorConfig<Meta>({
     areTypedArraysEqual: strict
       ? areObjectsEqualStrictDefault
       : areTypedArraysEqual,
+    unknownTagComparators: {},
   };
 
   if (createCustomConfig) {

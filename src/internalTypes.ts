@@ -80,6 +80,13 @@ export interface ComparatorConfig<Meta> {
    * additional properties added to the typed array.
    */
   areTypedArraysEqual: TypeEqualityComparator<any, Meta>;
+  /**
+   * Whether two values with unknown `@@toStringTag` are equal in value. This comparator is
+   * called when no other comparator applies.
+   * 
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag
+   */
+  unknownTagComparators: Partial<Record<string, TypeEqualityComparator<unknown, Meta>>>;
 }
 
 export type CreateCustomComparatorConfig<Meta> = (
