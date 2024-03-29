@@ -249,6 +249,38 @@ describe('recipes', () => {
         expect(deepEqual(a, c)).toBe(false);
       });
     });
+
+    describe("special-objects", () => {
+      it("should call unknownTagComparators", () => {
+        // Emulate something like a private property
+        const hiddenData = new WeakMap<Thing, number>();
+        const tag = "Thing";
+
+        class Thing {
+          [Symbol.toStringTag] = tag
+          constructor(value: number) {
+            hiddenData.set(this, value);
+          }
+          equals(other: Thing) {
+            return hiddenData.get(this) === hiddenData.get(other);
+          }
+        }
+
+        const deepEqual = createCustomEqual({
+          createCustomConfig: () => ({ 
+            unknownTagComparators: {
+              [tag]: (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b)
+            }
+          }),
+        });
+
+        const a = new Thing(1);
+        const b = new Thing(1);
+        const c = new Thing(2);
+        expect(deepEqual(a, b)).toBe(true);
+        expect(deepEqual(a, c)).toBe(false);
+      });
+    });
   });
 
   describe('createCustomCircularEqual', () => {
