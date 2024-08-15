@@ -14,6 +14,8 @@ import reactFastCompare from 'react-fast-compare';
 import shallowEqualFuzzy from 'shallow-equal-fuzzy';
 import { isEqual as isEqualUnderscore } from 'underscore';
 import { Bench } from 'tinybench';
+import { dequal } from 'dequal';
+import { dequal as dequalLite } from 'dequal/lite';
 
 const packages = {
   'assert.deepStrictEqual': (a, b) => {
@@ -35,6 +37,8 @@ const packages = {
   'react-fast-compare': reactFastCompare,
   'shallow-equal-fuzzy': shallowEqualFuzzy,
   'underscore.isEqual': isEqualUnderscore,
+  'dequal': dequal,
+  'dequal-lite': dequalLite,
 };
 
 console.log('');
