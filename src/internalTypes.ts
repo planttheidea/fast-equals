@@ -66,6 +66,10 @@ export interface ComparatorConfig<Meta> {
    */
   areMapsEqual: TypeEqualityComparator<any, Meta>;
   /**
+   * Whether the numbers passed are equal in value.
+   */
+  areNumbersEqual: TypeEqualityComparator<any, Meta>;
+  /**
    * Whether the objects passed are equal in value. In strict mode, this includes
    * non-enumerable properties added to the map, as well as symbol properties.
    */

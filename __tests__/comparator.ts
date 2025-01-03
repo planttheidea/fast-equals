@@ -15,7 +15,7 @@ import {
   areTypedArraysEqual,
   areUrlsEqual,
 } from '../src/equals';
-import { createIsCircular } from '../src/utils';
+import { createIsCircular, sameValueZeroEqual } from '../src/utils';
 
 import type { InternalEqualityComparator, State } from '../src/internalTypes';
 
@@ -25,6 +25,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
+  areNumbersEqual: sameValueZeroEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,

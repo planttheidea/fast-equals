@@ -119,6 +119,11 @@ export function areMapsEqual(
 }
 
 /**
+ * Whether the numbers are equal in value.
+ */
+export const areNumbersEqual = sameValueZeroEqual;
+
+/**
  * Whether the objects are equal in value.
  */
 export function areObjectsEqual(
