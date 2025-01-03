@@ -168,6 +168,8 @@ export function createEqualityComparator<Meta>({
       return areDatesEqual(a, b, state);
     }
 
+    // For RegExp, the properties are not enumerable, and therefore will give false positives if
+    // tested like a standard object.
     if (tag === REG_EXP_TAG) {
       return areRegExpsEqual(a, b, state);
     }
@@ -191,6 +193,8 @@ export function createEqualityComparator<Meta>({
       );
     }
 
+    // If URL objects are passed, it should be tested explicitly. Like RegExp, the properties are not
+    // enumerable, and therefore will give false positives if tested like a standard object.
     if (tag === URL_TAG) {
       return areUrlsEqual(a, b, state);
     }
