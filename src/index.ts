@@ -8,7 +8,24 @@ import type { CustomEqualCreatorOptions } from './internalTypes';
 import { sameValueZeroEqual } from './utils';
 
 export { sameValueZeroEqual };
-export * from './internalTypes';
+export type {
+  AnyEqualityComparator,
+  Cache,
+  CircularState,
+  ComparatorConfig,
+  CreateCustomComparatorConfig,
+  CreateState,
+  CustomEqualCreatorOptions,
+  DefaultState,
+  Dictionary,
+  EqualityComparator,
+  EqualityComparatorCreator,
+  InternalEqualityComparator,
+  PrimitiveWrapper,
+  State,
+  TypeEqualityComparator,
+  TypedArray,
+} from './internalTypes';
 
 /**
  * Whether the items passed are deeply-equal in value.

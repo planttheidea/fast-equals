@@ -1,6 +1,23 @@
 import type { CustomEqualCreatorOptions } from './src/internalTypes';
 
-export * from './src/internalTypes';
+export type {
+  AnyEqualityComparator,
+  Cache,
+  CircularState,
+  ComparatorConfig,
+  CreateCustomComparatorConfig,
+  CreateState,
+  CustomEqualCreatorOptions,
+  DefaultState,
+  Dictionary,
+  EqualityComparator,
+  EqualityComparatorCreator,
+  InternalEqualityComparator,
+  PrimitiveWrapper,
+  State,
+  TypeEqualityComparator,
+  TypedArray,
+} from './src/internalTypes';
 
 /**
  * Whether the values passed are strictly equal or both NaN.
