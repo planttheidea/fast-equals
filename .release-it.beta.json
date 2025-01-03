@@ -8,6 +8,11 @@
   },
   "preReleaseId": "beta",
   "scripts": {
-    "beforeStart": "npm run prepublish:compile"
+    "before:init": [
+      "npm run typecheck",
+      "npm run lint",
+      "npm run test",
+      "npm run build"
+    ]
   }
 }

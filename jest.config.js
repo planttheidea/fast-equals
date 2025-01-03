@@ -14,7 +14,7 @@ export default {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/build/tsconfig/base.json',
+        tsconfig: '<rootDir>/config/tsconfig/base.json',
       },
     ],
   },
