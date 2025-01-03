@@ -83,14 +83,20 @@ export function createEqualityComparator<Meta>({
       return false;
     }
 
-    // If the items are not non-nullish objects, then the only possibility
-    // of them being equal but not strictly is if they are both `NaN`. Since
-    // `NaN` is uniquely not equal to itself, we can use self-comparison of
-    // both objects, which is faster than `isNaN()`.
     if (type !== 'object') {
-      return type === 'function'
-        ? areFunctionsEqual(a, b, state)
-        : a !== a && b !== b;
+      if (type === 'number') {
+        // If the items are numbers, then the only possibility of them being equal but not strictly is if they are both
+        // `NaN`. Since `NaN` is uniquely not equal to itself, we can use self-comparison of both objects, which is
+        // faster than `isNaN()`.
+        return a !== a && b !== b;
+      }
+
+      if (type === 'function') {
+        return areFunctionsEqual(a, b, state);
+      }
+
+      // If a primitive value that is not strictly equal, it must be unequal.
+      return false;
     }
 
     const constructor = a.constructor;
