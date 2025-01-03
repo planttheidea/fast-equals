@@ -84,5 +84,5 @@ export const hasOwn =
  * Whether the values passed are strictly equal or both NaN.
  */
 export function sameValueZeroEqual(a: any, b: any): boolean {
-  return a || b ? a === b : a === b || (a !== a && b !== b);
+  return a === b || (!a && !b && a !== a && b !== b);
 }

@@ -4,6 +4,7 @@ import {
   areErrorsEqual as areErrorsEqualDefault,
   areFunctionsEqual as areFunctionsEqualDefault,
   areMapsEqual as areMapsEqualDefault,
+  areNumbersEqual as areNumbersEqualDefault,
   areObjectsEqual as areObjectsEqualDefault,
   areObjectsEqualStrict as areObjectsEqualStrictDefault,
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
@@ -61,6 +62,7 @@ export function createEqualityComparator<Meta>({
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
+  areNumbersEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
@@ -91,10 +93,7 @@ export function createEqualityComparator<Meta>({
 
     if (type !== 'object') {
       if (type === 'number') {
-        // If the items are numbers, then the only possibility of them being equal but not strictly is if they are both
-        // `NaN`. Since `NaN` is uniquely not equal to itself, we can use self-comparison of both objects, which is
-        // faster than `isNaN()`.
-        return a !== a && b !== b;
+        return areNumbersEqual(a, b, state);
       }
 
       if (type === 'function') {
@@ -253,6 +252,7 @@ export function createEqualityComparatorConfig<Meta>({
     areMapsEqual: strict
       ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault)
       : areMapsEqualDefault,
+    areNumbersEqual: areNumbersEqualDefault,
     areObjectsEqual: strict
       ? areObjectsEqualStrictDefault
       : areObjectsEqualDefault,

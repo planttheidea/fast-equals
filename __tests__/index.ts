@@ -453,6 +453,32 @@ describe('strict', () => {
       expect(customEqual(a, b)).toBe(false);
     });
 
+    it('issue 112 - handle custom float comparison', () => {
+      const customEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areNumbersEqual(a, b) {
+            if (a === b) {
+              return true;
+            }
+
+            const diff = Math.abs(a - b);
+
+            if (diff < Number.EPSILON) {
+              return true;
+            }
+
+            return diff <= Number.EPSILON * Math.min(Math.abs(a), Math.abs(b));
+          },
+        }),
+      });
+
+      const a = 0.1 + 0.2;
+      const b = 0.3;
+
+      expect(deepEqual(a, b)).toBe(false);
+      expect(customEqual(a, b)).toBe(true);
+    });
+
     it('issue 123 - custom function equality comparator', () => {
       const customEqual = createCustomEqual({
         createCustomConfig: () => ({
