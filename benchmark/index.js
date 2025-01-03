@@ -5,6 +5,8 @@ import tests from '../__tests__/__helpers__/testSuites.js';
 
 import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';
+import { dequal } from 'dequal';
+import { dequal as dequalLite } from 'dequal/lite';
 import fastDeepEqual from 'fast-deep-equal/es6/react.js';
 import * as fe from '../dist/esm/index.mjs';
 import isEqualLodash from 'lodash/isEqual.js';
@@ -25,6 +27,8 @@ const packages = {
   },
   'deep-eql': deepEql,
   'deep-equal': deepEqual,
+  dequal: dequal,
+  'dequal/lite': dequalLite,
   'fast-deep-equal': fastDeepEqual,
   'fast-equals': fe.deepEqual,
   'fast-equals (circular)': fe.circularDeepEqual,
