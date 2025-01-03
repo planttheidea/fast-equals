@@ -3,7 +3,12 @@
     "release": true,
     "tagName": "v${version}"
   },
-  "scripts": {
-    "beforeStart": "npm run prepublish:compile"
+  "hooks": {
+    "before:init": [
+      "npm run typecheck",
+      "npm run lint",
+      "npm run test",
+      "npm run build"
+    ]
   }
 }

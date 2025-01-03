@@ -42,7 +42,7 @@ export const BASE_CONFIG = {
     }),
     commonjs({ include: /use-sync-external-store/ }),
     typescript({
-      tsconfig: path.resolve(ROOT, 'build', 'tsconfig', 'base.json'),
+      tsconfig: path.resolve(ROOT, 'config', 'tsconfig', 'base.json'),
       typescript: tsc,
     }),
   ],
