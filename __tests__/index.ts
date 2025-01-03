@@ -125,6 +125,18 @@ describe('test suites', () => {
 });
 
 describe('values', () => {
+  it('issue 118 - handle Error objects', () => {
+    const errorA = new Error('boom');
+    const errorB = new Error('boom');
+    const errorC = new Error('shakalaka');
+
+    // Override the stack to be equal to test deep equality.
+    errorB.stack = errorA.stack;
+
+    expect(deepEqual(errorA, errorB)).toBe(true);
+    expect(deepEqual(errorA, errorC)).toBe(false);
+  });
+
   it('issue 121 - handle URL objects', () => {
     const urlA = new URL('https://www.foo.com');
     const urlB = new URL('https://www.foo.com');

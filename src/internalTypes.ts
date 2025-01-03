@@ -53,6 +53,10 @@ export interface ComparatorConfig<Meta> {
    */
   areDatesEqual: TypeEqualityComparator<any, Meta>;
   /**
+   * Whether the errors passed are equal in value.
+   */
+  areErrorsEqual: TypeEqualityComparator<any, Meta>;
+  /**
    * Whether the functions passed are equal in value.
    */
   areFunctionsEqual: TypeEqualityComparator<any, Meta>;
