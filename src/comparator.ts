@@ -199,7 +199,7 @@ export function createEqualityComparator<Meta>({
       return areUrlsEqual(a, b, state);
     }
 
-    // If arguments pass to a function, it should be treated as a standard object.
+    // If an arguments tag, it should be treated as a standard object.
     if (tag === ARGUMENTS_TAG) {
       return areObjectsEqual(a, b, state);
     }
