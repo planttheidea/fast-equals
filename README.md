@@ -281,8 +281,8 @@ interface Cache<Key extends object, Value> {
 interface ComparatorConfig<Meta> {
   areArraysEqual: TypeEqualityComparator<any[], Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;
-  areErrorsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
-  areFunctionsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
+  areErrorsEqual: TypeEqualityComparator<Error, Meta>;
+  areFunctionsEqual: TypeEqualityComparator<(...args: any[]) => any, Meta>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
   areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
   arePrimitiveWrappersEqual: TypeEqualityComparator<
@@ -292,7 +292,7 @@ interface ComparatorConfig<Meta> {
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
   areTypedArraysEqual: TypeEqualityComparatory<TypedArray, Meta>;
-  areUrlsEqual: TypeEqualityComparatory<TypedArray, Meta>;
+  areUrlsEqual: TypeEqualityComparatory<URL, Meta>;
 }
 
 function createCustomEqual<Meta>(options: {
