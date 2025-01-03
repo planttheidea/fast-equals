@@ -88,19 +88,22 @@ export function areMapsEqual(
     let matchIndex = 0;
 
     while ((bResult = bIterable.next())) {
-      if (bResult.done) {
+      if (bResult.done || hasMatch) {
         break;
       }
 
-      const [aKey, aValue] = aResult.value;
-      const [bKey, bValue] = bResult.value;
+      if (matchedIndices[matchIndex]) {
+        matchIndex++;
+        continue;
+      }
+
+      const aEntry = aResult.value;
+      const bEntry = bResult.value;
 
       if (
-        !hasMatch &&
-        !matchedIndices[matchIndex] &&
         (hasMatch =
-          state.equals(aKey, bKey, index, matchIndex, a, b, state) &&
-          state.equals(aValue, bValue, aKey, bKey, a, b, state))
+          state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state) &&
+          state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state))
       ) {
         matchedIndices[matchIndex] = true;
       }
@@ -276,13 +279,16 @@ export function areSetsEqual(
     let matchIndex = 0;
 
     while ((bResult = bIterable.next())) {
-      if (bResult.done) {
+      if (bResult.done || hasMatch) {
         break;
       }
 
+      if (matchedIndices[matchIndex]) {
+        matchIndex++;
+        continue;
+      }
+
       if (
-        !hasMatch &&
-        !matchedIndices[matchIndex] &&
         (hasMatch = state.equals(
           aResult.value,
           bResult.value,
