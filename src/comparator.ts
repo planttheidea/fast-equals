@@ -1,6 +1,7 @@
 import {
   areArraysEqual as areArraysEqualDefault,
   areDatesEqual as areDatesEqualDefault,
+  areErrorsEqual as areErrorsEqualDefault,
   areFunctionsEqual as areFunctionsEqualDefault,
   areMapsEqual as areMapsEqualDefault,
   areObjectsEqual as areObjectsEqualDefault,
@@ -24,6 +25,7 @@ import type {
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
 const DATE_TAG = '[object Date]';
+const ERROR_TAG = '[object Error]';
 const MAP_TAG = '[object Map]';
 const NUMBER_TAG = '[object Number]';
 const OBJECT_TAG = '[object Object]';
@@ -56,6 +58,7 @@ interface CreateIsEqualOptions<Meta> {
 export function createEqualityComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
+  areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
   areObjectsEqual,
@@ -193,10 +196,16 @@ export function createEqualityComparator<Meta>({
       );
     }
 
-    // If URL objects are passed, it should be tested explicitly. Like RegExp, the properties are not
+    // If a URL tag, it should be tested explicitly. Like RegExp, the properties are not
     // enumerable, and therefore will give false positives if tested like a standard object.
     if (tag === URL_TAG) {
       return areUrlsEqual(a, b, state);
+    }
+
+    // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
+    // enumerable, and therefore will give false positives if tested like a standard object.
+    if (tag === ERROR_TAG) {
+      return areErrorsEqual(a, b, state);
     }
 
     // If an arguments tag, it should be treated as a standard object.
@@ -239,6 +248,7 @@ export function createEqualityComparatorConfig<Meta>({
       ? areObjectsEqualStrictDefault
       : areArraysEqualDefault,
     areDatesEqual: areDatesEqualDefault,
+    areErrorsEqual: areErrorsEqualDefault,
     areFunctionsEqual: areFunctionsEqualDefault,
     areMapsEqual: strict
       ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault)

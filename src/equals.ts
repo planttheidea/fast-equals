@@ -37,6 +37,18 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 }
 
 /**
+ * Whether the errors passed are equal in value.
+ */
+export function areErrorsEqual(a: Error, b: Error): boolean {
+  return (
+    a.name === b.name &&
+    a.message === b.message &&
+    a.cause === b.cause &&
+    a.stack === b.stack
+  );
+}
+
+/**
  * Whether the functions passed are equal in value.
  */
 export function areFunctionsEqual(
