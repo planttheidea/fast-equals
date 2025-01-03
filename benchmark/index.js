@@ -19,7 +19,7 @@ const packages = {
   'assert.deepStrictEqual': (a, b) => {
     try {
       return assertDeepStrictEqual(a, b) === undefined;
-    } catch (e) {
+    } catch {
       return false;
     }
   },
