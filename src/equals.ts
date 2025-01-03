@@ -37,12 +37,6 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 }
 
 export function areErrorsEqual(a: Error, b: Error): boolean {
-  console.log({
-    name: a.name,
-    message: a.message,
-    cause: a.cause,
-    stack: a.stack,
-  });
   return (
     a.name === b.name &&
     a.message === b.message &&
@@ -130,8 +124,6 @@ export function areObjectsEqual(
   state: State<any>,
 ): boolean {
   const properties = keys(a);
-
-  console.log({ properties });
 
   let index = properties.length;
 
