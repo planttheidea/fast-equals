@@ -120,8 +120,6 @@ export type InternalEqualityComparator<Meta> = (
   state: State<Meta>,
 ) => boolean;
 
-export type Primitive = boolean | bigint | number | string | symbol;
-
 // We explicitly check for primitive wrapper types
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type PrimitiveWrapper = Boolean | Number | String;
