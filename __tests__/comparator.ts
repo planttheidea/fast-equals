@@ -12,6 +12,7 @@ import {
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlsEqual,
 } from '../src/equals';
 import { createIsCircular } from '../src/utils';
 
@@ -27,6 +28,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlsEqual,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   ...STANDARD_COMPARATOR_OPTIONS,

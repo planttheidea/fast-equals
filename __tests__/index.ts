@@ -124,6 +124,19 @@ describe('test suites', () => {
   );
 });
 
+describe('values', () => {
+  it('issue 121 - handle URL objects', () => {
+    const urlA = new URL('https://www.foo.com');
+    const urlB = new URL('https://www.foo.com');
+    const urlC = new URL('https://www.foo.com:4000/bar?quz&blah=boo#baz');
+    const urlD = new URL('https://www.foo.com:4000/bar?quz&blah=boo#baz');
+
+    expect(deepEqual(urlA, urlB)).toBe(true);
+    expect(deepEqual(urlA, urlC)).toBe(false);
+    expect(deepEqual(urlC, urlD)).toBe(true);
+  });
+});
+
 describe('circular', () => {
   describe('circularDeepEqual', () => {
     it('should handles deeply-nested circular objects', () => {

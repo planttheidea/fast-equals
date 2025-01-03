@@ -308,3 +308,18 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
 
   return true;
 }
+
+/**
+ * Whether the URL instances are equal in value.
+ */
+export function areUrlsEqual(a: URL, b: URL): boolean {
+  return (
+    a.hostname === b.hostname &&
+    a.pathname === b.pathname &&
+    a.protocol === b.protocol &&
+    a.port === b.port &&
+    a.hash === b.hash &&
+    a.username === b.username &&
+    a.password === b.password
+  );
+}
