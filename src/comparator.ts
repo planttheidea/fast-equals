@@ -29,6 +29,7 @@ const OBJECT_TAG = '[object Object]';
 const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
+const URL_TAG = '[object URL]';
 
 const { isArray } = Array;
 const isTypedArray =
@@ -188,8 +189,8 @@ export function createEqualityComparator<Meta>({
       );
     }
 
-    // If an arguments tag, it should be treated as a standard object.
-    if (tag === ARGUMENTS_TAG) {
+    // If a tag related to alternative objects, it should be treated as a standard object.
+    if (tag === ARGUMENTS_TAG || tag === URL_TAG) {
       return areObjectsEqual(a, b, state);
     }
 
