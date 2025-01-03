@@ -37,6 +37,16 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 }
 
 /**
+ * Whether the functions passed are equal in value.
+ */
+export function areFunctionsEqual(
+  a: (...args: any[]) => any,
+  b: (...args: any[]) => any,
+): boolean {
+  return a === b;
+}
+
+/**
  * Whether the `Map`s are equal in value.
  */
 export function areMapsEqual(

@@ -53,6 +53,10 @@ export interface ComparatorConfig<Meta> {
    */
   areDatesEqual: TypeEqualityComparator<any, Meta>;
   /**
+   * Whether the functions passed are equal in value.
+   */
+  areFunctionsEqual: TypeEqualityComparator<any, Meta>;
+  /**
    * Whether the maps passed are equal in value. In strict mode, this includes
    * additional properties added to the map.
    */
@@ -115,6 +119,8 @@ export type InternalEqualityComparator<Meta> = (
   parentB: any,
   state: State<Meta>,
 ) => boolean;
+
+export type Primitive = boolean | bigint | number | string | symbol;
 
 // We explicitly check for primitive wrapper types
 // eslint-disable-next-line @typescript-eslint/ban-types

@@ -427,5 +427,28 @@ describe('strict', () => {
 
       expect(customEqual(a, b)).toBe(false);
     });
+
+    it('issue 123 - custom function equality comparator', () => {
+      const customEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          areFunctionsEqual(a, b) {
+            return a.name === b.name;
+          },
+        }),
+      });
+
+      const a = function foo() {
+        return 'a';
+      };
+      const b = function foo() {
+        return 'b';
+      };
+      const c = function bar() {
+        return 'c';
+      };
+
+      expect(customEqual(a, b)).toBe(true);
+      expect(customEqual(a, c)).toBe(false);
+    });
   });
 });
