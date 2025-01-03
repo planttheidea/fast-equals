@@ -84,6 +84,10 @@ export interface ComparatorConfig<Meta> {
    * additional properties added to the typed array.
    */
   areTypedArraysEqual: TypeEqualityComparator<any, Meta>;
+  /**
+   * Whether the URLs passed are equal in value.
+   */
+  areUrlsEqual: TypeEqualityComparator<any, Meta>;
 }
 
 export type CreateCustomComparatorConfig<Meta> = (

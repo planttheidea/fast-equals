@@ -8,7 +8,8 @@ import {
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
-  areTypedArraysEqual,
+  areTypedArraysEqual as areTypedArraysEqualDefault,
+  areUrlsEqual as areUrlsEqualDefault,
 } from './equals';
 import { combineComparators, createIsCircular } from './utils';
 import type {
@@ -29,6 +30,7 @@ const OBJECT_TAG = '[object Object]';
 const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
+const URL_TAG = '[object URL]';
 
 const { isArray } = Array;
 const isTypedArray =
@@ -61,6 +63,7 @@ export function createEqualityComparator<Meta>({
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlsEqual,
 }: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -165,6 +168,8 @@ export function createEqualityComparator<Meta>({
       return areDatesEqual(a, b, state);
     }
 
+    // For RegExp, the properties are not enumerable, and therefore will give false positives if
+    // tested like a standard object.
     if (tag === REG_EXP_TAG) {
       return areRegExpsEqual(a, b, state);
     }
@@ -186,6 +191,12 @@ export function createEqualityComparator<Meta>({
         typeof b.then !== 'function' &&
         areObjectsEqual(a, b, state)
       );
+    }
+
+    // If URL objects are passed, it should be tested explicitly. Like RegExp, the properties are not
+    // enumerable, and therefore will give false positives if tested like a standard object.
+    if (tag === URL_TAG) {
+      return areUrlsEqual(a, b, state);
     }
 
     // If an arguments tag, it should be treated as a standard object.
@@ -242,7 +253,8 @@ export function createEqualityComparatorConfig<Meta>({
       : areSetsEqualDefault,
     areTypedArraysEqual: strict
       ? areObjectsEqualStrictDefault
-      : areTypedArraysEqual,
+      : areTypedArraysEqualDefault,
+    areUrlsEqual: areUrlsEqualDefault,
   };
 
   if (createCustomConfig) {
