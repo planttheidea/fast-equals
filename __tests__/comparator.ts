@@ -5,6 +5,7 @@ import {
 import {
   areArraysEqual,
   areDatesEqual,
+  areFunctionsEqual,
   areMapsEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
@@ -19,6 +20,7 @@ import type { InternalEqualityComparator, State } from '../src/internalTypes';
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,
   areDatesEqual,
+  areFunctionsEqual,
   areMapsEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,

@@ -1,6 +1,7 @@
 import {
   areArraysEqual as areArraysEqualDefault,
   areDatesEqual as areDatesEqualDefault,
+  areFunctionsEqual as areFunctionsEqualDefault,
   areMapsEqual as areMapsEqualDefault,
   areObjectsEqual as areObjectsEqualDefault,
   areObjectsEqualStrict as areObjectsEqualStrictDefault,
@@ -53,6 +54,7 @@ interface CreateIsEqualOptions<Meta> {
 export function createEqualityComparator<Meta>({
   areArraysEqual,
   areDatesEqual,
+  areFunctionsEqual,
   areMapsEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
@@ -69,17 +71,32 @@ export function createEqualityComparator<Meta>({
       return true;
     }
 
-    // If the items are not non-nullish objects, then the only possibility
-    // of them being equal but not strictly is if they are both `NaN`. Since
-    // `NaN` is uniquely not equal to itself, we can use self-comparison of
-    // both objects, which is faster than `isNaN()`.
-    if (
-      a == null ||
-      b == null ||
-      typeof a !== 'object' ||
-      typeof b !== 'object'
-    ) {
-      return a !== a && b !== b;
+    // If either of the items are nullish and fail the strictly equal check
+    // above, then they must be unequal.
+    if (a == null || b == null) {
+      return false;
+    }
+
+    const type = typeof a;
+
+    if (type !== typeof b) {
+      return false;
+    }
+
+    if (type !== 'object') {
+      if (type === 'number') {
+        // If the items are numbers, then the only possibility of them being equal but not strictly is if they are both
+        // `NaN`. Since `NaN` is uniquely not equal to itself, we can use self-comparison of both objects, which is
+        // faster than `isNaN()`.
+        return a !== a && b !== b;
+      }
+
+      if (type === 'function') {
+        return areFunctionsEqual(a, b, state);
+      }
+
+      // If a primitive value that is not strictly equal, it must be unequal.
+      return false;
     }
 
     const constructor = a.constructor;
@@ -211,6 +228,7 @@ export function createEqualityComparatorConfig<Meta>({
       ? areObjectsEqualStrictDefault
       : areArraysEqualDefault,
     areDatesEqual: areDatesEqualDefault,
+    areFunctionsEqual: areFunctionsEqualDefault,
     areMapsEqual: strict
       ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault)
       : areMapsEqualDefault,
