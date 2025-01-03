@@ -36,6 +36,9 @@ export function areDatesEqual(a: Date, b: Date): boolean {
   return sameValueZeroEqual(a.getTime(), b.getTime());
 }
 
+/**
+ * Whether the errors passed are equal in value.
+ */
 export function areErrorsEqual(a: Error, b: Error): boolean {
   return (
     a.name === b.name &&
