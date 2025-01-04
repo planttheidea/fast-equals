@@ -2,9 +2,17 @@
 
 ## 5.1.3
 
+### Enhancements
+
 - [#136](https://github.com/planttheidea/fast-equals/pull/136) - More than double speed of iterables (`Map` / `Set`) equality comparisons
 
+### Maintenance
+
+- [#135](https://github.com/planttheidea/fast-equals/pull/135) - Include `dequal` and `dequal/lite` in benchmark comparisons
+
 ## 5.1.2
+
+### Maintenance
 
 Re-release of `5.1.0` with correct pre-release setup.
 
