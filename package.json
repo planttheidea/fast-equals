@@ -99,7 +99,7 @@
     "start": "npm run dev",
     "release": "release-it",
     "release:beta": "release-it --config=.release-it.beta.json",
-    "release:scripts": "npm run typecheck && npm run lint && npm run test:coverage && npm run dist",
+    "release:scripts": "npm run typecheck && npm run lint && npm run test:coverage && npm run build",
     "test": "NODE_PATH=. jest",
     "test:coverage": "rm -rf coverage && npm test -- --coverage",
     "test:watch": "npm test -- --watch",
