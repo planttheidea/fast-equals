@@ -66,16 +66,22 @@ export function areMapsEqual(
   b: Map<any, any>,
   state: State<any>,
 ): boolean {
-  if (a.size !== b.size) {
+  const size = a.size;
+
+  if (size !== b.size) {
     return false;
   }
 
-  const matchedIndices: Record<number, true> = {};
+  if (!size) {
+    return true;
+  }
+
+  const matchedIndices: Array<true | undefined> = new Array(size);
   const aIterable = a.entries();
 
-  let index = 0;
   let aResult: IteratorResult<[any, any]>;
   let bResult: IteratorResult<[any, any]>;
+  let index = 0;
 
   while ((aResult = aIterable.next())) {
     if (aResult.done) {
@@ -92,17 +98,20 @@ export function areMapsEqual(
         break;
       }
 
-      const [aKey, aValue] = aResult.value;
-      const [bKey, bValue] = bResult.value;
+      if (matchedIndices[matchIndex]) {
+        matchIndex++;
+        continue;
+      }
+
+      const aEntry = aResult.value;
+      const bEntry = bResult.value;
 
       if (
-        !hasMatch &&
-        !matchedIndices[matchIndex] &&
-        (hasMatch =
-          state.equals(aKey, bKey, index, matchIndex, a, b, state) &&
-          state.equals(aValue, bValue, aKey, bKey, a, b, state))
+        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state) &&
+        state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
       ) {
-        matchedIndices[matchIndex] = true;
+        hasMatch = matchedIndices[matchIndex] = true;
+        break;
       }
 
       matchIndex++;
@@ -255,11 +264,17 @@ export function areSetsEqual(
   b: Set<any>,
   state: State<any>,
 ): boolean {
-  if (a.size !== b.size) {
+  const size = a.size;
+
+  if (size !== b.size) {
     return false;
   }
 
-  const matchedIndices: Record<number, true> = {};
+  if (!size) {
+    return true;
+  }
+
+  const matchedIndices: Array<true | undefined> = new Array(size);
   const aIterable = a.values();
 
   let aResult: IteratorResult<any>;
@@ -281,9 +296,8 @@ export function areSetsEqual(
       }
 
       if (
-        !hasMatch &&
         !matchedIndices[matchIndex] &&
-        (hasMatch = state.equals(
+        state.equals(
           aResult.value,
           bResult.value,
           aResult.value,
@@ -291,9 +305,10 @@ export function areSetsEqual(
           a,
           b,
           state,
-        ))
+        )
       ) {
-        matchedIndices[matchIndex] = true;
+        hasMatch = matchedIndices[matchIndex] = true;
+        break;
       }
 
       matchIndex++;

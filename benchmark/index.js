@@ -79,11 +79,17 @@ for (const name in packages) {
   }
 
   for (const testSuite of tests) {
-    if (!typesBenches[testSuite.description]) {
-      typesBenches[testSuite.description] = new Bench({ iterations });
+    const { description } = testSuite;
+
+    if (description !== 'maps' && description !== 'sets') {
+      continue;
     }
 
-    const typesBench = typesBenches[testSuite.description];
+    if (!typesBenches[description]) {
+      typesBenches[description] = new Bench({ iterations });
+    }
+
+    const typesBench = typesBenches[description];
 
     typesBench.add(
       `${name} (${
