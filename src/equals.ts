@@ -6,7 +6,9 @@ import type {
   TypedArray,
 } from './internalTypes';
 
-const OWNER = '_owner';
+const PREACT_VNODE = '__v';
+const PREACT_OWNER = '__o';
+const REACT_OWNER = '_owner';
 
 const { getOwnPropertyDescriptor, keys } = Object;
 
@@ -158,11 +160,16 @@ export function areObjectsEqual(
     property = properties[index]!;
 
     if (
-      property === OWNER &&
-      (a.$$typeof || b.$$typeof) &&
-      a.$$typeof !== b.$$typeof
+      (property === REACT_OWNER ||
+        property === PREACT_OWNER ||
+        property === PREACT_VNODE) &&
+      (a.$$typeof || b.$$typeof)
     ) {
-      return false;
+      if (a.$$typeof !== b.$$typeof) {
+        return false;
+      }
+
+      continue;
     }
 
     if (
@@ -204,18 +211,20 @@ export function areObjectsEqualStrict(
     property = properties[index]!;
 
     if (
-      property === OWNER &&
-      (a.$$typeof || b.$$typeof) &&
-      a.$$typeof !== b.$$typeof
+      (property === REACT_OWNER ||
+        property === PREACT_OWNER ||
+        property === PREACT_VNODE) &&
+      (a.$$typeof || b.$$typeof)
     ) {
-      return false;
-    }
+      if (a.$$typeof !== b.$$typeof) {
+        return false;
+      }
 
-    if (!hasOwn(b, property)) {
-      return false;
+      continue;
     }
 
     if (
+      !hasOwn(b, property) ||
       !state.equals(a[property], b[property], property, property, a, b, state)
     ) {
       return false;
