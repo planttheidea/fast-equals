@@ -66,16 +66,23 @@ export function areMapsEqual(
   b: Map<any, any>,
   state: State<any>,
 ): boolean {
-  if (a.size !== b.size) {
+  const size = a.size;
+
+  if (size !== b.size) {
     return false;
   }
 
-  const matchedIndices: Array<true | undefined> = new Array(b.size);
+  if (!size) {
+    return true;
+  }
+
+  const matchedIndices: Array<true | undefined> = new Array(size);
   const aIterable = a.entries();
 
-  let index = 0;
   let aResult: IteratorResult<[any, any]>;
   let bResult: IteratorResult<[any, any]>;
+  let matchIndex: number;
+  let index = 0;
 
   while ((aResult = aIterable.next())) {
     if (aResult.done) {
@@ -85,15 +92,16 @@ export function areMapsEqual(
     const bIterable = b.entries();
 
     let hasMatch = false;
-    let matchIndex = 0;
+    let nextMatchIndex = (matchIndex = 0);
 
     while ((bResult = bIterable.next())) {
       if (bResult.done) {
         break;
       }
 
+      matchIndex = nextMatchIndex++;
+
       if (matchedIndices[matchIndex]) {
-        matchIndex++;
         continue;
       }
 
@@ -107,8 +115,6 @@ export function areMapsEqual(
         hasMatch = matchedIndices[matchIndex] = true;
         break;
       }
-
-      matchIndex++;
     }
 
     if (!hasMatch) {
@@ -258,11 +264,17 @@ export function areSetsEqual(
   b: Set<any>,
   state: State<any>,
 ): boolean {
-  if (a.size !== b.size) {
+  const size = a.size;
+
+  if (size !== b.size) {
     return false;
   }
 
-  const matchedIndices: Array<true | undefined> = new Array(b.size);
+  if (!size) {
+    return true;
+  }
+
+  const matchedIndices: Array<true | undefined> = new Array(size);
   const aIterable = a.values();
 
   let aResult: IteratorResult<any>;
