@@ -88,7 +88,7 @@ export function areMapsEqual(
     let matchIndex = 0;
 
     while ((bResult = bIterable.next())) {
-      if (bResult.done || hasMatch) {
+      if (bResult.done) {
         break;
       }
 
@@ -105,6 +105,7 @@ export function areMapsEqual(
         state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
       ) {
         hasMatch = matchedIndices[matchIndex] = true;
+        break;
       }
 
       matchIndex++;
@@ -278,7 +279,7 @@ export function areSetsEqual(
     let matchIndex = 0;
 
     while ((bResult = bIterable.next())) {
-      if (bResult.done || hasMatch) {
+      if (bResult.done) {
         break;
       }
 
@@ -295,6 +296,7 @@ export function areSetsEqual(
         )
       ) {
         hasMatch = matchedIndices[matchIndex] = true;
+        break;
       }
 
       matchIndex++;
