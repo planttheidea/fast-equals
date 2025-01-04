@@ -1,5 +1,33 @@
 # fast-equals CHANGELOG
 
+## 5.1.3
+
+- [#136](https://github.com/planttheidea/fast-equals/pull/136) - More than double speed of iterables (`Map` / `Set`) equality comparisons
+
+## 5.1.2
+
+Re-release of `5.1.0` with correct pre-release setup.
+
+## 5.1.1
+
+**DO NOT USE**
+
+This was an accidental pre-release when cleaning up release setup.
+
+## 5.1.0
+
+### Enhancements
+
+- [#127](https://github.com/planttheidea/fast-equals/pull/127) - Add support for custom `Function` instance comparisons (resolves [#118](https://github.com/planttheidea/fast-equals/issues/118))
+- [#128](https://github.com/planttheidea/fast-equals/pull/128) - Add support for `URL` instance comparisons (resolves [#121](https://github.com/planttheidea/fast-equals/issues/121))
+- [#129](https://github.com/planttheidea/fast-equals/pull/129) - Add support for `Error` instance comparisons (resolves [#123](https://github.com/planttheidea/fast-equals/issues/123))
+- [#130](https://github.com/planttheidea/fast-equals/pull/130) - Add support for custom `Number` instance comparisons (resolves [#112](https://github.com/planttheidea/fast-equals/issues/112))
+
+### Bugfixes
+
+- [#132](https://github.com/planttheidea/fast-equals/pull/126) - Fix `assert.deepEqual` check in benchmark (resolves [#125](https://github.com/planttheidea/fast-equals/issues/125))
+- [#126](https://github.com/planttheidea/fast-equals/pull/132) - Export explicit types via `export type` (attempts to resolve [#114](https://github.com/planttheidea/fast-equals/issues/114))
+
 ## 5.0.1
 
 ### Bugfixes
