@@ -150,32 +150,12 @@ export function areObjectsEqual(
     return false;
   }
 
-  let property: string;
-
   // Decrementing `while` showed faster results than either incrementing or
   // decrementing `for` loop and than an incrementing `while` loop. Declarative
   // methods like `some` / `every` were not used to avoid incurring the garbage
   // cost of anonymous callbacks.
   while (index-- > 0) {
-    property = properties[index]!;
-
-    if (
-      (property === REACT_OWNER ||
-        property === PREACT_OWNER ||
-        property === PREACT_VNODE) &&
-      (a.$$typeof || b.$$typeof)
-    ) {
-      if (a.$$typeof !== b.$$typeof) {
-        return false;
-      }
-
-      continue;
-    }
-
-    if (
-      !hasOwn(b, property) ||
-      !state.equals(a[property], b[property], property, property, a, b, state)
-    ) {
+    if (!isPropertyEqual(a, b, state, properties[index]!)) {
       return false;
     }
   }
@@ -210,23 +190,7 @@ export function areObjectsEqualStrict(
   while (index-- > 0) {
     property = properties[index]!;
 
-    if (
-      (property === REACT_OWNER ||
-        property === PREACT_OWNER ||
-        property === PREACT_VNODE) &&
-      (a.$$typeof || b.$$typeof)
-    ) {
-      if (a.$$typeof !== b.$$typeof) {
-        return false;
-      }
-
-      continue;
-    }
-
-    if (
-      !hasOwn(b, property) ||
-      !state.equals(a[property], b[property], property, property, a, b, state)
-    ) {
+    if (!isPropertyEqual(a, b, state, property)) {
       return false;
     }
 
@@ -362,5 +326,26 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
     a.hash === b.hash &&
     a.username === b.username &&
     a.password === b.password
+  );
+}
+
+function isPropertyEqual(
+  a: Dictionary,
+  b: Dictionary,
+  state: State<any>,
+  property: string | symbol,
+) {
+  if (
+    (property === REACT_OWNER ||
+      property === PREACT_OWNER ||
+      property === PREACT_VNODE) &&
+    (a.$$typeof || b.$$typeof)
+  ) {
+    return true;
+  }
+
+  return (
+    hasOwn(b, property) &&
+    state.equals(a[property], b[property], property, property, a, b, state)
   );
 }
