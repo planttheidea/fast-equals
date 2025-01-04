@@ -81,7 +81,6 @@ export function areMapsEqual(
 
   let aResult: IteratorResult<[any, any]>;
   let bResult: IteratorResult<[any, any]>;
-  let matchIndex: number;
   let index = 0;
 
   while ((aResult = aIterable.next())) {
@@ -92,16 +91,15 @@ export function areMapsEqual(
     const bIterable = b.entries();
 
     let hasMatch = false;
-    let nextMatchIndex = (matchIndex = 0);
+    let matchIndex = 0;
 
     while ((bResult = bIterable.next())) {
       if (bResult.done) {
         break;
       }
 
-      matchIndex = nextMatchIndex++;
-
       if (matchedIndices[matchIndex]) {
+        matchIndex++;
         continue;
       }
 
@@ -115,6 +113,8 @@ export function areMapsEqual(
         hasMatch = matchedIndices[matchIndex] = true;
         break;
       }
+
+      matchIndex++;
     }
 
     if (!hasMatch) {
