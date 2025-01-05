@@ -4,6 +4,19 @@ import React from 'react';
 const fn = () => {};
 const promise = Promise.resolve('foo');
 
+const reactElementA = { ...React.createElement('div', { x: 1 }) };
+// in reality the _owner object is much more complex (and contains over dozen circular references)
+reactElementA._owner = { children: [reactElementA] };
+
+const reactElementA2 = { ...React.createElement('div', { x: 1 }) };
+reactElementA2._owner = { children: [reactElementA2] };
+
+const reactElementB = { ...React.createElement('div', { x: 2 }) };
+reactElementB._owner = { children: [reactElementB] };
+
+const reactElementC = { ...React.createElement('span', { x: 1 }) };
+reactElementC._owner = { children: [reactElementC] };
+
 export default [
   {
     description: 'primitives',
@@ -608,17 +621,31 @@ export default [
     tests: [
       {
         deepEqual: true,
-        description: 'simple react elements are deeply equal',
+        description: 'react element compared with itself',
+        shallowEqual: true,
+        value1: reactElementA,
+        value2: reactElementA,
+      },
+      {
+        deepEqual: true,
+        description: 'react elements equal in value',
         shallowEqual: false,
-        value1: React.createElement('div', {}, 'foo'),
-        value2: React.createElement('div', {}, 'foo'),
+        value1: reactElementA,
+        value2: reactElementA2,
       },
       {
         deepEqual: false,
-        description: 'simple react elements are not deeply equal',
+        description: 'react elements unequal by value',
         shallowEqual: false,
-        value1: React.createElement('div', {}, 'foo'),
-        value2: React.createElement('div', {}, 'bar'),
+        value1: reactElementA,
+        value2: reactElementB,
+      },
+      {
+        deepEqual: false,
+        description: 'react elements equal in value but different types',
+        shallowEqual: false,
+        value1: reactElementA,
+        value2: reactElementC,
       },
     ],
   },

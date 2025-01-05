@@ -1,5 +1,15 @@
 # fast-equals CHANGELOG
 
+## 5.1.4
+
+### Enhancements
+
+- Support Preact objects in equality comparison
+
+### Bugfixes
+
+- [#137](https://github.com/planttheidea/fast-equals/pull/137) - Fix circular React references in object comparisons
+
 ## 5.1.3
 
 ### Enhancements
