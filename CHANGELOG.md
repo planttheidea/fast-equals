@@ -1,6 +1,6 @@
 # fast-equals CHANGELOG
 
-## 5.1.4
+## 5.2.0
 
 ### Enhancements
 
