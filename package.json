@@ -87,10 +87,11 @@
   },
   "scripts": {
     "benchmark": "npm run build:esm && node benchmark/index.js",
-    "build": "npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:min",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:min && npm run build:types",
     "build:cjs": "rm -rf dist/cjs && NODE_ENV=production rollup -c config/rollup/config.cjs.js && tsc -p ./config/tsconfig/cjs.json",
     "build:esm": "rm -rf dist/esm && NODE_ENV=production rollup -c config/rollup/config.esm.js && tsc -p ./config/tsconfig/esm.json",
     "build:min": "rm -rf dist/min && NODE_ENV=production rollup -c config/rollup/config.min.js && tsc -p ./config/tsconfig/min.json",
+    "build:types": "node scripts/fallback-types.mjs",
     "build:umd": "rm -rf dist/umd && NODE_ENV=production rollup -c config/rollup/config.umd.js && tsc -p ./config/tsconfig/umd.json",
     "dev": "NODE_ENV=development webpack serve --progress --config=config/webpack.config.js",
     "format": "prettier **/*.ts --write",
@@ -108,5 +109,5 @@
   "sideEffects": false,
   "type": "module",
   "types": "./index.d.ts",
-  "version": "5.2.0"
+  "version": "5.2.1-beta.0"
 }
