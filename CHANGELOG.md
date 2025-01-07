@@ -1,5 +1,11 @@
 # fast-equals CHANGELOG
 
+## 5.2.1
+
+### Bugfixes
+
+- [#138](https://github.com/planttheidea/fast-equals/pull/138) - Actually fix reference to `src` code in `index.d.ts` by flattening types in file
+
 ## 5.2.0
 
 ### Enhancements
