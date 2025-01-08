@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.2.2
+
+- [#139](https://github.com/planttheidea/fast-equals/pull/139/files) - Add file extensions to type definition files to allow it to work in projects with `NodeNext` module resolution
+
 ## 5.2.1
 
 ### Bugfixes
