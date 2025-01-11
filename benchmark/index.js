@@ -21,8 +21,14 @@ const packages = {
   'assert.deepStrictEqual': (a, b) => {
     try {
       return assertDeepStrictEqual(a, b) === undefined;
-    } catch {
-      return false;
+    } catch (e) {
+      const message = e.message.split('\n')[0];
+
+      if (message.includes('Expected values to be strictly deep-equal')) {
+        return false;
+      }
+
+      throw e;
     }
   },
   'deep-eql': deepEql,
@@ -60,8 +66,8 @@ for (const name in packages) {
       try {
         if (fn(test.value1, test.value2) !== test.deepEqual) {
           console.error(
-            'different result',
-            name,
+            'result did not match',
+            `(${name})`,
             testSuite.description,
             test.description,
           );
@@ -69,7 +75,12 @@ for (const name in packages) {
           passed = false;
         }
       } catch (e) {
-        console.error(name, testSuite.description, test.description, e);
+        console.error(
+          `ERROR - ${e.message.split('\n')[0]}`,
+          `(${name})`,
+          testSuite.description,
+          test.description,
+        );
 
         passed = false;
       }
