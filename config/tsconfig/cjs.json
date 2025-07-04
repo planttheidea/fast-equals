@@ -3,6 +3,7 @@
   "compilerOptions": {
     "declarationDir": "../../dist/cjs/types",
     "module": "CommonJS",
+    "moduleResolution": "Node16",
     "outDir": "../../dist/cjs"
   }
 }
