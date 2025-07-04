@@ -57,11 +57,11 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/esm/types/index.d.ts",
+        "types": "./dist/esm/types/index.d.mts",
         "default": "./dist/esm/index.mjs"
       },
       "require": {
-        "types": "./dist/cjs/types/index.d.ts",
+        "types": "./dist/cjs/types/index.d.cts",
         "default": "./dist/cjs/index.cjs"
       },
       "default": {
