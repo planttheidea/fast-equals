@@ -16,7 +16,7 @@ function getReplacement(type) {
   return function (line, dependencies, _quoteType, location) {
     const extension = line.startsWith(`${type} type`) ? 'd.ts' : 'ts';
 
-    return `${type}${dependencies}from '${location}.${extension}'`;
+    return `${type}${dependencies}from '${location}.d.ts'`;
   };
 }
 
