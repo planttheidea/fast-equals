@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~1.8kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -38,6 +38,7 @@ Methods are available for deep, shallow, or referential equality comparison. In 
     - [strictCircularDeepEqual](#strictcirculardeepequal)
     - [strictCircularShallowEqual](#strictcircularshallowequal)
     - [createCustomEqual](#createcustomequal)
+      - [unknownTagComparators](#unknowntagcomparators)
       - [Recipes](#recipes)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
@@ -291,8 +292,9 @@ interface ComparatorConfig<Meta> {
   >;
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  areTypedArraysEqual: TypeEqualityComparatory<TypedArray, Meta>;
-  areUrlsEqual: TypeEqualityComparatory<URL, Meta>;
+  areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;
+  areUrlsEqual: TypeEqualityComparator<URL, Meta>;
+  unknownTagComparators: Record<string, TypeEqualityComparator<string, any>>;
 }
 
 function createCustomEqual<Meta>(options: {
@@ -320,6 +322,10 @@ Create a custom equality comparator. This allows complete control over building 
 
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
 
+#### unknownTagComparators
+
+If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to support via the `unknownTagComparators` option. See [this recipe]('./recipes/special-objects.md) for an example.
+
 #### Recipes
 
 Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable to the problem you are solving, they can offer guidance of how to structure your solution.
@@ -330,6 +336,7 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
 - [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 - [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
+- [Custom `@@toStringTag` support]('./recipes/special-objects.md)
 
 ## Benchmarks
 

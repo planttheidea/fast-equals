@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.3.0
+
+- [#150](https://github.com/planttheidea/fast-equals/pull/150/files) - Add support for `unknownTagComparators` in custom configuration (thanks to @mrcljx for the idea)
+
 ## 5.2.2
 
 - [#139](https://github.com/planttheidea/fast-equals/pull/139/files) - Add file extensions to type definition files to allow it to work in projects with `NodeNext` module resolution
