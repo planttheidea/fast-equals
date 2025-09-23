@@ -96,6 +96,15 @@ export interface ComparatorConfig<Meta> {
    * Whether the URLs passed are equal in value.
    */
   areUrlsEqual: TypeEqualityComparator<any, Meta>;
+  /**
+   * Whether two values with unknown `@@toStringTag` are equal in value. This comparator is
+   * called when no other comparator applies.
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag
+   */
+  unknownTagComparators:
+    | Record<string, TypeEqualityComparator<any, Meta>>
+    | undefined;
 }
 
 export type CreateCustomComparatorConfig<Meta> = (

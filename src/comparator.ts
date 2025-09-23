@@ -13,7 +13,7 @@ import {
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
 } from './equals';
-import { combineComparators, createIsCircular } from './utils';
+import { combineComparators, createIsCircular, getShortTag } from './utils';
 import type {
   ComparatorConfig,
   CreateState,
@@ -69,6 +69,7 @@ export function createEqualityComparator<Meta>({
   areSetsEqual,
   areTypedArraysEqual,
   areUrlsEqual,
+  unknownTagComparators,
 }: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -219,6 +220,24 @@ export function createEqualityComparator<Meta>({
       return arePrimitiveWrappersEqual(a, b, state);
     }
 
+    if (unknownTagComparators) {
+      let unknownTagComparator = unknownTagComparators[tag];
+
+      if (!unknownTagComparator) {
+        const shortTag = getShortTag(a);
+
+        if (shortTag) {
+          unknownTagComparator = unknownTagComparators[shortTag];
+        }
+      }
+
+      // If the custom config has an unknown tag comparator that matches the captured tag or the
+      // @@toStringTag, it is the source of truth for whether the values are equal.
+      if (unknownTagComparator) {
+        return unknownTagComparator(a, b, state);
+      }
+    }
+
     // If not matching any tags that require a specific type of comparison, then we hard-code false because
     // the only thing remaining is strict equality, which has already been compared. This is for a few reasons:
     //   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
@@ -265,6 +284,7 @@ export function createEqualityComparatorConfig<Meta>({
       ? areObjectsEqualStrictDefault
       : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
+    unknownTagComparators: undefined,
   };
 
   if (createCustomConfig) {
