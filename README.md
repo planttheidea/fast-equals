@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~1.8kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -38,6 +38,7 @@ Methods are available for deep, shallow, or referential equality comparison. In 
     - [strictCircularDeepEqual](#strictcirculardeepequal)
     - [strictCircularShallowEqual](#strictcircularshallowequal)
     - [createCustomEqual](#createcustomequal)
+      - [unknownTagComparators](#unknowntagcomparators)
       - [Recipes](#recipes)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
