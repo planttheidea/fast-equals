@@ -4,6 +4,11 @@
   "bugs": {
     "url": "https://github.com/planttheidea/fast-equals/issues"
   },
+  "files": [
+    "dist",
+    "src",
+    "index.d.ts"
+  ],
   "description": "A blazing fast equality comparison, either shallow or deep",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
