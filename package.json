@@ -70,6 +70,15 @@
       }
     }
   },
+  "files": [
+    "dist",
+    "src",
+    "CHANGELOG.md",
+    "index.d.ts",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
   "homepage": "https://github.com/planttheidea/fast-equals#readme",
   "keywords": [
     "fast",
