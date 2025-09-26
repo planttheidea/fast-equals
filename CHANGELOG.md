@@ -3,6 +3,7 @@
 ## 5.3.2
 
 - [#154](https://github.com/planttheidea/fast-equals/pull/154) - Use include with `"files"` instead of exclude with `.npmignore` (Thanks [@43081j](https://github.com/43081j))
+- [#155](https://github.com/planttheidea/fast-equals/pull/155) - Upgrade build dependencies to resolve security vulnerabilities
 
 ## 5.3.1
 
