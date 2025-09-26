@@ -336,7 +336,7 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
 - [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 - [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
-- [Custom `@@toStringTag` support]('./recipes/special-objects.md)
+- [Custom `@@toStringTag` support](./recipes/special-objects.md)
 
 ## Benchmarks
 
