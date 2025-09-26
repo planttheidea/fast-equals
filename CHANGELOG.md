@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.3.1
+
+- [#153](https://github.com/planttheidea/fast-equals/pull/153) - Avoid publishing `.yarn` folder
+
 ## 5.3.0
 
 - [#150](https://github.com/planttheidea/fast-equals/pull/150/files) - Add support for `unknownTagComparators` in custom configuration (thanks to @mrcljx for the idea)
