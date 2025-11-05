@@ -15,7 +15,7 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../../dist",
+    "outDir": "../../dist",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
