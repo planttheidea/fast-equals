@@ -1,4 +1,4 @@
-import testSuites from './__helpers__/testSuites.ts';
+import testSuites from './__helpers__/testSuites.js';
 import {
   circularDeepEqual,
   circularShallowEqual,

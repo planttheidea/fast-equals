@@ -14,6 +14,9 @@ export default {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
       {
+        diagnostics: {
+          ignoreCodes: [151002],
+        },
         tsconfig: '<rootDir>/config/tsconfig/base.json',
       },
     ],
