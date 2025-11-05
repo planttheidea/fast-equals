@@ -1,4 +1,5 @@
-import testSuites from './__helpers__/testSuites.js';
+import { describe, expect, it } from 'vitest';
+import testSuites from './__helpers__/testSuites.ts';
 import {
   circularDeepEqual,
   circularShallowEqual,

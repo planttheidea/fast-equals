@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
   createEqualityComparator,
   createInternalEqualityComparator,
@@ -126,7 +127,7 @@ describe('createEqualityComparator', () => {
 
   describe('custom', () => {
     it('should call the custom comparator with the correct params', () => {
-      const customComparatorMock = jest.fn();
+      const customComparatorMock = vi.fn();
       const comparator = createEqualityComparator(STANDARD_COMPARATOR_OPTIONS);
       const state: State<'META'> = {
         cache: undefined,
