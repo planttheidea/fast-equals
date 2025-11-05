@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.3.3
+
+- [#147](https://github.com/planttheidea/fast-equals/pull/147) - Fix type resolution when using `Node16` as `moduleResolution` in TypeScript (fixes [#145](https://github.com/planttheidea/fast-equals/issues/145))
+
 ## 5.3.2
 
 - [#154](https://github.com/planttheidea/fast-equals/pull/154) - Use include with `"files"` instead of exclude with `.npmignore` (Thanks [@43081j](https://github.com/43081j))
