@@ -1,5 +1,18 @@
 # fast-equals CHANGELOG
 
+## 5.3.2
+
+- [#154](https://github.com/planttheidea/fast-equals/pull/154) - Use include with `"files"` instead of exclude with `.npmignore` (Thanks [@43081j](https://github.com/43081j))
+- [#155](https://github.com/planttheidea/fast-equals/pull/155) - Upgrade build dependencies to resolve security vulnerabilities
+
+## 5.3.1
+
+- [#153](https://github.com/planttheidea/fast-equals/pull/153) - Avoid publishing `.yarn` folder
+
+## 5.3.0
+
+- [#150](https://github.com/planttheidea/fast-equals/pull/150/files) - Add support for `unknownTagComparators` in custom configuration (thanks to @mrcljx for the idea)
+
 ## 5.2.2
 
 - [#139](https://github.com/planttheidea/fast-equals/pull/139/files) - Add file extensions to type definition files to allow it to work in projects with `NodeNext` module resolution

@@ -35,6 +35,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areSetsEqual,
   areTypedArraysEqual,
   areUrlsEqual,
+  unknownTagComparators: undefined,
 };
 const CIRCULAR_COMPARATOR_OPTIONS = {
   ...STANDARD_COMPARATOR_OPTIONS,
