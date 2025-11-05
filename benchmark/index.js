@@ -93,7 +93,7 @@ for (const name in packages) {
     const { description } = testSuite;
 
     if (!typesBenches[description]) {
-      typesBenches[description] = new Bench({ iterations });
+      typesBenches[description] = new Bench({ iterations, time: 500 });
     }
 
     const typesBench = typesBenches[description];
