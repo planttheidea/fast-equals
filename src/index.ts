@@ -3,9 +3,9 @@ import {
   createEqualityComparator,
   createInternalEqualityComparator,
   createIsEqual,
-} from './comparator.ts';
+} from './comparator.js';
 import type { CustomEqualCreatorOptions } from './internalTypes.ts';
-import { sameValueZeroEqual } from './utils.ts';
+import { sameValueZeroEqual } from './utils.js';
 
 export { sameValueZeroEqual };
 export type {

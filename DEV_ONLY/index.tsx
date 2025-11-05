@@ -8,7 +8,7 @@ import {
   shallowEqual,
   strictDeepEqual,
   strictShallowEqual,
-} from '../src/index.ts';
+} from '../src/index.js';
 
 document.body.style.backgroundColor = '#1d1d1d';
 document.body.style.color = '#d5d5d5';

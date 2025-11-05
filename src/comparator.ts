@@ -12,8 +12,8 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
-} from './equals.ts';
-import { combineComparators, createIsCircular, getShortTag } from './utils.ts';
+} from './equals.js';
+import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 import type {
   ComparatorConfig,
   CreateState,

@@ -1,4 +1,4 @@
-import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.ts';
+import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.js';
 import type {
   Dictionary,
   PrimitiveWrapper,
