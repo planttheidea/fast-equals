@@ -415,7 +415,7 @@ Standard practice, clone the repo and `npm i` to get the dependencies. The follo
 - benchmark => run benchmark tests against other equality libraries
 - build => build `main`, `module`, and `browser` distributables with `rollup`
 - clean => run `rimraf` on the `dist` folder
-- dev => start webpack playground App
+- dev => start `vite` playground App
 - dist => run `build`
 - lint => run ESLint on all files in `src` folder (also runs on `dev` script)
 - lint:fix => run `lint` script, but with auto-fixer
