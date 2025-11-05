@@ -610,20 +610,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nabla/vite-plugin-eslint@npm:^2.0.6":
-  version: 2.0.6
-  resolution: "@nabla/vite-plugin-eslint@npm:2.0.6"
-  dependencies:
-    "@types/eslint": "npm:*"
-    chalk: "npm:^4"
-    debug: "npm:^4"
-  peerDependencies:
-    eslint: ^8.45 || ^9
-    vite: ^4 || ^5 || ^6 || ^7
-  checksum: 10/2275f1019b766ebefe4e86739059e3d43f34f7f00a7d7497340404e4facf32734423119d5a5a3b0b1b191692e91b8a473d52fbc50c909b5b6d107d982fe4863b
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1124,16 +1110,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:*":
-  version: 9.6.1
-  resolution: "@types/eslint@npm:9.6.1"
-  dependencies:
-    "@types/estree": "npm:*"
-    "@types/json-schema": "npm:*"
-  checksum: 10/719fcd255760168a43d0e306ef87548e1e15bffe361d5f4022b0f266575637acc0ecb85604ac97879ee8ae83c6a6d0613b0ed31d0209ddf22a0fe6d608fc56fe
-  languageName: node
-  linkType: hard
-
 "@types/estree@npm:*, @types/estree@npm:1.0.8, @types/estree@npm:^1.0.0":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -1141,7 +1117,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:*, @types/json-schema@npm:^7.0.9":
+"@types/json-schema@npm:^7.0.9":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 10/1a3c3e06236e4c4aab89499c428d585527ce50c24fe8259e8b3926d3df4cfbbbcf306cfc73ddfb66cbafc973116efd15967020b0f738f63e09e64c7d260519e7
@@ -1779,7 +1755,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^4, chalk@npm:^4.0.0, chalk@npm:^4.1.0":
+"chalk@npm:^4.0.0, chalk@npm:^4.1.0":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -1957,7 +1933,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.3":
+"debug@npm:4, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4, debug@npm:^4.4.3":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
   dependencies:
@@ -2596,7 +2572,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fast-equals@workspace:."
   dependencies:
-    "@nabla/vite-plugin-eslint": "npm:^2.0.6"
     "@rollup/plugin-commonjs": "npm:^24.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.3.1"
     "@rollup/plugin-replace": "npm:^5.0.7"

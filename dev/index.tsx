@@ -271,6 +271,8 @@ class Circular {
   }
 }
 
+const foo = 'bar';
+
 console.log(
   'true',
   circularDeepEqual(new Circular('foo'), new Circular('foo')),
