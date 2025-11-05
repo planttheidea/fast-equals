@@ -6,15 +6,19 @@ const promise = Promise.resolve('foo');
 
 const reactElementA = { ...React.createElement('div', { x: 1 }) };
 // in reality the _owner object is much more complex (and contains over dozen circular references)
+// @ts-expect-error - `_owner` is not surfaced on element API
 reactElementA._owner = { children: [reactElementA] };
 
 const reactElementA2 = { ...React.createElement('div', { x: 1 }) };
+// @ts-expect-error - `_owner` is not surfaced on element API
 reactElementA2._owner = { children: [reactElementA2] };
 
 const reactElementB = { ...React.createElement('div', { x: 2 }) };
+// @ts-expect-error - `_owner` is not surfaced on element API
 reactElementB._owner = { children: [reactElementB] };
 
 const reactElementC = { ...React.createElement('span', { x: 1 }) };
+// @ts-expect-error - `_owner` is not surfaced on element API
 reactElementC._owner = { children: [reactElementC] };
 
 export default [

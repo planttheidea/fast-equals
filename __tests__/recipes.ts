@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { createCustomEqual, sameValueZeroEqual } from '../src/index';
 
 import type { CreateState, TypeEqualityComparator } from '../src/internalTypes';
@@ -52,7 +53,7 @@ describe('recipes', () => {
         return a.foo === b.foo && a.bar.baz === b.bar.baz;
       };
 
-      const spy = jest.fn(
+      const spy = vi.fn(
         areObjectsEqual,
       ) as TypeEqualityComparator<SpecialObject>;
 

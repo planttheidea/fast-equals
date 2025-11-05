@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import testSuites from './__helpers__/testSuites';
 import {
   circularDeepEqual,
