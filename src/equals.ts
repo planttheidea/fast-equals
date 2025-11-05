@@ -1,10 +1,10 @@
-import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils';
+import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.ts';
 import type {
   Dictionary,
   PrimitiveWrapper,
   State,
   TypedArray,
-} from './internalTypes';
+} from './internalTypes.ts';
 
 const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';

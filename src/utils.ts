@@ -5,7 +5,7 @@ import type {
   Dictionary,
   State,
   TypeEqualityComparator,
-} from './internalTypes';
+} from './internalTypes.ts';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;

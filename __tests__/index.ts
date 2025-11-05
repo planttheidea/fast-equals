@@ -1,4 +1,4 @@
-import testSuites from './__helpers__/testSuites';
+import testSuites from './__helpers__/testSuites.ts';
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -10,7 +10,7 @@ import {
   strictCircularShallowEqual,
   strictDeepEqual,
   strictShallowEqual,
-} from '../src';
+} from '../src/index.ts';
 
 describe('exports', () => {
   [

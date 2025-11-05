@@ -1,7 +1,7 @@
 import {
   createEqualityComparator,
   createInternalEqualityComparator,
-} from '../src/comparator';
+} from '../src/comparator.ts';
 import {
   areArraysEqual,
   areDatesEqual,
@@ -14,10 +14,13 @@ import {
   areSetsEqual,
   areTypedArraysEqual,
   areUrlsEqual,
-} from '../src/equals';
-import { createIsCircular, sameValueZeroEqual } from '../src/utils';
+} from '../src/equals.ts';
+import { createIsCircular, sameValueZeroEqual } from '../src/utils.ts';
 
-import type { InternalEqualityComparator, State } from '../src/internalTypes';
+import type {
+  InternalEqualityComparator,
+  State,
+} from '../src/internalTypes.ts';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,

@@ -12,8 +12,8 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
-} from './equals';
-import { combineComparators, createIsCircular } from './utils';
+} from './equals.ts';
+import { combineComparators, createIsCircular } from './utils.ts';
 import type {
   ComparatorConfig,
   CreateState,
@@ -21,7 +21,7 @@ import type {
   EqualityComparator,
   InternalEqualityComparator,
   State,
-} from './internalTypes';
+} from './internalTypes.ts';
 
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';

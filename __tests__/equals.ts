@@ -4,9 +4,9 @@ import {
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-} from '../src/equals';
-import { deepEqual } from '../src/index';
-import { sameValueZeroEqual } from '../src/utils';
+} from '../src/equals.ts';
+import { deepEqual } from '../src/index.ts';
+import { sameValueZeroEqual } from '../src/utils.ts';
 
 const shallowState = {
   cache: undefined,

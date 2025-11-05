@@ -1,6 +1,9 @@
-import { createCustomEqual, sameValueZeroEqual } from '../src/index';
+import { createCustomEqual, sameValueZeroEqual } from '../src/index.ts';
 
-import type { CreateState, TypeEqualityComparator } from '../src/internalTypes';
+import type {
+  CreateState,
+  TypeEqualityComparator,
+} from '../src/internalTypes.ts';
 
 describe('recipes', () => {
   describe('createCustomEqual', () => {

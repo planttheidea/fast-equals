@@ -1,10 +1,10 @@
-import { sameValueZeroEqual } from '../src/utils';
+import { sameValueZeroEqual } from '../src/utils.ts';
 
 import {
   alternativeValues,
   mainValues,
   primitiveValues,
-} from './__helpers__/dataTypes';
+} from './__helpers__/dataTypes.ts';
 
 describe('isSameValueZero', () => {
   Object.keys(primitiveValues).forEach((key) => {
