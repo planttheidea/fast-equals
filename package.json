@@ -100,7 +100,7 @@
     "build:min": "rm -rf dist/min && NODE_ENV=production rollup -c config/rollup/config.min.js && tsc -p ./config/tsconfig/min.json",
     "build:types": "node scripts/fallback-types.mjs && node scripts/apply-type-file-extensions.mjs",
     "build:umd": "rm -rf dist/umd && NODE_ENV=production rollup -c config/rollup/config.umd.js && tsc -p ./config/tsconfig/umd.json",
-    "dev": "NODE_ENV=development webpack serve --progress --config=config/webpack.config.js",
+    "dev": "vite --config config/vite.config.js",
     "format": "prettier **/*.ts --write",
     "lint": "eslint src/*.ts",
     "lint:fix": "npm run lint -- --fix",
@@ -116,5 +116,8 @@
   "sideEffects": false,
   "type": "module",
   "types": "./index.d.ts",
-  "version": "5.3.2"
+  "version": "5.3.2",
+  "dependencies": {
+    "vite": "^7.2.0"
+  }
 }
