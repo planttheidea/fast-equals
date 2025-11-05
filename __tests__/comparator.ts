@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createEqualityComparator,
   createInternalEqualityComparator,
-} from '../src/comparator.ts';
+} from '../src/comparator.js';
 import {
   areArraysEqual,
   areDatesEqual,
@@ -15,8 +15,8 @@ import {
   areSetsEqual,
   areTypedArraysEqual,
   areUrlsEqual,
-} from '../src/equals.ts';
-import { createIsCircular, sameValueZeroEqual } from '../src/utils.ts';
+} from '../src/equals.js';
+import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
 
 import type {
   InternalEqualityComparator,

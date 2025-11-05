@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCustomEqual, sameValueZeroEqual } from '../src/index.ts';
+import { createCustomEqual, sameValueZeroEqual } from '../src/index.js';
 
 import type {
   CreateState,

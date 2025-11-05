@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import testSuites from './__helpers__/testSuites.ts';
+import testSuites from './__helpers__/testSuites.js';
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -11,7 +11,7 @@ import {
   strictCircularShallowEqual,
   strictDeepEqual,
   strictShallowEqual,
-} from '../src/index.ts';
+} from '../src/index.js';
 
 describe('exports', () => {
   [
