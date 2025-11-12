@@ -4,7 +4,7 @@ import {
   createInternalEqualityComparator,
   createIsEqual,
 } from './comparator.js';
-import type { CustomEqualCreatorOptions } from './internalTypes.ts';
+import type { CustomEqualCreatorOptions } from './internalTypes.js';
 import { sameValueZeroEqual } from './utils.js';
 
 export { sameValueZeroEqual };
@@ -25,7 +25,7 @@ export type {
   State,
   TypeEqualityComparator,
   TypedArray,
-} from './internalTypes.ts';
+} from './internalTypes.js';
 
 /**
  * Whether the items passed are deeply-equal in value.

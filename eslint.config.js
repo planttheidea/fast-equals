@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tsEslint from 'typescript-eslint';
+import eslintImportPlugin from 'eslint-plugin-import';
 
 export default defineConfig([
   globalIgnores([
@@ -12,6 +13,7 @@ export default defineConfig([
   eslint.configs.recommended,
   tsEslint.configs.strictTypeChecked,
   tsEslint.configs.stylisticTypeChecked,
+  eslintImportPlugin.flatConfigs.recommended,
   {
     languageOptions: {
       parserOptions: {
@@ -20,6 +22,30 @@ export default defineConfig([
       },
     },
     rules: {
+      'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+      'import/enforce-node-protocol-usage': ['error', 'always'],
+      'import/export': 'error',
+      'import/first': 'error',
+      'import/newline-after-import': 'error',
+      'import/no-commonjs': 'error',
+      'import/no-cycle': 'error',
+      'import/no-default-export': 'error',
+      'import/no-empty-named-blocks': 'error',
+      'import/no-self-import': 'off',
+      'import/no-unresolved': 'off',
+      'import/order': [
+        'error',
+        {
+          alphabetize: {
+            order: 'asc',
+            orderImportKind: 'asc',
+          },
+          'newlines-between': 'never',
+        },
+      ],
+      'import/no-absolute-path': 'error',
+      'import/no-self-import': 'error',
+
       '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',

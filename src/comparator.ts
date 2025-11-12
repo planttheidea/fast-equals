@@ -13,7 +13,6 @@ import {
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
 } from './equals.js';
-import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 import type {
   ComparatorConfig,
   CreateState,
@@ -21,7 +20,8 @@ import type {
   EqualityComparator,
   InternalEqualityComparator,
   State,
-} from './internalTypes.ts';
+} from './internalTypes.js';
+import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
