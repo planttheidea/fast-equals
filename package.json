@@ -112,5 +112,5 @@
   "sideEffects": false,
   "type": "module",
   "types": "./index.d.ts",
-  "version": "5.3.3-beta.1"
+  "version": "5.3.3"
 }
