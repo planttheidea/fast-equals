@@ -137,7 +137,7 @@ export function createEqualityComparator<Meta>({
 
     // `isTypedArray()` works on all possible TypedArray classes, so we can avoid
     // capturing the string tag or comparing against all possible constructors.
-    if (isTypedArray?.(a)) {
+    if (isTypedArray != null && isTypedArray(a)) {
       return areTypedArraysEqual(a, b, state);
     }
 

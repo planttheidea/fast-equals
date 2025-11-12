@@ -60,6 +60,7 @@ export default defineConfig([
       ],
       '@typescript-eslint/prefer-for-of': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/prefer-optional-chain': 'off',
       '@typescript-eslint/unbound-method': 'off',
     },
     settings: {
