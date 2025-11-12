@@ -2898,7 +2898,6 @@ __metadata:
     eslint-plugin-import: "npm:^2.32.0"
     fast-deep-equal: "npm:^3.1.3"
     fast-glob: "npm:^3.3.3"
-    in-publish: "npm:^2.0.1"
     lodash: "npm:^4.17.21"
     nano-equal: "npm:^2.0.2"
     prettier: "npm:^3.6.2"
@@ -3420,18 +3419,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"in-publish@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "in-publish@npm:2.0.1"
-  bin:
-    in-install: in-install.js
-    in-publish: in-publish.js
-    not-in-install: not-in-install.js
-    not-in-publish: not-in-publish.js
-  checksum: 10/e02c5812669f37adaf4c3cea43854aae0746e8987a8a455dbcb03e4cb83059aba60e522cf053fc027ab943123e71ccf5121bc2924dc6d8b73f34020849414e20
-  languageName: node
-  linkType: hard
-
 "inquirer@npm:12.9.6":
   version: 12.9.6
   resolution: "inquirer@npm:12.9.6"
@@ -3894,13 +3881,13 @@ __metadata:
   linkType: hard
 
 "js-yaml@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "js-yaml@npm:4.1.0"
+  version: 4.1.1
+  resolution: "js-yaml@npm:4.1.1"
   dependencies:
     argparse: "npm:^2.0.1"
   bin:
     js-yaml: bin/js-yaml.js
-  checksum: 10/c138a34a3fd0d08ebaf71273ad4465569a483b8a639e0b118ff65698d257c2791d3199e3f303631f2cb98213fa7b5f5d6a4621fd0fff819421b990d30d967140
+  checksum: 10/a52d0519f0f4ef5b4adc1cde466cb54c50d56e2b4a983b9d5c9c0f2f99462047007a6274d7e95617a21d3c91fde3ee6115536ed70991cd645ba8521058b78f77
   languageName: node
   linkType: hard
 
