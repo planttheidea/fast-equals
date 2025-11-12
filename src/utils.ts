@@ -5,7 +5,7 @@ import type {
   Dictionary,
   State,
   TypeEqualityComparator,
-} from './internalTypes';
+} from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty } = Object.prototype;
@@ -83,6 +83,7 @@ export function getStrictProperties(
  * Whether the object contains the property passed as an own property.
  */
 export const hasOwn =
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   Object.hasOwn ||
   ((object: Dictionary, property: number | string | symbol) =>
     hasOwnProperty.call(object, property));

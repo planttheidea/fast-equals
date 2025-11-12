@@ -21,6 +21,10 @@ const reactElementC = { ...React.createElement('span', { x: 1 }) };
 // @ts-expect-error - `_owner` is not surfaced on element API
 reactElementC._owner = { children: [reactElementC] };
 
+const error = new Error('boom');
+const typeError = new TypeError('boom');
+const rangeError = new RangeError('boom');
+
 export default [
   {
     description: 'primitives',
@@ -617,6 +621,53 @@ export default [
         shallowEqual: false,
         value1: promise,
         value2: Promise.resolve('foo'),
+      },
+    ],
+  },
+  {
+    description: 'errors',
+    tests: [
+      {
+        deepEqual: true,
+        description: 'errors are equal',
+        shallowEqual: true,
+        value1: error,
+        value2: Object.create(error),
+      },
+      {
+        deepEqual: false,
+        description: 'errors are not equal',
+        shallowEqual: false,
+        value1: error,
+        value2: new Error('boom'),
+      },
+      {
+        deepEqual: true,
+        description: 'range errors are equal',
+        shallowEqual: true,
+        value1: rangeError,
+        value2: Object.create(rangeError),
+      },
+      {
+        deepEqual: false,
+        description: 'range errors are not equal',
+        shallowEqual: false,
+        value1: rangeError,
+        value2: new RangeError('boom'),
+      },
+      {
+        deepEqual: true,
+        description: 'type errors are equal',
+        shallowEqual: true,
+        value1: typeError,
+        value2: Object.create(typeError),
+      },
+      {
+        deepEqual: false,
+        description: 'type errors are not equal',
+        shallowEqual: false,
+        value1: typeError,
+        value2: new TypeError('boom'),
       },
     ],
   },

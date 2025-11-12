@@ -142,7 +142,7 @@ export type InternalEqualityComparator<Meta> = (
 ) => boolean;
 
 // We explicitly check for primitive wrapper types
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
 export type PrimitiveWrapper = Boolean | Number | String;
 
 /**

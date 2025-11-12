@@ -12,8 +12,7 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
-} from './equals';
-import { combineComparators, createIsCircular, getShortTag } from './utils';
+} from './equals.js';
 import type {
   ComparatorConfig,
   CreateState,
@@ -21,7 +20,8 @@ import type {
   EqualityComparator,
   InternalEqualityComparator,
   State,
-} from './internalTypes';
+} from './internalTypes.js';
+import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
@@ -37,7 +37,7 @@ const URL_TAG = '[object URL]';
 
 const { isArray } = Array;
 const isTypedArray =
-  typeof ArrayBuffer === 'function' && ArrayBuffer.isView
+  typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function'
     ? ArrayBuffer.isView
     : null;
 const { assign } = Object;
@@ -165,7 +165,7 @@ export function createEqualityComparator<Meta>({
 
     // Since this is a custom object, capture the string tag to determing its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
-    const tag = getTag(a);
+    const tag = getTag(a as object);
 
     if (tag === DATE_TAG) {
       return areDatesEqual(a, b, state);
@@ -341,7 +341,7 @@ export function createIsEqual<Meta>({
   if (createState) {
     return function isEqual<A, B>(a: A, b: B): boolean {
       const { cache = circular ? new WeakMap() : undefined, meta } =
-        createState!();
+        createState();
 
       return comparator(a, b, {
         cache,

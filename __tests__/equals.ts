@@ -5,9 +5,9 @@ import {
   areObjectsEqual,
   areRegExpsEqual,
   areSetsEqual,
-} from '../src/equals';
-import { deepEqual } from '../src/index';
-import { sameValueZeroEqual } from '../src/utils';
+} from '../src/equals.js';
+import { deepEqual } from '../src/index.js';
+import { sameValueZeroEqual } from '../src/utils.js';
 
 const shallowState = {
   cache: undefined,

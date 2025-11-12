@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { sameValueZeroEqual } from '../src/utils';
+import { sameValueZeroEqual } from '../src/utils.js';
 
 import {
   alternativeValues,
   mainValues,
   primitiveValues,
-} from './__helpers__/dataTypes';
+} from './__helpers__/dataTypes.js';
 
 describe('isSameValueZero', () => {
   Object.keys(primitiveValues).forEach((key) => {

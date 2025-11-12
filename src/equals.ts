@@ -1,10 +1,10 @@
-import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils';
 import type {
   Dictionary,
   PrimitiveWrapper,
   State,
   TypedArray,
-} from './internalTypes';
+} from './internalTypes.js';
+import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.js';
 
 const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
@@ -78,13 +78,14 @@ export function areMapsEqual(
     return true;
   }
 
-  const matchedIndices: Array<true | undefined> = new Array(size);
+  const matchedIndices = new Array<true | undefined>(size);
   const aIterable = a.entries();
 
   let aResult: IteratorResult<[any, any]>;
   let bResult: IteratorResult<[any, any]>;
   let index = 0;
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while ((aResult = aIterable.next())) {
     if (aResult.done) {
       break;
@@ -95,6 +96,7 @@ export function areMapsEqual(
     let hasMatch = false;
     let matchIndex = 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while ((bResult = bIterable.next())) {
       if (bResult.done) {
         break;
@@ -247,12 +249,13 @@ export function areSetsEqual(
     return true;
   }
 
-  const matchedIndices: Array<true | undefined> = new Array(size);
+  const matchedIndices = new Array<true | undefined>(size);
   const aIterable = a.values();
 
   let aResult: IteratorResult<any>;
   let bResult: IteratorResult<any>;
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   while ((aResult = aIterable.next())) {
     if (aResult.done) {
       break;
@@ -263,6 +266,7 @@ export function areSetsEqual(
     let hasMatch = false;
     let matchIndex = 0;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while ((bResult = bIterable.next())) {
       if (bResult.done) {
         break;
