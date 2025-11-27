@@ -8,7 +8,7 @@ import deepEqual from 'deep-equal';
 import { dequal } from 'dequal';
 import { dequal as dequalLite } from 'dequal/lite';
 import fastDeepEqual from 'fast-deep-equal/es6/react.js';
-import * as fe from '../dist/esm/index.mjs';
+import * as fe from '../dist/es/index.mjs';
 import isEqualLodash from 'lodash/isEqual.js';
 import sortBy from 'lodash/sortBy.js';
 import nanoEqual from 'nano-equal';
