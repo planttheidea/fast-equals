@@ -1,5 +1,3 @@
-/* globals document */
-
 import {
   createCustomEqual,
   circularDeepEqual,
@@ -194,7 +192,7 @@ const object4 = {
   zero: 0,
 };
 
-const doesNotEverEqualOne = createCustomEqual<undefined>({
+const doesNotEverEqualOne = createCustomEqual({
   createInternalComparator: (comparator) => (a: any, b: any, _keyA, _keyB, _parentA, _parentB, state) => {
     if (typeof a === 'number' || typeof b === 'number') {
       return a !== 1 && b !== 1;

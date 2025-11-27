@@ -21,7 +21,8 @@
     "inlineSources": true,
     "target": "ES2015",
     "verbatimModuleSyntax": true,
-    "types": ["node"],
+    "types": ["node", "react"],
+    "jsx": "react-jsx",
     "outDir": "../../dist/cjs"
   },
   "exclude": ["**/node_modules/**", "**/__tests__/**"],

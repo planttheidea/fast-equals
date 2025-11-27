@@ -1,6 +1,5 @@
 import React from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const fn = () => {};
 const promise = Promise.resolve('foo');
 
@@ -25,7 +24,7 @@ const error = new Error('boom');
 const typeError = new TypeError('boom');
 const rangeError = new RangeError('boom');
 
-export default [
+export const testSuites = [
   {
     description: 'primitives',
     tests: [
@@ -221,7 +220,6 @@ export default [
         description: 'function and different function are not equal',
         shallowEqual: false,
         value1: fn,
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         value2: () => {},
       },
     ],

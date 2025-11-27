@@ -21,11 +21,21 @@
     "inlineSources": true,
     "target": "ES2015",
     "verbatimModuleSyntax": true,
-    "types": ["node"],
+    "types": ["node", "react"],
     "baseUrl": "src",
+    "jsx": "react-jsx",
     "outDir": "dist",
     "rootDir": "./"
   },
   "exclude": ["**/node_modules/**", "dist/**/*"],
-  "include": ["config/**/*.ts", "dev/**/*.ts", "src/**/*.ts", "__tests__/**/*.ts"]
+  "include": [
+    "config/**/*.ts",
+    "config/**/*.tsx",
+    "dev/**/*.ts",
+    "dev/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
+  ]
 }

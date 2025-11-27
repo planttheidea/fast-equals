@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { sameValueZeroEqual } from '../src/utils.js';
-
 import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 
 describe('isSameValueZero', () => {

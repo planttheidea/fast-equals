@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createCustomEqual, sameValueZeroEqual } from '../src/index.js';
-
 import type { CreateState, TypeEqualityComparator } from '../src/internalTypes.ts';
 
 describe('recipes', () => {
@@ -250,6 +249,7 @@ describe('recipes', () => {
           get(key: object) {
             for (let index = 0; index < entries.length; ++index) {
               if (entries[index]![0] === key) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return entries[index]![1];
               }
             }

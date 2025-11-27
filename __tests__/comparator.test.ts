@@ -13,9 +13,8 @@ import {
   areTypedArraysEqual,
   areUrlsEqual,
 } from '../src/equals.js';
-import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
-
 import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
+import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,

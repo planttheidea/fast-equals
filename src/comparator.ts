@@ -37,8 +37,10 @@ const URL_TAG = '[object URL]';
 
 const { isArray } = Array;
 const isTypedArray =
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' ? ArrayBuffer.isView : null;
 const { assign } = Object;
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const getTag = Object.prototype.toString.call.bind(Object.prototype.toString) as (a: object) => string;
 
 interface CreateIsEqualOptions<Meta> {

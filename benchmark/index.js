@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { deepStrictEqual as assertDeepStrictEqual } from 'node:assert';
-import tests from '../__tests__/__helpers__/testSuites.js';
+import { testSuites as tests } from '../__tests__/__helpers__/testSuites.js';
 
 import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';

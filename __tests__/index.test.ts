@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import testSuites from './__helpers__/testSuites.js';
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -12,6 +11,7 @@ import {
   strictDeepEqual,
   strictShallowEqual,
 } from '../src/index.js';
+import { testSuites } from './__helpers__/testSuites.js';
 
 describe('exports', () => {
   [
@@ -32,18 +32,18 @@ describe('exports', () => {
   });
 });
 
-type Test = {
+interface Test {
   deepEqual: boolean;
   description: string;
   shallowEqual: boolean;
   value1: any;
   value2: any;
-};
+}
 
-type TestSuite = {
+interface TestSuite {
   description: string;
   tests: Test[];
-};
+}
 
 class DeepCircular {
   me: {
@@ -179,7 +179,7 @@ describe('circular', () => {
 
   describe('createCustomCircularEqual', () => {
     function getFakeWeakMap() {
-      const entries: [object, object][] = [];
+      const entries: Array<[object, object]> = [];
 
       return {
         delete(key: object) {

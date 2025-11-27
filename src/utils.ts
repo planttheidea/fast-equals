@@ -8,6 +8,7 @@ import type {
 } from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const { hasOwnProperty } = Object.prototype;
 
 /**
@@ -60,7 +61,7 @@ export function createIsCircular<AreItemsEqual extends TypeEqualityComparator<an
  * Get the `@@toStringTag` of the value, if it exists.
  */
 export function getShortTag(value: any): string | undefined {
-  return value != null ? value[Symbol.toStringTag] : undefined;
+  return value != null ? (value[Symbol.toStringTag] as string) : undefined;
 }
 
 /**
