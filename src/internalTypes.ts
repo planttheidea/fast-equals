@@ -102,34 +102,20 @@ export interface ComparatorConfig<Meta> {
    *
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag
    */
-  unknownTagComparators:
-    | Record<string, TypeEqualityComparator<any, Meta>>
-    | undefined;
+  unknownTagComparators: Record<string, TypeEqualityComparator<any, Meta>> | undefined;
 }
 
-export type CreateCustomComparatorConfig<Meta> = (
-  config: ComparatorConfig<Meta>,
-) => Partial<ComparatorConfig<Meta>>;
+export type CreateCustomComparatorConfig<Meta> = (config: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
 
 export type CreateState<Meta> = () => {
   cache?: Cache<any, any> | undefined;
   meta?: Meta;
 };
 
-export type EqualityComparator<Meta> = <A, B>(
-  a: A,
-  b: B,
-  state: State<Meta>,
-) => boolean;
-export type AnyEqualityComparator<Meta> = (
-  a: any,
-  b: any,
-  state: State<Meta>,
-) => boolean;
+export type EqualityComparator<Meta> = <A, B>(a: A, b: B, state: State<Meta>) => boolean;
+export type AnyEqualityComparator<Meta> = (a: any, b: any, state: State<Meta>) => boolean;
 
-export type EqualityComparatorCreator<Meta> = (
-  fn: EqualityComparator<Meta>,
-) => InternalEqualityComparator<Meta>;
+export type EqualityComparatorCreator<Meta> = (fn: EqualityComparator<Meta>) => InternalEqualityComparator<Meta>;
 
 export type InternalEqualityComparator<Meta> = (
   a: any,
@@ -167,11 +153,7 @@ export type TypedArray =
   | Uint8Array
   | Uint8ClampedArray;
 
-export type TypeEqualityComparator<Type, Meta = undefined> = (
-  a: Type,
-  b: Type,
-  state: State<Meta>,
-) => boolean;
+export type TypeEqualityComparator<Type, Meta = undefined> = (a: Type, b: Type, state: State<Meta>) => boolean;
 
 export interface CustomEqualCreatorOptions<Meta> {
   /**
@@ -193,9 +175,7 @@ export interface CustomEqualCreatorOptions<Meta> {
    * class instance differently than other objects) or to incorporate `meta` in
    * the comparison. See the recipes for examples.
    */
-  createInternalComparator?: (
-    compare: EqualityComparator<Meta>,
-  ) => InternalEqualityComparator<Meta>;
+  createInternalComparator?: (compare: EqualityComparator<Meta>) => InternalEqualityComparator<Meta>;
   /**
    * Create a custom `state` object passed between the methods. This allows for
    * custom `cache` and/or `meta` values to be used.

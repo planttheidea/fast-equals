@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "declaration": false,
+    "declaration": true,
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "isolatedModules": true,
     "lib": ["ESNext", "DOM"],
-    "module": "NodeNext",
+    "module": "Node16",
     "moduleDetection": "force",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node16",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
@@ -22,20 +22,9 @@
     "target": "ES2015",
     "verbatimModuleSyntax": true,
     "types": ["node", "react"],
-    "baseUrl": "src",
     "jsx": "react-jsx",
-    "outDir": "dist",
-    "rootDir": "./"
+    "outDir": "../../dist/cjs"
   },
-  "exclude": ["**/node_modules/**", "dist/**/*"],
-  "include": [
-    "config/**/*.ts",
-    "config/**/*.tsx",
-    "dev/**/*.ts",
-    "dev/**/*.tsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "__tests__/**/*.ts",
-    "__tests__/**/*.tsx"
-  ]
+  "exclude": ["**/node_modules/**", "**/__tests__/**"],
+  "include": ["../../src/**/*.ts"]
 }

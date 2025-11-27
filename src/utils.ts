@@ -8,6 +8,7 @@ import type {
 } from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const { hasOwnProperty } = Object.prototype;
 
 /**
@@ -27,14 +28,10 @@ export function combineComparators<Meta>(
  * for circular references to be safely included in the comparison without creating
  * stack overflows.
  */
-export function createIsCircular<
-  AreItemsEqual extends TypeEqualityComparator<any, any>,
->(areItemsEqual: AreItemsEqual): AreItemsEqual {
-  return function isCircular(
-    a: any,
-    b: any,
-    state: CircularState<Cache<any, any>>,
-  ) {
+export function createIsCircular<AreItemsEqual extends TypeEqualityComparator<any, any>>(
+  areItemsEqual: AreItemsEqual,
+): AreItemsEqual {
+  return function isCircular(a: any, b: any, state: CircularState<Cache<any, any>>) {
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object') {
       return areItemsEqual(a, b, state);
     }
@@ -64,19 +61,15 @@ export function createIsCircular<
  * Get the `@@toStringTag` of the value, if it exists.
  */
 export function getShortTag(value: any): string | undefined {
-  return value != null ? value[Symbol.toStringTag] : undefined;
+  return value != null ? (value[Symbol.toStringTag] as string) : undefined;
 }
 
 /**
  * Get the properties to strictly examine, which include both own properties that are
  * not enumerable and symbol properties.
  */
-export function getStrictProperties(
-  object: Dictionary,
-): Array<string | symbol> {
-  return (getOwnPropertyNames(object) as Array<string | symbol>).concat(
-    getOwnPropertySymbols(object),
-  );
+export function getStrictProperties(object: Dictionary): Array<string | symbol> {
+  return (getOwnPropertyNames(object) as Array<string | symbol>).concat(getOwnPropertySymbols(object));
 }
 
 /**
@@ -84,9 +77,7 @@ export function getStrictProperties(
  */
 export const hasOwn =
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  Object.hasOwn ||
-  ((object: Dictionary, property: number | string | symbol) =>
-    hasOwnProperty.call(object, property));
+  Object.hasOwn || ((object: Dictionary, property: number | string | symbol) => hasOwnProperty.call(object, property));
 
 /**
  * Whether the values passed are strictly equal or both NaN.

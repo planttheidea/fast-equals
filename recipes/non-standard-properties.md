@@ -1,6 +1,7 @@
 # Non-standard properties
 
-Sometimes, objects require a comparison that extend beyond its own keys, or even its own properties or symbols. Using a custom object comparator with `createCustomEqual` allows these kinds of comparisons.
+Sometimes, objects require a comparison that extend beyond its own keys, or even its own properties or symbols. Using a
+custom object comparator with `createCustomEqual` allows these kinds of comparisons.
 
 ```ts
 import { createCustomEqual } from 'fast-equals';
@@ -22,9 +23,7 @@ class HiddenProperty {
   }
 }
 
-function createAreObjectsEqual(
-  areObjectsEqual: AreObjectsEqual,
-): AreObjectsEqual {
+function createAreObjectsEqual(areObjectsEqual: AreObjectsEqual): AreObjectsEqual {
   return function (a, b, state) {
     if (!areObjectsEqual(a, b, state)) {
       return false;
@@ -42,7 +41,6 @@ function createAreObjectsEqual(
 }
 
 const deepEqual = createCustomEqual({
-  createCustomConfig: ({ areObjectsEqual }) =>
-    createAreObjectsEqual(areObjectsEqual),
+  createCustomConfig: ({ areObjectsEqual }) => createAreObjectsEqual(areObjectsEqual),
 });
 ```

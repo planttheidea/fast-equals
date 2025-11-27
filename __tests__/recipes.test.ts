@@ -1,23 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createCustomEqual, sameValueZeroEqual } from '../src/index.js';
-
-import type {
-  CreateState,
-  TypeEqualityComparator,
-} from '../src/internalTypes.ts';
+import type { CreateState, TypeEqualityComparator } from '../src/internalTypes.ts';
 
 describe('recipes', () => {
   describe('createCustomEqual', () => {
     describe('legacy-regexp-support', () => {
       const areRegExpsEqual = (a: RegExp, b: RegExp) => {
         return (
-          a.source === b.source &&
-          a.global === b.global &&
-          a.ignoreCase === b.ignoreCase &&
-          a.multiline === b.multiline &&
-          a.unicode === b.unicode &&
-          a.sticky === b.sticky &&
-          a.lastIndex === b.lastIndex
+          a.source === b.source
+          && a.global === b.global
+          && a.ignoreCase === b.ignoreCase
+          && a.multiline === b.multiline
+          && a.unicode === b.unicode
+          && a.sticky === b.sticky
+          && a.lastIndex === b.lastIndex
         );
       };
 
@@ -56,9 +52,7 @@ describe('recipes', () => {
         return a.foo === b.foo && a.bar.baz === b.bar.baz;
       };
 
-      const spy = vi.fn(
-        areObjectsEqual,
-      ) as TypeEqualityComparator<SpecialObject>;
+      const spy = vi.fn(areObjectsEqual) as TypeEqualityComparator<SpecialObject>;
 
       const isSpecialObjectEqual = createCustomEqual({
         createCustomConfig: () => ({
@@ -84,14 +78,9 @@ describe('recipes', () => {
       const createState: CreateState<Meta> = () => ({ meta: { value: 'baz' } });
 
       const deepEqual = createCustomEqual<Meta>({
-        createInternalComparator:
-          (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
-            return (
-              deepEqual(a, b, state) ||
-              a === state.meta.value ||
-              b === state.meta.value
-            );
-          },
+        createInternalComparator: (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+          return deepEqual(a, b, state) || a === state.meta.value || b === state.meta.value;
+        },
         createState,
       });
 
@@ -132,26 +121,15 @@ describe('recipes', () => {
         return object;
       }
 
-      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (
-        a,
-        b,
-      ) => {
-        const propertiesA = [
-          ...Object.getOwnPropertyNames(a),
-          ...Object.getOwnPropertySymbols(a),
-        ];
-        const propertiesB = [
-          ...Object.getOwnPropertyNames(b),
-          ...Object.getOwnPropertySymbols(b),
-        ];
+      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (a, b) => {
+        const propertiesA = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)];
+        const propertiesB = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)];
 
         if (propertiesA.length !== propertiesB.length) {
           return false;
         }
 
-        return propertiesA.every(
-          (property) => a[property as any] === b[property as any],
-        );
+        return propertiesA.every((property) => a[property as any] === b[property as any]);
       };
 
       const deepEqual = createCustomEqual({
@@ -170,18 +148,9 @@ describe('recipes', () => {
     });
 
     describe('strict-property-descriptor-check', () => {
-      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (
-        a,
-        b,
-      ) => {
-        const propertiesA = [
-          ...Object.getOwnPropertyNames(a),
-          ...Object.getOwnPropertySymbols(a),
-        ];
-        const propertiesB = [
-          ...Object.getOwnPropertyNames(b),
-          ...Object.getOwnPropertySymbols(b),
-        ];
+      const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (a, b) => {
+        const propertiesA = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)];
+        const propertiesB = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)];
 
         if (propertiesA.length !== propertiesB.length) {
           return false;
@@ -192,12 +161,12 @@ describe('recipes', () => {
           const descriptorB = Object.getOwnPropertyDescriptor(b, property);
 
           return (
-            descriptorA &&
-            descriptorB &&
-            descriptorA.configurable === descriptorB.configurable &&
-            descriptorA.enumerable === descriptorB.enumerable &&
-            descriptorA.value === descriptorB.value &&
-            descriptorA.writable === descriptorB.writable
+            descriptorA
+            && descriptorB
+            && descriptorA.configurable === descriptorB.configurable
+            && descriptorA.enumerable === descriptorB.enumerable
+            && descriptorA.value === descriptorB.value
+            && descriptorA.writable === descriptorB.writable
           );
         });
       };
@@ -280,6 +249,7 @@ describe('recipes', () => {
           get(key: object) {
             for (let index = 0; index < entries.length; ++index) {
               if (entries[index]![0] === key) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return entries[index]![1];
               }
             }
@@ -355,8 +325,7 @@ describe('recipes', () => {
       const deepEqual = createCustomEqual({
         createCustomConfig: () => ({
           unknownTagComparators: {
-            [tag]: (a, b) =>
-              a instanceof Thing && b instanceof Thing && a.equals(b),
+            [tag]: (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b),
           },
         }),
       });
@@ -386,8 +355,7 @@ describe('recipes', () => {
       const deepEqual = createCustomEqual({
         createCustomConfig: () => ({
           unknownTagComparators: {
-            [`[object ${tag}]`]: (a, b) =>
-              a instanceof Thing && b instanceof Thing && a.equals(b),
+            [`[object ${tag}]`]: (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b),
           },
         }),
       });

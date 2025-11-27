@@ -7,10 +7,10 @@ const rangeError = new RangeError('boom');
 export const primitiveValues = {
   boolean: true,
   nan: NaN,
-  nil: null as null,
+  nil: null,
   number: 123,
   string: 'foo',
-  undef: undefined as undefined,
+  undef: undefined,
 };
 
 export const mainValues = {

@@ -2,12 +2,15 @@
 
 ## 5.3.3
 
-- [#147](https://github.com/planttheidea/fast-equals/pull/147) - Fix type resolution when using `Node16` as `moduleResolution` in TypeScript (fixes [#145](https://github.com/planttheidea/fast-equals/issues/145))
+- [#147](https://github.com/planttheidea/fast-equals/pull/147) - Fix type resolution when using `Node16` as
+  `moduleResolution` in TypeScript (fixes [#145](https://github.com/planttheidea/fast-equals/issues/145))
 
 ## 5.3.2
 
-- [#154](https://github.com/planttheidea/fast-equals/pull/154) - Use include with `"files"` instead of exclude with `.npmignore` (Thanks [@43081j](https://github.com/43081j))
-- [#155](https://github.com/planttheidea/fast-equals/pull/155) - Upgrade build dependencies to resolve security vulnerabilities
+- [#154](https://github.com/planttheidea/fast-equals/pull/154) - Use include with `"files"` instead of exclude with
+  `.npmignore` (Thanks [@43081j](https://github.com/43081j))
+- [#155](https://github.com/planttheidea/fast-equals/pull/155) - Upgrade build dependencies to resolve security
+  vulnerabilities
 
 ## 5.3.1
 
@@ -15,17 +18,20 @@
 
 ## 5.3.0
 
-- [#150](https://github.com/planttheidea/fast-equals/pull/150/files) - Add support for `unknownTagComparators` in custom configuration (thanks to @mrcljx for the idea)
+- [#150](https://github.com/planttheidea/fast-equals/pull/150/files) - Add support for `unknownTagComparators` in custom
+  configuration (thanks to @mrcljx for the idea)
 
 ## 5.2.2
 
-- [#139](https://github.com/planttheidea/fast-equals/pull/139/files) - Add file extensions to type definition files to allow it to work in projects with `NodeNext` module resolution
+- [#139](https://github.com/planttheidea/fast-equals/pull/139/files) - Add file extensions to type definition files to
+  allow it to work in projects with `NodeNext` module resolution
 
 ## 5.2.1
 
 ### Bugfixes
 
-- [#138](https://github.com/planttheidea/fast-equals/pull/138) - Actually fix reference to `src` code in `index.d.ts` by flattening types in file
+- [#138](https://github.com/planttheidea/fast-equals/pull/138) - Actually fix reference to `src` code in `index.d.ts` by
+  flattening types in file
 
 ## 5.2.0
 
@@ -41,11 +47,13 @@
 
 ### Enhancements
 
-- [#136](https://github.com/planttheidea/fast-equals/pull/136) - More than double speed of iterables (`Map` / `Set`) equality comparisons
+- [#136](https://github.com/planttheidea/fast-equals/pull/136) - More than double speed of iterables (`Map` / `Set`)
+  equality comparisons
 
 ### Maintenance
 
-- [#135](https://github.com/planttheidea/fast-equals/pull/135) - Include `dequal` and `dequal/lite` in benchmark comparisons
+- [#135](https://github.com/planttheidea/fast-equals/pull/135) - Include `dequal` and `dequal/lite` in benchmark
+  comparisons
 
 ## 5.1.2
 
@@ -63,15 +71,21 @@ This was an accidental pre-release when cleaning up release setup.
 
 ### Enhancements
 
-- [#127](https://github.com/planttheidea/fast-equals/pull/127) - Add support for custom `Function` instance comparisons (resolves [#118](https://github.com/planttheidea/fast-equals/issues/118))
-- [#128](https://github.com/planttheidea/fast-equals/pull/128) - Add support for `URL` instance comparisons (resolves [#121](https://github.com/planttheidea/fast-equals/issues/121))
-- [#129](https://github.com/planttheidea/fast-equals/pull/129) - Add support for `Error` instance comparisons (resolves [#123](https://github.com/planttheidea/fast-equals/issues/123))
-- [#130](https://github.com/planttheidea/fast-equals/pull/130) - Add support for custom `Number` instance comparisons (resolves [#112](https://github.com/planttheidea/fast-equals/issues/112))
+- [#127](https://github.com/planttheidea/fast-equals/pull/127) - Add support for custom `Function` instance comparisons
+  (resolves [#118](https://github.com/planttheidea/fast-equals/issues/118))
+- [#128](https://github.com/planttheidea/fast-equals/pull/128) - Add support for `URL` instance comparisons (resolves
+  [#121](https://github.com/planttheidea/fast-equals/issues/121))
+- [#129](https://github.com/planttheidea/fast-equals/pull/129) - Add support for `Error` instance comparisons (resolves
+  [#123](https://github.com/planttheidea/fast-equals/issues/123))
+- [#130](https://github.com/planttheidea/fast-equals/pull/130) - Add support for custom `Number` instance comparisons
+  (resolves [#112](https://github.com/planttheidea/fast-equals/issues/112))
 
 ### Bugfixes
 
-- [#132](https://github.com/planttheidea/fast-equals/pull/126) - Fix `assert.deepEqual` check in benchmark (resolves [#125](https://github.com/planttheidea/fast-equals/issues/125))
-- [#126](https://github.com/planttheidea/fast-equals/pull/132) - Export explicit types via `export type` (attempts to resolve [#114](https://github.com/planttheidea/fast-equals/issues/114))
+- [#132](https://github.com/planttheidea/fast-equals/pull/126) - Fix `assert.deepEqual` check in benchmark (resolves
+  [#125](https://github.com/planttheidea/fast-equals/issues/125))
+- [#126](https://github.com/planttheidea/fast-equals/pull/132) - Export explicit types via `export type` (attempts to
+  resolve [#114](https://github.com/planttheidea/fast-equals/issues/114))
 
 ## 5.0.1
 
@@ -85,23 +99,32 @@ This was an accidental pre-release when cleaning up release setup.
 
 #### `constructor` equality now required
 
-To align with other implementations common in the community, but also to be more functionally correct, the two objects being compared now must have equal `constructor`s.
+To align with other implementations common in the community, but also to be more functionally correct, the two objects
+being compared now must have equal `constructor`s.
 
 #### `Map` / `Set` comparisons no longer support IE11
 
-In previous verisons, `.forEach()` was used to ensure that support for `Symbol` was not required, as IE11 did not have `Symbol` and therefore both `Map` and `Set` did not have iterator-based methods such as `.values()` or `.entries()`. Since IE11 is no longer a supported browser, and support for those methods is present in all browsers and Node for quite a while, the comparison has moved to use these methods. This results in a ~20% performance increase.
+In previous verisons, `.forEach()` was used to ensure that support for `Symbol` was not required, as IE11 did not have
+`Symbol` and therefore both `Map` and `Set` did not have iterator-based methods such as `.values()` or `.entries()`.
+Since IE11 is no longer a supported browser, and support for those methods is present in all browsers and Node for quite
+a while, the comparison has moved to use these methods. This results in a ~20% performance increase.
 
 #### `createCustomEqual` contract has changed
 
-To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for `createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details, but froma high-level:
+To better facilitate strict comparisons, but also to allow for `meta` use separate from caching, the contract for
+`createCustomEqual` has changed. See the [README documentation](./README.md#createcustomequal) for more details, but
+froma high-level:
 
 - `meta` is no longer passed through to equality comparators, but rather a general `state` object which contains `meta`
-- `cache` now also lives on the `state` object, which allows for use of the `meta` property separate from but in parallel with the circular cache
-- `equals` is now on `state`, which prevents the need to pass through the separate `isEqual` method for the equality comparator
+- `cache` now also lives on the `state` object, which allows for use of the `meta` property separate from but in
+  parallel with the circular cache
+- `equals` is now on `state`, which prevents the need to pass through the separate `isEqual` method for the equality
+  comparator
 
 #### `createCustomCircularEqual` has been removed
 
-You can create a custom circular equality comparator through `createCustomEqual` now by providing `circular: true` to the options.
+You can create a custom circular equality comparator through `createCustomEqual` now by providing `circular: true` to
+the options.
 
 #### Custom `meta` values are no longer passed at callsite
 
@@ -124,19 +147,24 @@ The following new comparators are available:
 - `strictCircularDeepEqual`
 - `strictCircularShallowEqual`
 
-This will perform the same comparisons as their non-strict counterparts, but will verify additional properties (non-enumerable properties on objects, keyed objects on `Array` / `Map` / `Set`) and that the descriptors for the properties align.
+This will perform the same comparisons as their non-strict counterparts, but will verify additional properties
+(non-enumerable properties on objects, keyed objects on `Array` / `Map` / `Set`) and that the descriptors for the
+properties align.
 
 #### `TypedArray` support
 
-Support for comparing all typed array values is now supported, and you can provide a custom comparator via the new `areTypedArraysEqual` option in the `createCustomEqual` configuration.
+Support for comparing all typed array values is now supported, and you can provide a custom comparator via the new
+`areTypedArraysEqual` option in the `createCustomEqual` configuration.
 
 #### Better build system resolution
 
-The library now leverages the `exports` property in the `package.json` to provide builds specific to your method of consumption (ESM / CommonJS / UMD). There is still a minified UMD version available if you want to use it instead.
+The library now leverages the `exports` property in the `package.json` to provide builds specific to your method of
+consumption (ESM / CommonJS / UMD). There is still a minified UMD version available if you want to use it instead.
 
 #### `arePrimitiveWrappersEqual` option added to `createCustomEqual` configuration
 
-If you want a custom comparator for primitive wrappers (`new Boolean()` / `new Number()` / `new String()`) it is now available.
+If you want a custom comparator for primitive wrappers (`new Boolean()` / `new Number()` / `new String()`) it is now
+available.
 
 ## 4.0.3
 
@@ -148,7 +176,8 @@ If you want a custom comparator for primitive wrappers (`new Boolean()` / `new N
 
 ## 4.0.1
 
-- [#81](https://github.com/planttheidea/fast-equals/issues/81) - Fix typing issues related to importing in `index.d.ts` file
+- [#81](https://github.com/planttheidea/fast-equals/issues/81) - Fix typing issues related to importing in `index.d.ts`
+  file
 
 ## 4.0.0
 
@@ -161,25 +190,35 @@ In previous versions, there were automatic fallbacks for certain ES2015 features
 - [`RegExp.prototype.flags`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags)
 - [`WeakMap`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)
 
-Due to the omnipresence of support in both browser and NodeJS, these have been deprecated. There is still an option if you require support for these legacy environments, however; see [`createCustomEqual`](./README.md#createcustomequal) and [`createCustomCircularEqual`](./README.md#createcustomcircularequal) for more details.
+Due to the omnipresence of support in both browser and NodeJS, these have been deprecated. There is still an option if
+you require support for these legacy environments, however; see [`createCustomEqual`](./README.md#createcustomequal) and
+[`createCustomCircularEqual`](./README.md#createcustomcircularequal) for more details.
 
 #### `createCustomEqual` contract has changed
 
-To allow more flexibility and customizability for a variety of edge cases, `createCustomEqual` now allows override of specific type value comparisons in addition to the general comparator it did prior. See [the documentation](./README.md#createcustomequal) for more details.
+To allow more flexibility and customizability for a variety of edge cases, `createCustomEqual` now allows override of
+specific type value comparisons in addition to the general comparator it did prior. See
+[the documentation](./README.md#createcustomequal) for more details.
 
 ### Enhancements
 
 #### `createCustomCircularEqual` added
 
-Like `createCustomEqual`, it will create a custom equality comparator, with the exception that it will handle circular references. See [the documentation](./README.md#createcustomcircularequal) for more details.
+Like `createCustomEqual`, it will create a custom equality comparator, with the exception that it will handle circular
+references. See [the documentation](./README.md#createcustomcircularequal) for more details.
 
 #### Cross-realm comparisons are now supported
 
-Prior to `4.x.x.`, `instanceof` was used internally for checking of object classes, which only worked when comparing objects from the same [Realm](https://262.ecma-international.org/6.0/#sec-code-realms). This has changed to instead use an object's [StringTag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag), which is not realm-specific.
+Prior to `4.x.x.`, `instanceof` was used internally for checking of object classes, which only worked when comparing
+objects from the same [Realm](https://262.ecma-international.org/6.0/#sec-code-realms). This has changed to instead use
+an object's
+[StringTag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag), which
+is not realm-specific.
 
 #### TypeScript typings improved
 
-For better typing in edge-case scenarios like custom comparators with `meta` values, typings have been refactored for accuracy and better narrow flow-through.
+For better typing in edge-case scenarios like custom comparators with `meta` values, typings have been refactored for
+accuracy and better narrow flow-through.
 
 ## 3.0.3
 
@@ -188,7 +227,8 @@ For better typing in edge-case scenarios like custom comparators with `meta` val
 ## 3.0.2
 
 - Fix [#73](https://github.com/planttheidea/fast-equals/issues/73) - support comparison of primitive wrappers
-- [#76](https://github.com/planttheidea/fast-equals/pull/76) - improve speed and accuracy of `RegExp` comparison in modern environments
+- [#76](https://github.com/planttheidea/fast-equals/pull/76) - improve speed and accuracy of `RegExp` comparison in
+  modern environments
 
 ## 3.0.1
 
@@ -216,14 +256,18 @@ type InternalEqualityComparator = (
 ) => boolean;
 ```
 
-If you have a custom equality comparator, you can ignore the differences by just passing additional `undefined` parameters, or you can use the parameters to further improve / clarify the logic.
+If you have a custom equality comparator, you can ignore the differences by just passing additional `undefined`
+parameters, or you can use the parameters to further improve / clarify the logic.
 
-- Add [#57](https://github.com/planttheidea/fast-equals/pull/57) - support additional metadata for custom equality comparators
+- Add [#57](https://github.com/planttheidea/fast-equals/pull/57) - support additional metadata for custom equality
+  comparators
 
 ## 2.0.4
 
-- Fix [#58](https://github.com/planttheidea/fast-equals/issues/58) - duplicate entries in `Map` / `Set` can create false equality success
-- [#60](https://github.com/planttheidea/fast-equals/issues/60) - Add documentation for key equality of `Map` being a part of `deepEqual`
+- Fix [#58](https://github.com/planttheidea/fast-equals/issues/58) - duplicate entries in `Map` / `Set` can create false
+  equality success
+- [#60](https://github.com/planttheidea/fast-equals/issues/60) - Add documentation for key equality of `Map` being a
+  part of `deepEqual`
 
 ## 2.0.3
 
@@ -238,7 +282,8 @@ If you have a custom equality comparator, you can ignore the differences by just
 
 ## 2.0.1
 
-- Fix [#41](https://github.com/planttheidea/fast-equals/pull/41) - prevent `.rpt2_cache` directory from being published for better CI environment support (thanks [@herberttn](https://github.com/herberttn))
+- Fix [#41](https://github.com/planttheidea/fast-equals/pull/41) - prevent `.rpt2_cache` directory from being published
+  for better CI environment support (thanks [@herberttn](https://github.com/herberttn))
 
 ## 2.0.0
 
@@ -297,7 +342,8 @@ If you have a custom equality comparator, you can ignore the differences by just
 
 ## 1.5.0
 
-- Add [`circularDeepEqual`](README.md#circulardeepequal) and [`circularShallowEqual`](README.md#circularshallowequal) methods
+- Add [`circularDeepEqual`](README.md#circulardeepequal) and [`circularShallowEqual`](README.md#circularshallowequal)
+  methods
 - Add `meta` third parameter to `comparator` calls, for use with `createCustomEqual` method
 
 ## 1.4.1

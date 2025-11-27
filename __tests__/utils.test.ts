@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { sameValueZeroEqual } from '../src/utils.js';
-
-import {
-  alternativeValues,
-  mainValues,
-  primitiveValues,
-} from './__helpers__/dataTypes.js';
+import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 
 describe('isSameValueZero', () => {
   Object.keys(primitiveValues).forEach((key) => {
@@ -23,10 +18,7 @@ describe('isSameValueZero', () => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
       it(`should have ${key} be equal by SameValueZero`, () => {
         expect(
-          sameValueZeroEqual(
-            mainValues[key as keyof typeof mainValues],
-            mainValues[key as keyof typeof mainValues],
-          ),
+          sameValueZeroEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
         ).toBe(true);
       });
     }

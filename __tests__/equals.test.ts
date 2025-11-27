@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  areArraysEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-} from '../src/equals.js';
+import { areArraysEqual, areMapsEqual, areObjectsEqual, areRegExpsEqual, areSetsEqual } from '../src/equals.js';
 import { deepEqual } from '../src/index.js';
 import { sameValueZeroEqual } from '../src/utils.js';
 
@@ -132,16 +126,13 @@ describe('areMapsEqual', () => {
         ],
         false,
       ],
-    ])(
-      'should handle `Map` entries %s',
-      (_, aEntries: any[], bEntries: any[], expected) => {
-        const mapA = new Map<any, any>(aEntries);
-        const mapB = new Map<any, any>(bEntries);
+    ])('should handle `Map` entries %s', (_, aEntries: any[], bEntries: any[], expected) => {
+      const mapA = new Map<any, any>(aEntries);
+      const mapB = new Map<any, any>(bEntries);
 
-        expect(areMapsEqual(mapA, mapB, deepState)).toBe(expected);
-        expect(areMapsEqual(mapB, mapA, deepState)).toBe(expected);
-      },
-    );
+      expect(areMapsEqual(mapA, mapB, deepState)).toBe(expected);
+      expect(areMapsEqual(mapB, mapA, deepState)).toBe(expected);
+    });
   });
 });
 
@@ -257,24 +248,9 @@ describe('areSetsEqual', () => {
 
   describe('issue 58 - key and value being identical', () => {
     it.each([
-      [
-        'being different references but equal',
-        [{ b: 'c' }, { b: 'c' }],
-        [{ b: 'c' }, { b: 'c' }],
-        true,
-      ],
-      [
-        'being unequal based on first',
-        [{ b: 'c' }, { b: 'c' }],
-        ['foo', { b: 'c' }],
-        false,
-      ],
-      [
-        'being unequal based on last',
-        [{ b: 'c' }, { b: 'c' }],
-        [{ b: 'c' }, 'foo'],
-        false,
-      ],
+      ['being different references but equal', [{ b: 'c' }, { b: 'c' }], [{ b: 'c' }, { b: 'c' }], true],
+      ['being unequal based on first', [{ b: 'c' }, { b: 'c' }], ['foo', { b: 'c' }], false],
+      ['being unequal based on last', [{ b: 'c' }, { b: 'c' }], [{ b: 'c' }, 'foo'], false],
       [
         'being unequal based on an intermediary entry',
         [{ b: 'c' }, { b: 'c' }, { b: 'c' }],

@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  createEqualityComparator,
-  createInternalEqualityComparator,
-} from '../src/comparator.js';
+import { createEqualityComparator, createInternalEqualityComparator } from '../src/comparator.js';
 import {
   areArraysEqual,
   areDatesEqual,
@@ -16,12 +13,8 @@ import {
   areTypedArraysEqual,
   areUrlsEqual,
 } from '../src/equals.js';
+import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
 import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
-
-import type {
-  InternalEqualityComparator,
-  State,
-} from '../src/internalTypes.ts';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArraysEqual,
@@ -49,10 +42,7 @@ const CIRCULAR_COMPARATOR_OPTIONS = {
 describe('createEqualityComparator', () => {
   [
     {
-      createState: <Meta>(
-        equals: InternalEqualityComparator<undefined>,
-        meta?: Meta,
-      ) => ({
+      createState: <Meta>(equals: InternalEqualityComparator<undefined>, meta?: Meta) => ({
         cache: undefined,
         equals,
         meta,
@@ -62,10 +52,7 @@ describe('createEqualityComparator', () => {
       options: STANDARD_COMPARATOR_OPTIONS,
     },
     {
-      createState: <Meta>(
-        equals: InternalEqualityComparator<undefined>,
-        meta?: Meta,
-      ) => ({
+      createState: <Meta>(equals: InternalEqualityComparator<undefined>, meta?: Meta) => ({
         cache: new WeakMap(),
         equals,
         meta: meta,
@@ -98,19 +85,8 @@ describe('createEqualityComparator', () => {
 
         const comparator = createEqualityComparator(options);
         const state = createState(
-          (
-            a: any,
-            b: any,
-            indexOrKeyA: any,
-            indexOrKeyB: any,
-            parentA: any,
-            parentB: any,
-            state: State<undefined>,
-          ) => {
-            if (
-              typeof indexOrKeyA === 'number' &&
-              typeof indexOrKeyB === 'number'
-            ) {
+          (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<undefined>) => {
+            if (typeof indexOrKeyA === 'number' && typeof indexOrKeyB === 'number') {
               // Only check key equality comparison
               expect(indexOrKeyA).toBe(Array.from(parentA.keys()).indexOf(a));
               expect(indexOrKeyB).toBe(Array.from(parentB.keys()).indexOf(b));
@@ -159,15 +135,7 @@ describe('createEqualityComparator', () => {
         [a.foo, b.foo, 'foo', 'foo', a, b, state],
         [a.foo.oof, b.foo.oof, 'oof', 'oof', a.foo, b.foo, state],
         ['y', 'y', 0, 0, a.foo.oof, b.foo.oof, state], // called with the keys of a Map
-        [
-          a.foo.oof.get('y'),
-          b.foo.oof.get('y'),
-          'y',
-          'y',
-          a.foo.oof,
-          b.foo.oof,
-          state,
-        ],
+        [a.foo.oof.get('y'), b.foo.oof.get('y'), 'y', 'y', a.foo.oof, b.foo.oof, state],
         [a.foo.baz, b.foo.baz, 'baz', 'baz', a.foo, b.foo, state],
         ['x', 'x', 'x', 'x', a.foo.baz, b.foo.baz, state],
         [a.foo.bar, b.foo.bar, 'bar', 'bar', a.foo, b.foo, state],

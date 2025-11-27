@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { deepStrictEqual as assertDeepStrictEqual } from 'node:assert';
-import tests from '../__tests__/__helpers__/testSuites.js';
+import { testSuites as tests } from '../__tests__/__helpers__/testSuites.js';
 
 import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';
 import { dequal } from 'dequal';
 import { dequal as dequalLite } from 'dequal/lite';
 import fastDeepEqual from 'fast-deep-equal/es6/react.js';
-import * as fe from '../dist/esm/index.mjs';
+import * as fe from '../dist/es/index.mjs';
 import isEqualLodash from 'lodash/isEqual.js';
 import sortBy from 'lodash/sortBy.js';
 import nanoEqual from 'nano-equal';
@@ -65,22 +65,12 @@ for (const name in packages) {
     for (const test of testSuite.tests) {
       try {
         if (fn(test.value1, test.value2) !== test.deepEqual) {
-          console.error(
-            'result did not match',
-            `(${name})`,
-            testSuite.description,
-            test.description,
-          );
+          console.error('result did not match', `(${name})`, testSuite.description, test.description);
 
           passed = false;
         }
       } catch (e) {
-        console.error(
-          `ERROR - ${e.message.split('\n')[0]}`,
-          `(${name})`,
-          testSuite.description,
-          test.description,
-        );
+        console.error(`ERROR - ${e.message.split('\n')[0]}`, `(${name})`, testSuite.description, test.description);
 
         passed = false;
       }
@@ -98,23 +88,16 @@ for (const name in packages) {
 
     const typesBench = typesBenches[description];
 
-    typesBench.add(
-      `${name} (${
-        passingTests[getPassedKey(name, testSuite)] ? 'passed' : 'failed'
-      })`,
-      () => {
-        for (const test of testSuite.tests) {
-          if (
-            test.description !==
-              'pseudo array and equivalent array are not equal' &&
-            test.description !==
-              'empty objects with `null` as prototype are equal'
-          ) {
-            fn(test.value1, test.value2);
-          }
+    typesBench.add(`${name} (${passingTests[getPassedKey(name, testSuite)] ? 'passed' : 'failed'})`, () => {
+      for (const test of testSuite.tests) {
+        if (
+          test.description !== 'pseudo array and equivalent array are not equal'
+          && test.description !== 'empty objects with `null` as prototype are equal'
+        ) {
+          fn(test.value1, test.value2);
         }
-      },
-    );
+      }
+    });
   }
 }
 
@@ -124,9 +107,7 @@ async function run(name, bench) {
 
   await bench.run();
 
-  const tasks = sortBy(bench.tasks, ({ result }) => result.mean).filter(
-    ({ name }) => !name.includes('failed'),
-  );
+  const tasks = sortBy(bench.tasks, ({ result }) => result.mean).filter(({ name }) => !name.includes('failed'));
 
   console.table(
     tasks.map(({ name, result }) => ({
