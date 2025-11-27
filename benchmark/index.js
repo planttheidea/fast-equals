@@ -65,22 +65,12 @@ for (const name in packages) {
     for (const test of testSuite.tests) {
       try {
         if (fn(test.value1, test.value2) !== test.deepEqual) {
-          console.error(
-            'result did not match',
-            `(${name})`,
-            testSuite.description,
-            test.description,
-          );
+          console.error('result did not match', `(${name})`, testSuite.description, test.description);
 
           passed = false;
         }
       } catch (e) {
-        console.error(
-          `ERROR - ${e.message.split('\n')[0]}`,
-          `(${name})`,
-          testSuite.description,
-          test.description,
-        );
+        console.error(`ERROR - ${e.message.split('\n')[0]}`, `(${name})`, testSuite.description, test.description);
 
         passed = false;
       }
@@ -98,23 +88,16 @@ for (const name in packages) {
 
     const typesBench = typesBenches[description];
 
-    typesBench.add(
-      `${name} (${
-        passingTests[getPassedKey(name, testSuite)] ? 'passed' : 'failed'
-      })`,
-      () => {
-        for (const test of testSuite.tests) {
-          if (
-            test.description !==
-              'pseudo array and equivalent array are not equal' &&
-            test.description !==
-              'empty objects with `null` as prototype are equal'
-          ) {
-            fn(test.value1, test.value2);
-          }
+    typesBench.add(`${name} (${passingTests[getPassedKey(name, testSuite)] ? 'passed' : 'failed'})`, () => {
+      for (const test of testSuite.tests) {
+        if (
+          test.description !== 'pseudo array and equivalent array are not equal'
+          && test.description !== 'empty objects with `null` as prototype are equal'
+        ) {
+          fn(test.value1, test.value2);
         }
-      },
-    );
+      }
+    });
   }
 }
 
@@ -124,9 +107,7 @@ async function run(name, bench) {
 
   await bench.run();
 
-  const tasks = sortBy(bench.tasks, ({ result }) => result.mean).filter(
-    ({ name }) => !name.includes('failed'),
-  );
+  const tasks = sortBy(bench.tasks, ({ result }) => result.mean).filter(({ name }) => !name.includes('failed'));
 
   console.table(
     tasks.map(({ name, result }) => ({

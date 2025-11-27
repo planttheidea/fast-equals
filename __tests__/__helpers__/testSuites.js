@@ -543,8 +543,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Map objects (same keys / values, different pairings)',
+        description: 'not equal Map objects (same keys / values, different pairings)',
         shallowEqual: false,
         value1: new Map().set('foo', 'bar'),
         value2: new Map().set('bar', 'foo'),
@@ -737,8 +736,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Float32Array objects (different TypedArray class)',
+        description: 'not equal Float32Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Float32Array([21, 31]),
         value2: new Float64Array([21, 31]),
@@ -759,8 +757,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Float64Array objects (different TypedArray class)',
+        description: 'not equal Float64Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Float64Array([21, 31]),
         value2: new Int8Array([21, 31]),
@@ -802,8 +799,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Int16Array objects (different TypedArray class)',
+        description: 'not equal Int16Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Int16Array([21, 31]),
         value2: new Int32Array([21, 31]),
@@ -824,8 +820,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Int32Array objects (different TypedArray class)',
+        description: 'not equal Int32Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Int32Array([21, 31]),
         value2: new Uint8Array([21, 31]),
@@ -846,8 +841,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Uint8Array objects (different TypedArray class)',
+        description: 'not equal Uint8Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Uint8Array([21, 31]),
         value2: new Uint8ClampedArray([21, 31]),
@@ -868,8 +862,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Uint8ClampedArray objects (different TypedArray class)',
+        description: 'not equal Uint8ClampedArray objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Uint8ClampedArray([21, 31]),
         value2: new Uint16Array([21, 31]),
@@ -890,8 +883,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Uint16Array objects (different TypedArray class)',
+        description: 'not equal Uint16Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Uint16Array([21, 31]),
         value2: new Uint32Array([21, 31]),
@@ -912,8 +904,7 @@ export default [
       },
       {
         deepEqual: false,
-        description:
-          'not equal Uint32Array objects (different TypedArray class)',
+        description: 'not equal Uint32Array objects (different TypedArray class)',
         shallowEqual: false,
         value1: new Uint32Array([21, 31]),
         value2: new Float32Array([21, 31]),

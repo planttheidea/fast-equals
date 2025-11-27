@@ -37,13 +37,9 @@ const URL_TAG = '[object URL]';
 
 const { isArray } = Array;
 const isTypedArray =
-  typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function'
-    ? ArrayBuffer.isView
-    : null;
+  typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' ? ArrayBuffer.isView : null;
 const { assign } = Object;
-const getTag = Object.prototype.toString.call.bind(
-  Object.prototype.toString,
-) as (a: object) => string;
+const getTag = Object.prototype.toString.call.bind(Object.prototype.toString) as (a: object) => string;
 
 interface CreateIsEqualOptions<Meta> {
   circular: boolean;
@@ -189,11 +185,7 @@ export function createEqualityComparator<Meta>({
       // The exception for value comparison is custom `Promise`-like class instances. These should
       // be treated the same as standard `Promise` objects, which means strict equality, and if
       // it reaches this point then that strict equality comparison has already failed.
-      return (
-        typeof a.then !== 'function' &&
-        typeof b.then !== 'function' &&
-        areObjectsEqual(a, b, state)
-      );
+      return typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state);
     }
 
     // If a URL tag, it should be tested explicitly. Like RegExp, the properties are not
@@ -262,27 +254,17 @@ export function createEqualityComparatorConfig<Meta>({
   strict,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
   let config = {
-    areArraysEqual: strict
-      ? areObjectsEqualStrictDefault
-      : areArraysEqualDefault,
+    areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
     areDatesEqual: areDatesEqualDefault,
     areErrorsEqual: areErrorsEqualDefault,
     areFunctionsEqual: areFunctionsEqualDefault,
-    areMapsEqual: strict
-      ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault)
-      : areMapsEqualDefault,
+    areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
     areNumbersEqual: areNumbersEqualDefault,
-    areObjectsEqual: strict
-      ? areObjectsEqualStrictDefault
-      : areObjectsEqualDefault,
+    areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
     arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
-    areSetsEqual: strict
-      ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault)
-      : areSetsEqualDefault,
-    areTypedArraysEqual: strict
-      ? areObjectsEqualStrictDefault
-      : areTypedArraysEqualDefault,
+    areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
+    areTypedArraysEqual: strict ? areObjectsEqualStrictDefault : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
     unknownTagComparators: undefined,
   };
@@ -331,17 +313,10 @@ export function createInternalEqualityComparator<Meta>(
 /**
  * Create the `isEqual` function used by the consuming application.
  */
-export function createIsEqual<Meta>({
-  circular,
-  comparator,
-  createState,
-  equals,
-  strict,
-}: CreateIsEqualOptions<Meta>) {
+export function createIsEqual<Meta>({ circular, comparator, createState, equals, strict }: CreateIsEqualOptions<Meta>) {
   if (createState) {
     return function isEqual<A, B>(a: A, b: B): boolean {
-      const { cache = circular ? new WeakMap() : undefined, meta } =
-        createState();
+      const { cache = circular ? new WeakMap() : undefined, meta } = createState();
 
       return comparator(a, b, {
         cache,

@@ -48,14 +48,8 @@ console.log('false', deepEqual({}, []));
 console.groupEnd();
 
 console.group('deep array');
-console.log(
-  'true',
-  deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ foo: 'bar' }, { bar: 'baz' }]),
-);
-console.log(
-  'false',
-  deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ bar: 'baz' }, { foo: 'bar' }]),
-);
+console.log('true', deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ foo: 'bar' }, { bar: 'baz' }]));
+console.log('false', deepEqual([{ foo: 'bar' }, { bar: 'baz' }], [{ bar: 'baz' }, { foo: 'bar' }]));
 console.groupEnd();
 
 console.group('date');
@@ -117,10 +111,7 @@ console.groupEnd();
 console.group('map shallow');
 console.log(
   'true',
-  shallowEqual(
-    new Map().set('foo', 'bar').set('bar', 'baz'),
-    new Map().set('foo', 'bar').set('bar', 'baz'),
-  ),
+  shallowEqual(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('foo', 'bar').set('bar', 'baz')),
 );
 console.log(
   'false',
@@ -131,10 +122,7 @@ console.log(
 );
 console.log(
   'true',
-  shallowEqual(
-    new Map().set('foo', 'bar').set('bar', 'baz'),
-    new Map().set('bar', 'baz').set('foo', 'bar'),
-  ),
+  shallowEqual(new Map().set('foo', 'bar').set('bar', 'baz'), new Map().set('bar', 'baz').set('foo', 'bar')),
 );
 console.log(
   'false',
@@ -160,20 +148,8 @@ console.log('false', deepEqual(new Set().add('bar'), new Set().add('baz')));
 console.groupEnd();
 
 console.group('object');
-console.log(
-  'true',
-  deepEqual(
-    { some: { deeply: { nested: 'value' } } },
-    { some: { deeply: { nested: 'value' } } },
-  ),
-);
-console.log(
-  'false',
-  deepEqual(
-    { some: { deeply: { nested: 'value' } } },
-    { some: { deeply: { nested: 'thing' } } },
-  ),
-);
+console.log('true', deepEqual({ some: { deeply: { nested: 'value' } } }, { some: { deeply: { nested: 'value' } } }));
+console.log('false', deepEqual({ some: { deeply: { nested: 'value' } } }, { some: { deeply: { nested: 'thing' } } }));
 console.groupEnd();
 
 console.group('custom');
@@ -219,15 +195,13 @@ const object4 = {
 };
 
 const doesNotEverEqualOne = createCustomEqual<undefined>({
-  createInternalComparator:
-    (comparator) =>
-    (a: any, b: any, _keyA, _keyB, _parentA, _parentB, state) => {
-      if (typeof a === 'number' || typeof b === 'number') {
-        return a !== 1 && b !== 1;
-      }
+  createInternalComparator: (comparator) => (a: any, b: any, _keyA, _keyB, _parentA, _parentB, state) => {
+    if (typeof a === 'number' || typeof b === 'number') {
+      return a !== 1 && b !== 1;
+    }
 
-      return Object.keys(a).every((key) => comparator(a[key], b[key], state));
-    },
+    return Object.keys(a).every((key) => comparator(a[key], b[key], state));
+  },
 });
 
 console.log('true', doesNotEverEqualOne(object1, object2));
@@ -260,14 +234,8 @@ class Circular {
   }
 }
 
-console.log(
-  'true',
-  circularDeepEqual(new Circular('foo'), new Circular('foo')),
-);
-console.log(
-  'false',
-  circularDeepEqual(new Circular('foo'), new Circular('bar')),
-);
+console.log('true', circularDeepEqual(new Circular('foo'), new Circular('foo')));
+console.log('false', circularDeepEqual(new Circular('foo'), new Circular('bar')));
 console.log('false', circularDeepEqual(new Circular('foo'), { foo: 'baz' }));
 
 console.groupEnd();
@@ -290,13 +258,13 @@ function getCustomCircularCache(): CustomCircularMeta {
 
 function areRegExpsEqual(a: RegExp, b: RegExp) {
   return (
-    a.source === b.source &&
-    a.global === b.global &&
-    a.ignoreCase === b.ignoreCase &&
-    a.multiline === b.multiline &&
-    a.unicode === b.unicode &&
-    a.sticky === b.sticky &&
-    a.lastIndex === b.lastIndex
+    a.source === b.source
+    && a.global === b.global
+    && a.ignoreCase === b.ignoreCase
+    && a.multiline === b.multiline
+    && a.unicode === b.unicode
+    && a.sticky === b.sticky
+    && a.lastIndex === b.lastIndex
   );
 }
 
@@ -315,42 +283,23 @@ const customDeepEqualCircular = createCustomEqual<CustomCircularMeta>({
   }),
 });
 
-console.log(
-  'true',
-  customDeepEqualCircular(new Circular('foo'), new Circular('foo')),
-);
-console.log(
-  'false',
-  customDeepEqualCircular(new Circular('foo'), new Circular('bar')),
-);
-console.log(
-  'false',
-  customDeepEqualCircular(new Circular('foo'), { foo: 'baz' }),
-);
+console.log('true', customDeepEqualCircular(new Circular('foo'), new Circular('foo')));
+console.log('false', customDeepEqualCircular(new Circular('foo'), new Circular('bar')));
+console.log('false', customDeepEqualCircular(new Circular('foo'), { foo: 'baz' }));
 
 console.groupEnd();
 
 console.group('targeted custom');
 
 const isDeepEqualOrFooMatchesMeta = createCustomEqual<'bar'>({
-  createInternalComparator:
-    (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
-      return a === state.meta || b === state.meta || compare(a, b, state);
-    },
+  createInternalComparator: (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+    return a === state.meta || b === state.meta || compare(a, b, state);
+  },
   createState: () => ({ meta: 'bar' }),
 });
 
-console.log(
-  'shallow',
-  isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }),
-);
-console.log(
-  'deep',
-  isDeepEqualOrFooMatchesMeta(
-    { nested: { foo: 'bar' } },
-    { nested: { foo: 'baz' } },
-  ),
-);
+console.log('shallow', isDeepEqualOrFooMatchesMeta({ foo: 'bar' }, { foo: 'baz' }));
+console.log('deep', isDeepEqualOrFooMatchesMeta({ nested: { foo: 'bar' } }, { nested: { foo: 'baz' } }));
 
 console.groupEnd();
 
@@ -441,32 +390,14 @@ console.groupEnd();
 
 console.group('typed arrays');
 
-console.log(
-  'true - deep',
-  deepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
-);
-console.log(
-  'true - shallow',
-  shallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
-);
+console.log('true - deep', deepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])));
+console.log('true - shallow', shallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])));
 
-console.log(
-  'true - strict deep',
-  strictDeepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
-);
-console.log(
-  'true - strict shallow',
-  strictShallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])),
-);
+console.log('true - strict deep', strictDeepEqual(new Int8Array([21, 31]), new Int8Array([21, 31])));
+console.log('true - strict shallow', strictShallowEqual(new Int8Array([21, 31]), new Int8Array([21, 31])));
 
-console.log(
-  'true - deep (different types)',
-  deepEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
-);
-console.log(
-  'true - shallow (different types)',
-  shallowEqual(new Int8Array([21, 31]), new Int16Array([21, 31])),
-);
+console.log('true - deep (different types)', deepEqual(new Int8Array([21, 31]), new Int16Array([21, 31])));
+console.log('true - shallow (different types)', shallowEqual(new Int8Array([21, 31]), new Int16Array([21, 31])));
 
 console.log(
   'false - strict deep (different types)',

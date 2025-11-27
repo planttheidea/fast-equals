@@ -1,9 +1,4 @@
-import type {
-  Dictionary,
-  PrimitiveWrapper,
-  State,
-  TypedArray,
-} from './internalTypes.js';
+import type { Dictionary, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
 import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.js';
 
 const PREACT_VNODE = '__v';
@@ -42,32 +37,20 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * Whether the errors passed are equal in value.
  */
 export function areErrorsEqual(a: Error, b: Error): boolean {
-  return (
-    a.name === b.name &&
-    a.message === b.message &&
-    a.cause === b.cause &&
-    a.stack === b.stack
-  );
+  return a.name === b.name && a.message === b.message && a.cause === b.cause && a.stack === b.stack;
 }
 
 /**
  * Whether the functions passed are equal in value.
  */
-export function areFunctionsEqual(
-  a: (...args: any[]) => any,
-  b: (...args: any[]) => any,
-): boolean {
+export function areFunctionsEqual(a: (...args: any[]) => any, b: (...args: any[]) => any): boolean {
   return a === b;
 }
 
 /**
  * Whether the `Map`s are equal in value.
  */
-export function areMapsEqual(
-  a: Map<any, any>,
-  b: Map<any, any>,
-  state: State<any>,
-): boolean {
+export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<any>): boolean {
   const size = a.size;
 
   if (size !== b.size) {
@@ -111,8 +94,8 @@ export function areMapsEqual(
       const bEntry = bResult.value;
 
       if (
-        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state) &&
-        state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
+        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
+        && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
       ) {
         hasMatch = matchedIndices[matchIndex] = true;
         break;
@@ -139,11 +122,7 @@ export const areNumbersEqual = sameValueZeroEqual;
 /**
  * Whether the objects are equal in value.
  */
-export function areObjectsEqual(
-  a: Dictionary,
-  b: Dictionary,
-  state: State<any>,
-): boolean {
+export function areObjectsEqual(a: Dictionary, b: Dictionary, state: State<any>): boolean {
   const properties = keys(a);
 
   let index = properties.length;
@@ -168,11 +147,7 @@ export function areObjectsEqual(
 /**
  * Whether the objects are equal in value with strict property checking.
  */
-export function areObjectsEqualStrict(
-  a: Dictionary,
-  b: Dictionary,
-  state: State<any>,
-): boolean {
+export function areObjectsEqualStrict(a: Dictionary, b: Dictionary, state: State<any>): boolean {
   const properties = getStrictProperties(a);
 
   let index = properties.length;
@@ -200,12 +175,12 @@ export function areObjectsEqualStrict(
     descriptorB = getOwnPropertyDescriptor(b, property);
 
     if (
-      (descriptorA || descriptorB) &&
-      (!descriptorA ||
-        !descriptorB ||
-        descriptorA.configurable !== descriptorB.configurable ||
-        descriptorA.enumerable !== descriptorB.enumerable ||
-        descriptorA.writable !== descriptorB.writable)
+      (descriptorA || descriptorB)
+      && (!descriptorA
+        || !descriptorB
+        || descriptorA.configurable !== descriptorB.configurable
+        || descriptorA.enumerable !== descriptorB.enumerable
+        || descriptorA.writable !== descriptorB.writable)
     ) {
       return false;
     }
@@ -217,10 +192,7 @@ export function areObjectsEqualStrict(
 /**
  * Whether the primitive wrappers passed are equal in value.
  */
-export function arePrimitiveWrappersEqual(
-  a: PrimitiveWrapper,
-  b: PrimitiveWrapper,
-): boolean {
+export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapper): boolean {
   return sameValueZeroEqual(a.valueOf(), b.valueOf());
 }
 
@@ -234,11 +206,7 @@ export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
 /**
  * Whether the `Set`s are equal in value.
  */
-export function areSetsEqual(
-  a: Set<any>,
-  b: Set<any>,
-  state: State<any>,
-): boolean {
+export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boolean {
   const size = a.size;
 
   if (size !== b.size) {
@@ -273,16 +241,8 @@ export function areSetsEqual(
       }
 
       if (
-        !matchedIndices[matchIndex] &&
-        state.equals(
-          aResult.value,
-          bResult.value,
-          aResult.value,
-          bResult.value,
-          a,
-          b,
-          state,
-        )
+        !matchedIndices[matchIndex]
+        && state.equals(aResult.value, bResult.value, aResult.value, bResult.value, a, b, state)
       ) {
         hasMatch = matchedIndices[matchIndex] = true;
         break;
@@ -323,33 +283,23 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
   return (
-    a.hostname === b.hostname &&
-    a.pathname === b.pathname &&
-    a.protocol === b.protocol &&
-    a.port === b.port &&
-    a.hash === b.hash &&
-    a.username === b.username &&
-    a.password === b.password
+    a.hostname === b.hostname
+    && a.pathname === b.pathname
+    && a.protocol === b.protocol
+    && a.port === b.port
+    && a.hash === b.hash
+    && a.username === b.username
+    && a.password === b.password
   );
 }
 
-function isPropertyEqual(
-  a: Dictionary,
-  b: Dictionary,
-  state: State<any>,
-  property: string | symbol,
-) {
+function isPropertyEqual(a: Dictionary, b: Dictionary, state: State<any>, property: string | symbol) {
   if (
-    (property === REACT_OWNER ||
-      property === PREACT_OWNER ||
-      property === PREACT_VNODE) &&
-    (a.$$typeof || b.$$typeof)
+    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
+    && (a.$$typeof || b.$$typeof)
   ) {
     return true;
   }
 
-  return (
-    hasOwn(b, property) &&
-    state.equals(a[property], b[property], property, property, a, b, state)
-  );
+  return hasOwn(b, property) && state.equals(a[property], b[property], property, property, a, b, state);
 }

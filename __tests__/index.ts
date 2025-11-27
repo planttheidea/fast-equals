@@ -70,59 +70,48 @@ class DeepCircular {
 }
 
 describe('test suites', () => {
-  testSuites.forEach(
-    (
-      { description: suiteDescription, tests }: TestSuite,
-      testSuiteIndex: number,
-    ) => {
-      describe(`Suite ${testSuiteIndex}: ${suiteDescription}`, () => {
-        tests.forEach(
-          (
-            {
-              deepEqual: de,
-              description: testDescription,
-              shallowEqual: se,
-              value1,
-              value2,
-            }: Test,
-            testIndex: number,
-          ) => {
-            it(`should return ${de} for deepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(deepEqual(value1, value2)).toBe(de);
-            });
+  testSuites.forEach(({ description: suiteDescription, tests }: TestSuite, testSuiteIndex: number) => {
+    describe(`Suite ${testSuiteIndex}: ${suiteDescription}`, () => {
+      tests.forEach(
+        (
+          { deepEqual: de, description: testDescription, shallowEqual: se, value1, value2 }: Test,
+          testIndex: number,
+        ) => {
+          it(`should return ${de} for deepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(deepEqual(value1, value2)).toBe(de);
+          });
 
-            it(`should return ${de} for strictDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(strictDeepEqual(value1, value2)).toBe(de);
-            });
+          it(`should return ${de} for strictDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(strictDeepEqual(value1, value2)).toBe(de);
+          });
 
-            it(`should return ${de} for circularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(circularDeepEqual(value1, value2)).toBe(de);
-            });
+          it(`should return ${de} for circularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(circularDeepEqual(value1, value2)).toBe(de);
+          });
 
-            it(`should return ${de} for strictCircularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(strictCircularDeepEqual(value1, value2)).toBe(de);
-            });
+          it(`should return ${de} for strictCircularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(strictCircularDeepEqual(value1, value2)).toBe(de);
+          });
 
-            it(`should return ${se} for shallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(shallowEqual(value1, value2)).toBe(se);
-            });
+          it(`should return ${se} for shallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(shallowEqual(value1, value2)).toBe(se);
+          });
 
-            it(`should return ${se} for strictShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(strictShallowEqual(value1, value2)).toBe(se);
-            });
+          it(`should return ${se} for strictShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(strictShallowEqual(value1, value2)).toBe(se);
+          });
 
-            it(`should return ${se} for circularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(circularShallowEqual(value1, value2)).toBe(se);
-            });
+          it(`should return ${se} for circularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(circularShallowEqual(value1, value2)).toBe(se);
+          });
 
-            it(`should return ${se} for strictCircularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-              expect(strictCircularShallowEqual(value1, value2)).toBe(se);
-            });
-          },
-        );
-      });
-    },
-  );
+          it(`should return ${se} for strictCircularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
+            expect(strictCircularShallowEqual(value1, value2)).toBe(se);
+          });
+        },
+      );
+    });
+  });
 });
 
 describe('values', () => {
@@ -153,12 +142,8 @@ describe('values', () => {
 describe('circular', () => {
   describe('circularDeepEqual', () => {
     it('should handles deeply-nested circular objects', () => {
-      expect(
-        circularDeepEqual(new DeepCircular('foo'), new DeepCircular('foo')),
-      ).toBe(true);
-      expect(
-        circularDeepEqual(new DeepCircular('foo'), new DeepCircular('bar')),
-      ).toBe(false);
+      expect(circularDeepEqual(new DeepCircular('foo'), new DeepCircular('foo'))).toBe(true);
+      expect(circularDeepEqual(new DeepCircular('foo'), new DeepCircular('bar'))).toBe(false);
     });
 
     it('should handle shared references between objects', () => {
@@ -235,13 +220,13 @@ describe('circular', () => {
 
     function areRegExpsEqualNoFlagsSupport(a: RegExp, b: RegExp) {
       return (
-        a.source === b.source &&
-        a.global === b.global &&
-        a.ignoreCase === b.ignoreCase &&
-        a.multiline === b.multiline &&
-        a.unicode === b.unicode &&
-        a.sticky === b.sticky &&
-        a.lastIndex === b.lastIndex
+        a.source === b.source
+        && a.global === b.global
+        && a.ignoreCase === b.ignoreCase
+        && a.multiline === b.multiline
+        && a.unicode === b.unicode
+        && a.sticky === b.sticky
+        && a.lastIndex === b.lastIndex
       );
     }
 
@@ -256,18 +241,8 @@ describe('circular', () => {
     });
 
     it('should handle the custom equality check', () => {
-      expect(
-        customDeepEqualCircular(
-          new DeepCircular('foo'),
-          new DeepCircular('foo'),
-        ),
-      ).toBe(true);
-      expect(
-        customDeepEqualCircular(
-          new DeepCircular('foo'),
-          new DeepCircular('bar'),
-        ),
-      ).toBe(false);
+      expect(customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('foo'))).toBe(true);
+      expect(customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('bar'))).toBe(false);
     });
   });
 });
@@ -432,17 +407,7 @@ describe('strict', () => {
 
             if (aInstance || bInstance) {
               return (
-                aInstance &&
-                bInstance &&
-                state.equals(
-                  a.a,
-                  b.a,
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
-                  state,
-                )
+                aInstance && bInstance && state.equals(a.a, b.a, undefined, undefined, undefined, undefined, state)
               );
             }
 

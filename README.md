@@ -4,7 +4,9 @@
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also
+maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when
+minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -18,7 +20,9 @@ The following types are handled out-of-the-box:
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
 - Custom class instances, including subclasses of native classes
 
-Methods are available for deep, shallow, or referential equality comparison. In addition, you can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition, or both. You can also customize any specific type comparison based on your application's use-cases.
+Methods are available for deep, shallow, or referential equality comparison. In addition, you can opt into support for
+circular objects, or performing a "strict" comparison with unconventional property definition, or both. You can also
+customize any specific type comparison based on your application's use-cases.
 
 ## Table of contents
 
@@ -53,20 +57,23 @@ console.log(deepEqual({ foo: 'bar' }, { foo: 'bar' })); // true
 
 ### Specific builds
 
-By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if you want to force use of a specific build, they can be located here:
+By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if
+you want to force use of a specific build, they can be located here:
 
 - ESM => `fast-equals/dist/esm/index.mjs`
 - CommonJS => `fast-equals/dist/cjs/index.cjs`
 - UMD => `fast-equals/dist/umd/index.js`
 - Minified UMD => `fast-equals/dist/min/index.js`
 
-If you are having issues loading a specific build type, [please file an issue](https://github.com/planttheidea/fast-equals/issues).
+If you are having issues loading a specific build type,
+[please file an issue](https://github.com/planttheidea/fast-equals/issues).
 
 ## Available methods
 
 ### deepEqual
 
-Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
+Performs a deep equality comparison on the two objects passed and returns a boolean representing the value equivalency
+of the objects.
 
 ```ts
 import { deepEqual } from 'fast-equals';
@@ -80,7 +87,9 @@ console.log(deepEqual(objectA, objectB)); // true
 
 #### Comparing `Map`s
 
-`Map` objects support complex keys (objects, Arrays, etc.), however [the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality). If the spec were followed for comparison, the following would always be `false`:
+`Map` objects support complex keys (objects, Arrays, etc.), however
+[the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality).
+If the spec were followed for comparison, the following would always be `false`:
 
 ```ts
 const mapA = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
@@ -89,11 +98,13 @@ const mapB = new Map([[{ foo: 'bar' }, { baz: 'quz' }]]);
 deepEqual(mapA, mapB);
 ```
 
-To support true deep equality of all contents, `fast-equals` will perform a deep equality comparison for key and value parirs. Therefore, the above would be `true`.
+To support true deep equality of all contents, `fast-equals` will perform a deep equality comparison for key and value
+parirs. Therefore, the above would be `true`.
 
 ### shallowEqual
 
-Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value equivalency of the objects.
+Performs a shallow equality comparison on the two objects passed and returns a boolean representing the value
+equivalency of the objects.
 
 ```ts
 import { shallowEqual } from 'fast-equals';
@@ -111,7 +122,9 @@ console.log(shallowEqual(objectA, objectC)); // false
 
 ### sameValueZeroEqual
 
-Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means either strictly equal or both `NaN`.
+Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two
+objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means
+either strictly equal or both `NaN`.
 
 ```ts
 import { sameValueZeroEqual } from 'fast-equals';
@@ -129,7 +142,8 @@ console.log(sameValueZeroEqual(mainObject, objectC)); // false
 
 ### circularDeepEqual
 
-Performs the same comparison as `deepEqual` but supports circular objects. It is slower than `deepEqual`, so only use if you know circular objects are present.
+Performs the same comparison as `deepEqual` but supports circular objects. It is slower than `deepEqual`, so only use if
+you know circular objects are present.
 
 ```ts
 function Circular(value) {
@@ -151,7 +165,8 @@ Just as with `deepEqual`, [both keys and values are compared for deep equality](
 
 ### circularShallowEqual
 
-Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only use if you know circular objects are present.
+Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only
+use if you know circular objects are present.
 
 ```ts
 const array = ['foo'];
@@ -245,7 +260,8 @@ console.log(circularDeepEqual(first, new Circular('foo'))); // false
 
 ### strictCircularShallowEqual
 
-Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. In this
+includes:
 
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
@@ -268,7 +284,9 @@ console.log(circularShallowEqual(array, ['foo', array])); // false
 
 ### createCustomEqual
 
-Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and `shallowEqual`, this is a factory method that receives the default options used internally, and allows you to override the defaults as needed. This is generally for extreme edge-cases, or supporting legacy environments.
+Creates a custom equality comparator that will be used on nested values in the object. Unlike `deepEqual` and
+`shallowEqual`, this is a factory method that receives the default options used internally, and allows you to override
+the defaults as needed. This is generally for extreme edge-cases, or supporting legacy environments.
 
 The signature is as follows:
 
@@ -286,10 +304,7 @@ interface ComparatorConfig<Meta> {
   areFunctionsEqual: TypeEqualityComparator<(...args: any[]) => any, Meta>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
   areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  arePrimitiveWrappersEqual: TypeEqualityComparator<
-    boolean | string | number,
-    Meta
-  >;
+  arePrimitiveWrappersEqual: TypeEqualityComparator<boolean | string | number, Meta>;
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
   areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;
@@ -299,36 +314,33 @@ interface ComparatorConfig<Meta> {
 
 function createCustomEqual<Meta>(options: {
   circular?: boolean;
-  createCustomConfig?: (
-    defaultConfig: ComparatorConfig<Meta>,
-  ) => Partial<ComparatorConfig<Meta>>;
+  createCustomConfig?: (defaultConfig: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
   createInternalComparator?: (
     compare: <A, B>(a: A, b: B, state: State<Meta>) => boolean,
-  ) => (
-    a: any,
-    b: any,
-    indexOrKeyA: any,
-    indexOrKeyB: any,
-    parentA: any,
-    parentB: any,
-    state: State<Meta>,
-  ) => boolean;
+  ) => (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<Meta>) => boolean;
   createState?: () => { cache?: Cache; meta?: Meta };
   strict?: boolean;
 }): <A, B>(a: A, b: B) => boolean;
 ```
 
-Create a custom equality comparator. This allows complete control over building a bespoke equality method, in case your use-case requires a higher degree of performance, legacy environment support, or any other non-standard usage. The [recipes](#recipes) provide examples of use in different use-cases, but if you have a specific goal in mind and would like assistance feel free to [file an issue](https://github.com/planttheidea/fast-equals/issues).
+Create a custom equality comparator. This allows complete control over building a bespoke equality method, in case your
+use-case requires a higher degree of performance, legacy environment support, or any other non-standard usage. The
+[recipes](#recipes) provide examples of use in different use-cases, but if you have a specific goal in mind and would
+like assistance feel free to [file an issue](https://github.com/planttheidea/fast-equals/issues).
 
-_**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where ordering of keys matters to equality._
+_**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing
+equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where
+ordering of keys matters to equality._
 
 #### unknownTagComparators
 
-If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to support via the `unknownTagComparators` option. See [this recipe]('./recipes/special-objects.md) for an example.
+If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to
+support via the `unknownTagComparators` option. See [this recipe]('./recipes/special-objects.md) for an example.
 
 #### Recipes
 
-Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable to the problem you are solving, they can offer guidance of how to structure your solution.
+Some recipes have been created to provide examples of use-cases for `createCustomEqual`. Even if not directly applicable
+to the problem you are solving, they can offer guidance of how to structure your solution.
 
 - [Legacy environment support for `RegExp` comparators](./recipes/legacy-regexp-support.md)
 - [Explicit property check](./recipes/explicit-property-check.md)
@@ -340,7 +352,8 @@ Some recipes have been created to provide examples of use-cases for `createCusto
 
 ## Benchmarks
 
-All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version `20.17.0`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version
+`20.17.0`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -395,18 +408,26 @@ Testing mixed objects not equal...
 
 Caveats that impact the benchmark (and accuracy of comparison):
 
-- `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql` fully supported their comparison
-- `fast-deep-equal`, `react-fast-compare` and `nano-equal` throw on objects with `null` as prototype (`Object.create(null)`)
+- `Map`s, `Promise`s, and `Set`s were excluded from the benchmark entirely because no library other than `deep-eql`
+  fully supported their comparison
+- `fast-deep-equal`, `react-fast-compare` and `nano-equal` throw on objects with `null` as prototype
+  (`Object.create(null)`)
 - `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 - `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
-- `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses `SameValueZero` equality for dates
+- `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses
+  `SameValueZero` equality for dates
 - `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
-- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero` equality for dates
-- `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function` equality
+- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero`
+  equality for dates
+- `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function`
+  equality
 - `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
 - `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
 
-All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react` elements can be circular objects, however simple elements are not; I kept the `react` comparison very basic to allow it to be included.
+All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was
+the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react`
+elements can be circular objects, however simple elements are not; I kept the `react` comparison very basic to allow it
+to be included.
 
 ## Development
 

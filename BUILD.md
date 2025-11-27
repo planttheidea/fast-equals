@@ -8,7 +8,8 @@ cd fast-equals
 git checkout {version}
 ```
 
-Replace `{version}` above with the appropriate package version. If you want to compare a version older than `1.6.2`, you'll need to use a commit hash directly.
+Replace `{version}` above with the appropriate package version. If you want to compare a version older than `1.6.2`,
+you'll need to use a commit hash directly.
 
 ## Install
 
@@ -24,7 +25,8 @@ We use `yarn` for our package management, so to ensure that exact dependencies y
 yarn run build
 ```
 
-**NOTE**: To get an exact checksum match with the versions released on npm, it may be necessary to change line endings. For example, on Linux you might run:
+**NOTE**: To get an exact checksum match with the versions released on npm, it may be necessary to change line endings.
+For example, on Linux you might run:
 
 ```
 unix2dos dist/fast-equals.min.js

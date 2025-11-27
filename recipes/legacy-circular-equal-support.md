@@ -1,6 +1,9 @@
 # Legacy environment support for circular equal comparators
 
-Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to support such an environment and polyfilling is not an option, creating a custom comparator that uses a custom cache implementation with the same contract is a simple solution.
+Starting in `4.x.x`, `WeakMap` is expected to be available in the environment. All modern browsers support this global
+object, however there may be situations where a legacy environmental support is required (example: IE11). If you need to
+support such an environment and polyfilling is not an option, creating a custom comparator that uses a custom cache
+implementation with the same contract is a simple solution.
 
 ```ts
 import { createCustomEqual, sameValueZeroEqual } from 'fast-equals';
