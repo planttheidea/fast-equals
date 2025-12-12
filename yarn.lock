@@ -1026,13 +1026,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planttheidea/build-tools@npm:^1.2.3":
-  version: 1.2.3
-  resolution: "@planttheidea/build-tools@npm:1.2.3"
+"@planttheidea/build-tools@npm:^2.0.0-beta.1":
+  version: 2.0.0-beta.1
+  resolution: "@planttheidea/build-tools@npm:2.0.0-beta.1"
   dependencies:
     "@rollup/plugin-terser": "npm:^0.4.4"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@types/node": "npm:^24.10.1"
+    "@types/node": "npm:^24.10.3"
     "@types/react": "npm:^19.2.7"
     "@types/react-dom": "npm:^19.2.3"
     "@vitest/coverage-v8": "npm:^4.0.15"
@@ -1045,19 +1045,19 @@ __metadata:
     fast-glob: "npm:^3.3.3"
     git-root: "npm:^1.0.0"
     prettier: "npm:^3.7.4"
-    react: "npm:^19.2.1"
-    react-dom: "npm:^19.2.1"
-    release-it: "npm:^19.0.6"
+    react: "npm:^19.2.3"
+    react-dom: "npm:^19.2.3"
+    release-it: "npm:^19.1.0"
     rollup: "npm:^4.53.3"
     rollup-plugin-dts: "npm:^6.3.0"
     typescript: "npm:^5.9.3"
-    typescript-eslint: "npm:^8.48.1"
+    typescript-eslint: "npm:^8.49.0"
     vite: "npm:^7.2.7"
     vitest: "npm:^4.0.15"
     yargs: "npm:^18.0.0"
   bin:
     pti: bin/index.js
-  checksum: 10c0/830bcde738a9350653d5a3efcb1e35e87f15d25ac699540bb3af9273930ccb02dc54c3570b0a117de11ea42b8f0f4e3614daa207c97458fde10da470d8bdb557
+  checksum: 10c0/fe6de90cbbe086ca2bd64ccb641d896cd874d3b49a05859b05982c04a248c73a3db5a0032854fbd285ac265adbd74fcc82c3a8546c8f7602d105dc359b7b273e
   languageName: node
   linkType: hard
 
@@ -1346,7 +1346,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24.10.1, @types/node@npm:^24.10.3":
+"@types/node@npm:^24.10.3":
   version: 24.10.3
   resolution: "@types/node@npm:24.10.3"
   dependencies:
@@ -3223,7 +3223,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fast-equals@workspace:."
   dependencies:
-    "@planttheidea/build-tools": "npm:^1.2.3"
+    "@planttheidea/build-tools": "npm:^2.0.0-beta.1"
     "@types/lodash": "npm:^4.17.21"
     "@types/node": "npm:^24.10.3"
     "@types/ramda": "npm:^0.31.1"
@@ -5400,7 +5400,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.1, react-dom@npm:^19.2.3":
+"react-dom@npm:^19.2.3":
   version: 19.2.3
   resolution: "react-dom@npm:19.2.3"
   dependencies:
@@ -5425,7 +5425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.2.1, react@npm:^19.2.3":
+"react@npm:^19.2.3":
   version: 19.2.3
   resolution: "react@npm:19.2.3"
   checksum: 10c0/094220b3ba3a76c1b668f972ace1dd15509b157aead1b40391d1c8e657e720c201d9719537375eff08f5e0514748c0319063392a6f000e31303aafc4471f1436
@@ -5469,7 +5469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"release-it@npm:^19.0.6, release-it@npm:^19.1.0":
+"release-it@npm:^19.1.0":
   version: 19.1.0
   resolution: "release-it@npm:19.1.0"
   dependencies:
@@ -6438,7 +6438,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-eslint@npm:^8.48.1, typescript-eslint@npm:^8.49.0":
+"typescript-eslint@npm:^8.49.0":
   version: 8.49.0
   resolution: "typescript-eslint@npm:8.49.0"
   dependencies:
