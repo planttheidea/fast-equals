@@ -1,21 +1,26 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { deepStrictEqual as assertDeepStrictEqual } from 'node:assert';
-import { testSuites as tests } from '../__tests__/__helpers__/testSuites.js';
-
+import Table from 'cli-table3';
 import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';
 import { dequal } from 'dequal';
 import { dequal as dequalLite } from 'dequal/lite';
 import fastDeepEqual from 'fast-deep-equal/es6/react.js';
-import * as fe from '../dist/es/index.mjs';
 import isEqualLodash from 'lodash/isEqual.js';
-import sortBy from 'lodash/sortBy.js';
+import orderBy from 'lodash/orderBy.js';
 import nanoEqual from 'nano-equal';
 import reactFastCompare from 'react-fast-compare';
 import shallowEqualFuzzy from 'shallow-equal-fuzzy';
-import { isEqual as isEqualUnderscore } from 'underscore';
 import { Bench } from 'tinybench';
+import { isEqual as isEqualUnderscore } from 'underscore';
+import { testSuites as tests } from '../__tests__/__helpers__/testSuites.js';
+import {
+  circularDeepEqual as fastEqualsCircularDeepEqual,
+  deepEqual as fastEqualsDeepEqual,
+  strictCircularDeepEqual as fastEqualsStrictCircularDeepEqual,
+  strictDeepEqual as fastEqualsStrictDeepEqual,
+} from '../dist/es/index.mjs';
 
 const packages = {
   'assert.deepStrictEqual': (a, b) => {
@@ -36,16 +41,28 @@ const packages = {
   dequal: dequal,
   'dequal/lite': dequalLite,
   'fast-deep-equal': fastDeepEqual,
-  'fast-equals': fe.deepEqual,
-  'fast-equals (circular)': fe.circularDeepEqual,
-  'fast-equals (strict)': fe.strictDeepEqual,
-  'fast-equals (strict circular)': fe.strictCircularDeepEqual,
+  'fast-equals': fastEqualsDeepEqual,
+  'fast-equals (circular)': fastEqualsCircularDeepEqual,
+  'fast-equals (strict)': fastEqualsStrictDeepEqual,
+  'fast-equals (strict circular)': fastEqualsStrictCircularDeepEqual,
   'lodash.isEqual': isEqualLodash,
   'nano-equal': nanoEqual,
   'react-fast-compare': reactFastCompare,
   'shallow-equal-fuzzy': shallowEqualFuzzy,
   'underscore.isEqual': isEqualUnderscore,
 };
+
+function getResults(tasks) {
+  const table = new Table({
+    head: ['Name', 'Ops / sec'],
+  });
+
+  tasks.forEach(({ name, result }) => {
+    table.push([name, +(result.throughput?.mean ?? 0).toFixed(6)]);
+  });
+
+  return table.toString();
+}
 
 console.log('');
 
@@ -107,14 +124,14 @@ async function run(name, bench) {
 
   await bench.run();
 
-  const tasks = sortBy(bench.tasks, ({ result }) => result.mean).filter(({ name }) => !name.includes('failed'));
-
-  console.table(
-    tasks.map(({ name, result }) => ({
-      Package: name.replace(' (passed)', ''),
-      'Ops/sec': +(result?.hz).toFixed(6),
-    })),
+  const tasks = orderBy(
+    bench.tasks.filter(({ result }) => result),
+    ({ result }) => result.throughput?.mean ?? 0,
+    ['desc'],
   );
+  const table = getResults(tasks);
+
+  console.table(table);
 }
 
 for (const type in typesBenches) {
