@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.3.4
+
+- Update build infrastructure to ensure legacy types align with types built from source code
+
 ## 5.3.3
 
 - [#147](https://github.com/planttheidea/fast-equals/pull/147) - Fix type resolution when using `Node16` as
