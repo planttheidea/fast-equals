@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 5.4.0
+
+- [#163](https://github.com/planttheidea/fast-equals/pull/163) - Fix handling of `TypedArray`-based checks, and add
+  `areArrayBuffersEqual` and `areDataViewsEqual` to checks
+
 ## 5.3.4
 
 - Update build infrastructure to ensure legacy types align with types built from source code

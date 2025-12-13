@@ -12,7 +12,7 @@ The following types are handled out-of-the-box:
 
 - Plain objects (including `react` elements and `Arguments`)
 - Arrays
-- Typed Arrays
+- `ArrayBuffer` / `TypedArray` / `DataView` instances
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
