@@ -39,10 +39,19 @@ interface Dictionary<Value = any> {
 }
 interface ComparatorConfig<Meta> {
   /**
+   * Whether the array buffers passed are equal in value. In strict mode, this includes
+   * additional properties added to the array.
+   */
+  areArrayBuffersEqual: TypeEqualityComparator<any, Meta>;
+  /**
    * Whether the arrays passed are equal in value. In strict mode, this includes
    * additional properties added to the array.
    */
   areArraysEqual: TypeEqualityComparator<any, Meta>;
+  /**
+   * Whether the data views passed are equal in value.
+   */
+  areDataViewsEqual: TypeEqualityComparator<any, Meta>;
   /**
    * Whether the dates passed are equal in value.
    */
@@ -120,15 +129,10 @@ type PrimitiveWrapper = Boolean | Number | String;
 /**
  * Type which encompasses possible instances of TypedArray
  * classes.
- *
- * **NOTE**: This does not include `BigInt64Array` and
- * `BitUint64Array` because those are part of ES2020 and
- * not supported by certain TS configurations. If using
- * either in `areTypedArraysEqual`, you can cast the
- * instance as `TypedArray` and it will work as expected,
- * because runtime checks will still work for those classes.
  */
 type TypedArray =
+  | BigInt64Array
+  | BigUint64Array
   | Float32Array
   | Float64Array
   | Int8Array

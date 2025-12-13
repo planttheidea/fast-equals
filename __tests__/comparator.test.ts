@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createEqualityComparator, createInternalEqualityComparator } from '../src/comparator.js';
 import {
+  areArrayBuffersEqual,
   areArraysEqual,
+  areDataViewsEqual,
   areDatesEqual,
   areErrorsEqual,
   areFunctionsEqual,
@@ -17,7 +19,9 @@ import type { InternalEqualityComparator, State } from '../src/internalTypes.ts'
 import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
 
 const STANDARD_COMPARATOR_OPTIONS = {
+  areArrayBuffersEqual,
   areArraysEqual,
+  areDataViewsEqual,
   areDatesEqual,
   areErrorsEqual,
   areFunctionsEqual,
