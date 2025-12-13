@@ -8,6 +8,13 @@ const REACT_OWNER = '_owner';
 const { getOwnPropertyDescriptor, keys } = Object;
 
 /**
+ * Whether the array buffers are equal in value.
+ */
+export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
+  return a.byteLength === b.byteLength && areTypedArraysEqual(new Uint8Array(a), new Uint8Array(b));
+}
+
+/**
  * Whether the arrays are equal in value.
  */
 export function areArraysEqual(a: any[], b: any[], state: State<any>) {
@@ -24,6 +31,19 @@ export function areArraysEqual(a: any[], b: any[], state: State<any>) {
   }
 
   return true;
+}
+
+/**
+ * Whether the dataviews are equal in value.
+ */
+export function areDataViewsEqual(a: DataView, b: DataView): boolean {
+  return (
+    a.byteLength === b.byteLength
+    && areTypedArraysEqual(
+      new Uint8Array(a.buffer, a.byteOffset, a.byteLength),
+      new Uint8Array(b.buffer, b.byteOffset, b.byteLength),
+    )
+  );
 }
 
 /**
@@ -263,9 +283,9 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
  * Whether the TypedArray instances are equal in value.
  */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
-  let index = a.length;
+  let index = a.byteLength;
 
-  if (b.length !== index) {
+  if (b.byteLength !== index || a.byteOffset !== b.byteOffset) {
     return false;
   }
 

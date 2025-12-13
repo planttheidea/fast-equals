@@ -1,5 +1,7 @@
 import {
+  areArrayBuffersEqual,
   areArraysEqual as areArraysEqualDefault,
+  areDataViewsEqual,
   areDatesEqual as areDatesEqualDefault,
   areErrorsEqual as areErrorsEqualDefault,
   areFunctionsEqual as areFunctionsEqualDefault,
@@ -23,8 +25,10 @@ import type {
 } from './internalTypes.js';
 import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 
+const ARRAY_BUFFER_TAG = '[object ArrayBuffer]';
 const ARGUMENTS_TAG = '[object Arguments]';
 const BOOLEAN_TAG = '[object Boolean]';
+const DATA_VIEW_TAG = '[object DataView]';
 const DATE_TAG = '[object Date]';
 const ERROR_TAG = '[object Error]';
 const MAP_TAG = '[object Map]';
@@ -33,15 +37,24 @@ const OBJECT_TAG = '[object Object]';
 const REG_EXP_TAG = '[object RegExp]';
 const SET_TAG = '[object Set]';
 const STRING_TAG = '[object String]';
+const TYPED_ARRAY_TAGS: Record<string, boolean> = {
+  '[object Int8Array]': true,
+  '[object Uint8Array]': true,
+  '[object Uint8ClampedArray]': true,
+  '[object Int16Array]': true,
+  '[object Uint16Array]': true,
+  '[object Int32Array]': true,
+  '[object Uint32Array]': true,
+  '[object Float16Array]': true,
+  '[object Float32Array]': true,
+  '[object Float64Array]': true,
+  '[object BigInt64Array]': true,
+  '[object BigUint64Array]': true,
+};
 const URL_TAG = '[object URL]';
 
-const { isArray } = Array;
-const isTypedArray =
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' ? ArrayBuffer.isView : null;
-const { assign } = Object;
 // eslint-disable-next-line @typescript-eslint/unbound-method
-const getTag = Object.prototype.toString.call.bind(Object.prototype.toString) as (a: object) => string;
+const toString = Object.prototype.toString;
 
 interface CreateIsEqualOptions<Meta> {
   circular: boolean;
@@ -55,7 +68,9 @@ interface CreateIsEqualOptions<Meta> {
  * Create a comparator method based on the type-specific equality comparators passed.
  */
 export function createEqualityComparator<Meta>({
+  areArrayBuffersEqual,
   areArraysEqual,
+  areDataViewsEqual,
   areDatesEqual,
   areErrorsEqual,
   areFunctionsEqual,
@@ -129,14 +144,8 @@ export function createEqualityComparator<Meta>({
 
     // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
     // the string tag or doing an `instanceof` check.
-    if (isArray(a)) {
+    if (Array.isArray(a)) {
       return areArraysEqual(a, b, state);
-    }
-
-    // `isTypedArray()` works on all possible TypedArray classes, so we can avoid
-    // capturing the string tag or comparing against all possible constructors.
-    if (isTypedArray != null && isTypedArray(a)) {
-      return areTypedArraysEqual(a, b, state);
     }
 
     // Try to fast-path equality checks for other complex object types in the
@@ -163,7 +172,7 @@ export function createEqualityComparator<Meta>({
 
     // Since this is a custom object, capture the string tag to determing its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
-    const tag = getTag(a as object);
+    const tag = toString.call(a);
 
     if (tag === DATE_TAG) {
       return areDatesEqual(a, b, state);
@@ -205,6 +214,18 @@ export function createEqualityComparator<Meta>({
     // If an arguments tag, it should be treated as a standard object.
     if (tag === ARGUMENTS_TAG) {
       return areObjectsEqual(a, b, state);
+    }
+
+    if (TYPED_ARRAY_TAGS[tag]) {
+      return areTypedArraysEqual(a, b, state);
+    }
+
+    if (tag === ARRAY_BUFFER_TAG) {
+      return areArrayBuffersEqual(a, b, state);
+    }
+
+    if (tag === DATA_VIEW_TAG) {
+      return areDataViewsEqual(a, b, state);
     }
 
     // As the penultimate fallback, check if the values passed are primitive wrappers. This
@@ -256,7 +277,9 @@ export function createEqualityComparatorConfig<Meta>({
   strict,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
   let config = {
+    areArrayBuffersEqual,
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
+    areDataViewsEqual,
     areDatesEqual: areDatesEqualDefault,
     areErrorsEqual: areErrorsEqualDefault,
     areFunctionsEqual: areFunctionsEqualDefault,
@@ -266,13 +289,15 @@ export function createEqualityComparatorConfig<Meta>({
     arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
     areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
-    areTypedArraysEqual: strict ? areObjectsEqualStrictDefault : areTypedArraysEqualDefault,
+    areTypedArraysEqual: strict
+      ? combineComparators(areTypedArraysEqualDefault, areObjectsEqualStrictDefault)
+      : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
     unknownTagComparators: undefined,
   };
 
   if (createCustomConfig) {
-    config = assign({}, config, createCustomConfig(config));
+    config = Object.assign({}, config, createCustomConfig(config));
   }
 
   if (circular) {
@@ -281,7 +306,7 @@ export function createEqualityComparatorConfig<Meta>({
     const areObjectsEqual = createIsCircular(config.areObjectsEqual);
     const areSetsEqual = createIsCircular(config.areSetsEqual);
 
-    config = assign({}, config, {
+    config = Object.assign({}, config, {
       areArraysEqual,
       areMapsEqual,
       areObjectsEqual,
