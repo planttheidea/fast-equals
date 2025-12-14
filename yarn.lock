@@ -1026,9 +1026,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planttheidea/build-tools@npm:^2.0.0-beta.1":
-  version: 2.0.0-beta.1
-  resolution: "@planttheidea/build-tools@npm:2.0.0-beta.1"
+"@planttheidea/build-tools@npm:^2.0.0-beta.3":
+  version: 2.0.0-beta.3
+  resolution: "@planttheidea/build-tools@npm:2.0.0-beta.3"
   dependencies:
     "@rollup/plugin-terser": "npm:^0.4.4"
     "@rollup/plugin-typescript": "npm:^12.3.0"
@@ -1057,7 +1057,7 @@ __metadata:
     yargs: "npm:^18.0.0"
   bin:
     pti: bin/index.js
-  checksum: 10c0/fe6de90cbbe086ca2bd64ccb641d896cd874d3b49a05859b05982c04a248c73a3db5a0032854fbd285ac265adbd74fcc82c3a8546c8f7602d105dc359b7b273e
+  checksum: 10c0/6100fe58e2949f560b654167e8863c02e2c4e60d89fd58701dd29a5ece2b644a03c42410c2d76e73fba938378dc55e663ca14ee2ca56c7f9df49d60a880d20e9
   languageName: node
   linkType: hard
 
@@ -2985,7 +2985,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^9.39.1, eslint@npm:^9.39.2":
+"eslint@npm:^9.39.1":
   version: 9.39.2
   resolution: "eslint@npm:9.39.2"
   dependencies:
@@ -3223,7 +3223,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fast-equals@workspace:."
   dependencies:
-    "@planttheidea/build-tools": "npm:^2.0.0-beta.1"
+    "@planttheidea/build-tools": "npm:^2.0.0-beta.3"
     "@types/lodash": "npm:^4.17.21"
     "@types/node": "npm:^24.10.3"
     "@types/ramda": "npm:^0.31.1"
@@ -3237,7 +3237,7 @@ __metadata:
     deep-eql: "npm:^5.0.2"
     deep-equal: "npm:^2.2.3"
     dequal: "npm:^2.0.3"
-    eslint: "npm:^9.39.2"
+    eslint: "npm:^9.39.1"
     eslint-friendly-formatter: "npm:^4.0.1"
     eslint-plugin-import: "npm:^2.32.0"
     fast-deep-equal: "npm:^3.1.3"
