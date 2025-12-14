@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 6.0.0
+
+- [#164](https://github.com/planttheidea/fast-equals/pull/164) - Drop UMD support and distribution of source maps (see
+  [#161](https://github.com/planttheidea/fast-equals/pull/164) for reasoning)
+
 ## 5.4.0
 
 - [#163](https://github.com/planttheidea/fast-equals/pull/163) - Fix handling of `TypedArray`-based checks, and add
