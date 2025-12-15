@@ -1,11 +1,15 @@
 {
-  "author": "tony_quetano@planttheidea.com",
+  "author": {
+    "email": "tony.quetano@planttheidea.com",
+    "name": "Tony Quetano",
+    "url": "https://www.planttheidea.com/"
+  },
   "bugs": {
     "url": "https://github.com/planttheidea/fast-equals/issues"
   },
   "description": "A blazing fast equality comparison, either shallow or deep",
   "devDependencies": {
-    "@planttheidea/build-tools": "^2.0.0-beta.3",
+    "@planttheidea/build-tools": "^2.0.0-beta.5",
     "@types/lodash": "^4.17.21",
     "@types/node": "^24.10.3",
     "@types/ramda": "^0.31.1",
@@ -19,7 +23,7 @@
     "deep-eql": "^5.0.2",
     "deep-equal": "^2.2.3",
     "dequal": "^2.0.3",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-plugin-import": "^2.32.0",
     "fast-deep-equal": "^3.1.3",
@@ -74,15 +78,17 @@
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/es/index.mjs",
   "name": "fast-equals",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planttheidea/fast-equals.git"
   },
   "scripts": {
     "benchmark": "npm run build && node benchmark/index.js",
-    "build": "npm run clean && npm run build:dist && npm run build:types",
+    "build": "npm run clean && npm run build:dist",
     "build:dist": "NODE_ENV=production rollup -c config/rollup.config.js",
-    "build:types": "pti fix-types -l dist",
     "clean": "rm -rf dist",
     "clean:cjs": "rm -rf dist/cjs",
     "clean:es": "rm -rf dist/es",

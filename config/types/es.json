@@ -21,6 +21,7 @@
     "target": "ES2015",
     "verbatimModuleSyntax": true,
     "types": ["node", "react"],
+    "declarationDir": "../../dist/es/types",
     "jsx": "react-jsx",
     "outDir": "../../dist/es"
   },
