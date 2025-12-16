@@ -1,5 +1,5 @@
 import type { Dictionary, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
-import { getStrictProperties, hasOwn, sameValueZeroEqual } from './utils.js';
+import { getStrictProperties, hasOwn, sameValueEqual } from './utils.js';
 
 const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
@@ -50,7 +50,7 @@ export function areDataViewsEqual(a: DataView, b: DataView): boolean {
  * Whether the dates passed are equal in value.
  */
 export function areDatesEqual(a: Date, b: Date): boolean {
-  return sameValueZeroEqual(a.getTime(), b.getTime());
+  return sameValueEqual(a.getTime(), b.getTime());
 }
 
 /**
@@ -137,7 +137,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 /**
  * Whether the numbers are equal in value.
  */
-export const areNumbersEqual = sameValueZeroEqual;
+export const areNumbersEqual = sameValueEqual;
 
 /**
  * Whether the objects are equal in value.
@@ -213,7 +213,7 @@ export function areObjectsEqualStrict(a: Dictionary, b: Dictionary, state: State
  * Whether the primitive wrappers passed are equal in value.
  */
 export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapper): boolean {
-  return sameValueZeroEqual(a.valueOf(), b.valueOf());
+  return sameValueEqual(a.valueOf(), b.valueOf());
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCustomEqual, sameValueZeroEqual } from '../src/index.js';
+import { createCustomEqual, sameValueEqual } from '../src/index.js';
 import type { CreateState, TypeEqualityComparator } from '../src/internalTypes.ts';
 
 describe('recipes', () => {
@@ -23,7 +23,7 @@ describe('recipes', () => {
       const shallowEqual = createCustomEqual({
         createCustomConfig: () => ({
           areRegExpsEqual,
-          createIsNestedEqual: () => sameValueZeroEqual,
+          createIsNestedEqual: () => sameValueEqual,
         }),
       });
 

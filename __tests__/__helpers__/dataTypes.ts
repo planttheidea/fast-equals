@@ -51,6 +51,7 @@ export const mainValues = {
   uint8ClampedArray: new Uint8ClampedArray([31, 21]),
   uint16Array: new Uint16Array([31, 21]),
   uint32Array: new Uint32Array([31, 21]),
+  zero: 0,
 };
 
 export const alternativeValues = {
@@ -78,4 +79,5 @@ export const alternativeValues = {
   uint8ClampedArray: new Uint8ClampedArray([21, 31]),
   uint16Array: new Uint16Array([21, 31]),
   uint32Array: new Uint32Array([21, 31]),
+  zero: -0,
 };

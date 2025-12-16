@@ -34,7 +34,7 @@ customize any specific type comparison based on your application's use-cases.
     - [deepEqual](#deepequal)
       - [Comparing `Map`s](#comparing-maps)
     - [shallowEqual](#shallowequal)
-    - [sameValueZeroEqual](#samevaluezeroequal)
+    - [sameValueEqual](#samevalueequal)
     - [circularDeepEqual](#circulardeepequal)
     - [circularShallowEqual](#circularshallowequal)
     - [strictDeepEqual](#strictdeepequal)
@@ -120,14 +120,17 @@ console.log(shallowEqual(objectA, objectB)); // true
 console.log(shallowEqual(objectA, objectC)); // false
 ```
 
-### sameValueZeroEqual
+### sameValueEqual
 
-Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two
-objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means
-either strictly equal or both `NaN`.
+Performs a [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue) comparison on the two objects passed
+and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+
+- `+0` and `-0` are not equal
+- `NaN` is equal to `NaN`
+- All other items are based on referential equality (`a === b`)
 
 ```ts
-import { sameValueZeroEqual } from 'fast-equals';
+import { sameValueEqual } from 'fast-equals';
 
 const mainObject = { foo: NaN, bar: 'baz' };
 
@@ -135,10 +138,14 @@ const objectA = 'baz';
 const objectB = NaN;
 const objectC = { foo: NaN, bar: 'baz' };
 
-console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
-console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
-console.log(sameValueZeroEqual(mainObject, objectC)); // false
+console.log(sameValueEqual(mainObject.bar, objectA)); // true
+console.log(sameValueEqual(mainObject.foo, objectB)); // true
+console.log(sameValueEqual(mainObject, objectC)); // false
 ```
+
+**NOTE**: In environments that support
+[`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is), this is just
+a re-export of that method.
 
 ### circularDeepEqual
 
@@ -446,17 +453,17 @@ Caveats that impact the benchmark (and accuracy of comparison):
   fully supported their comparison
 - `fast-deep-equal`, `react-fast-compare` and `nano-equal` throw on objects with `null` as prototype
   (`Object.create(null)`)
-- `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
-- `deep-eql` does not support `SameValueZero` equality for zero equality (positive and negative zero are not equal)
+- `assert.deepStrictEqual` does not support `NaN` or `SameValue` equality for dates
+- `deep-eql` does not support `SameValue` equality for zero equality (positive and negative zero are not equal)
 - `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses
-  `SameValueZero` equality for dates
-- `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
-- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero`
+  `SameValue` equality for dates
+- `fast-deep-equal` does not support `NaN` or `SameValue` equality for dates
+- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValue`
   equality for dates
-- `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function`
+- `react-fast-compare` does not support `NaN` or `SameValue` equality for dates, and does not compare `function`
   equality
-- `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValueZero` equality for dates
-- `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
+- `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValue` equality for dates
+- `underscore.isEqual` does not support `SameValue` equality for primitives or dates
 
 All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was
 the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react`
