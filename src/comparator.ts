@@ -304,6 +304,7 @@ function createSupportedComparatorMap<Meta>({
     '[object Arguments]': areObjectsEqual,
     '[object Array]': areArraysEqual,
     '[object ArrayBuffer]': areArrayBuffersEqual,
+    '[object AsyncGeneratorFunction]': areFunctionsEqual,
     '[object BigInt]': areNumbersEqual,
     '[object BigInt64Array]': areTypedArraysEqual,
     '[object BigUint64Array]': areTypedArraysEqual,
