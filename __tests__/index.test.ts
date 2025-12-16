@@ -5,12 +5,14 @@ import {
   createCustomEqual,
   deepEqual,
   sameValueEqual,
+  sameValueZeroEqual,
   shallowEqual,
   strictCircularDeepEqual,
   strictCircularShallowEqual,
   strictDeepEqual,
   strictShallowEqual,
 } from '../src/index.js';
+import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 import { testSuites } from './__helpers__/testSuites.js';
 
 describe('exports', () => {
@@ -467,5 +469,86 @@ describe('strict', () => {
       expect(customEqual(a, b)).toBe(true);
       expect(customEqual(a, c)).toBe(false);
     });
+  });
+});
+
+describe('sameValueEqual', () => {
+  Object.keys(primitiveValues).forEach((key) => {
+    it(`should have ${key} be equal by SameValue`, () => {
+      expect(
+        sameValueEqual(
+          primitiveValues[key as keyof typeof primitiveValues],
+          mainValues[key as keyof typeof primitiveValues],
+        ),
+      ).toBe(true);
+    });
+  });
+
+  Object.keys(mainValues).forEach((key) => {
+    if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
+      it(`should have ${key} be equal by SameValue`, () => {
+        expect(
+          sameValueEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
+        ).toBe(true);
+      });
+    }
+  });
+
+  Object.keys(alternativeValues).forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
+      it(`should have ${key} not be equal by SameValue`, () => {
+        expect(
+          sameValueEqual(
+            alternativeValues[key as keyof typeof alternativeValues],
+            mainValues[key as keyof typeof alternativeValues],
+          ),
+        ).toBe(false);
+      });
+    }
+  });
+});
+
+describe('sameValueZeroEqual', () => {
+  Object.keys(primitiveValues).forEach((key) => {
+    it(`should have ${key} be equal by SameValueZero`, () => {
+      expect(
+        sameValueZeroEqual(
+          primitiveValues[key as keyof typeof primitiveValues],
+          mainValues[key as keyof typeof primitiveValues],
+        ),
+      ).toBe(true);
+    });
+  });
+
+  Object.keys(mainValues).forEach((key) => {
+    if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
+      it(`should have ${key} be equal by SameValueZero`, () => {
+        expect(
+          sameValueZeroEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
+        ).toBe(true);
+      });
+    }
+  });
+
+  Object.keys(alternativeValues).forEach((key) => {
+    if (key === 'zero') {
+      it(`should have ${key} be equal by SameValueZero`, () => {
+        expect(
+          sameValueZeroEqual(
+            alternativeValues[key as keyof typeof alternativeValues],
+            mainValues[key as keyof typeof alternativeValues],
+          ),
+        ).toBe(true);
+      });
+    } else if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
+      it(`should have ${key} not be equal by SameValueZero`, () => {
+        expect(
+          sameValueZeroEqual(
+            alternativeValues[key as keyof typeof alternativeValues],
+            mainValues[key as keyof typeof alternativeValues],
+          ),
+        ).toBe(false);
+      });
+    }
   });
 });

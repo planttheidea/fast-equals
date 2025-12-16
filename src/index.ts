@@ -4,10 +4,10 @@ import {
   createInternalEqualityComparator,
   createIsEqual,
 } from './comparator.js';
+import { sameValueEqual } from './equals.js';
 import type { CustomEqualCreatorOptions } from './internalTypes.js';
-import { sameValueEqual } from './utils.js';
 
-export { sameValueEqual };
+export { sameValueEqual, sameValueZeroEqual } from './equals.js';
 export type {
   AnyEqualityComparator,
   Cache,

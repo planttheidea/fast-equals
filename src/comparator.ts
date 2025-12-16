@@ -164,9 +164,6 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     // the only thing remaining is strict equality, which has already been compared. This is for a few reasons:
     //   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
     //     comparison that can be made.
-    //   - For types that can be introspected, but rarely have requirements to be compared
-    //     (`ArrayBuffer`, `DataView`, etc.), the cost is avoided to prioritize the common
-    //     use-cases (may be included in a future release, if requested enough).
     //   - For types that can be introspected but do not have an objective definition of what
     //     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
     // In all cases, these decisions should be reevaluated based on changes to the language and
