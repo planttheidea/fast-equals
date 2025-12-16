@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { createEqualityComparator, createInternalEqualityComparator } from '../src/comparator.js';
 import {
   areArrayBuffersEqual,
@@ -14,9 +14,10 @@ import {
   areSetsEqual,
   areTypedArraysEqual,
   areUrlsEqual,
+  sameValueEqual,
 } from '../src/equals.js';
 import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
-import { createIsCircular, sameValueEqual } from '../src/utils.js';
+import { createIsCircular } from '../src/utils.js';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArrayBuffersEqual,
@@ -44,7 +45,7 @@ const CIRCULAR_COMPARATOR_OPTIONS = {
 };
 
 describe('createEqualityComparator', () => {
-  [
+  describe.each([
     {
       createState: <Meta>(equals: InternalEqualityComparator<undefined>, meta?: Meta) => ({
         cache: undefined,
@@ -65,48 +66,46 @@ describe('createEqualityComparator', () => {
       name: 'circular',
       options: CIRCULAR_COMPARATOR_OPTIONS,
     },
-  ].forEach(({ createState, name, options }) => {
-    describe(name, () => {
-      it('should default to a deep-equal setup when no equality comparator is provided', () => {
-        const comparator = createEqualityComparator(options);
-        const meta = createState(createInternalEqualityComparator(comparator));
+  ])('$name', ({ createState, options }) => {
+    test('defaults to a deep-equal setup when no equality comparator is provided', () => {
+      const comparator = createEqualityComparator(options);
+      const meta = createState(createInternalEqualityComparator(comparator));
 
-        const a = { foo: { bar: 'baz' } };
-        const b = { foo: { bar: 'baz' } };
+      const a = { foo: { bar: 'baz' } };
+      const b = { foo: { bar: 'baz' } };
 
-        expect(comparator(a, b, meta)).toBe(true);
-      });
+      expect(comparator(a, b, meta)).toBe(true);
+    });
 
-      it('should provide correct iteration index when comparing Map keys', () => {
-        const mapA = new Map([
-          ['foo', 'bar'],
-          ['oof', 'baz'],
-        ]);
-        const mapB = new Map([
-          ['oof', 'baz'],
-          ['foo', 'bar'],
-        ]);
+    test('provides correct iteration index when comparing Map keys', () => {
+      const mapA = new Map([
+        ['foo', 'bar'],
+        ['oof', 'baz'],
+      ]);
+      const mapB = new Map([
+        ['oof', 'baz'],
+        ['foo', 'bar'],
+      ]);
 
-        const comparator = createEqualityComparator(options);
-        const state = createState(
-          (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<undefined>) => {
-            if (typeof indexOrKeyA === 'number' && typeof indexOrKeyB === 'number') {
-              // Only check key equality comparison
-              expect(indexOrKeyA).toBe(Array.from(parentA.keys()).indexOf(a));
-              expect(indexOrKeyB).toBe(Array.from(parentB.keys()).indexOf(b));
-            }
+      const comparator = createEqualityComparator(options);
+      const state = createState(
+        (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<undefined>) => {
+          if (typeof indexOrKeyA === 'number' && typeof indexOrKeyB === 'number') {
+            // Only check key equality comparison
+            expect(indexOrKeyA).toBe(Array.from(parentA.keys()).indexOf(a));
+            expect(indexOrKeyB).toBe(Array.from(parentB.keys()).indexOf(b));
+          }
 
-            return comparator(a, b, state);
-          },
-        );
+          return comparator(a, b, state);
+        },
+      );
 
-        comparator(mapA, mapB, state);
-      });
+      comparator(mapA, mapB, state);
     });
   });
 
   describe('custom', () => {
-    it('should call the custom comparator with the correct params', () => {
+    test('calls the custom comparator with the correct params', () => {
       const customComparatorMock = vi.fn();
       const comparator = createEqualityComparator(STANDARD_COMPARATOR_OPTIONS);
       const state: State<'META'> = {

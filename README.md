@@ -144,8 +144,31 @@ console.log(sameValueEqual(mainObject, objectC)); // false
 ```
 
 **NOTE**: In environments that support
-[`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is), this is just
-a re-export of that method.
+[`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is),
+`sameValueEqual` is just a re-export of that method.
+
+### sameValueZeroEqual
+
+Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two
+objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+
+- `+0` and `-0` are equal
+- `NaN` is equal to `NaN`
+- All other items are based on referential equality (`a === b`)
+
+```ts
+import { sameValueEqual } from 'fast-equals';
+
+const mainObject = { foo: NaN, bar: 'baz' };
+
+const objectA = 'baz';
+const objectB = NaN;
+const objectC = { foo: NaN, bar: 'baz' };
+
+console.log(sameValueEqual(mainObject.bar, objectA)); // true
+console.log(sameValueEqual(mainObject.foo, objectB)); // true
+console.log(sameValueEqual(mainObject, objectC)); // false
+```
 
 ### circularDeepEqual
 
