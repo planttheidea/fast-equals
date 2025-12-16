@@ -6,7 +6,7 @@ support such an environment and polyfilling is not an option, creating a custom 
 implementation with the same contract is a simple solution.
 
 ```ts
-import { createCustomEqual, sameValueZeroEqual } from 'fast-equals';
+import { createCustomEqual, sameValueEqual } from 'fast-equals';
 import type { Cache } from 'fast-equals';
 
 function getCache(): Cache<any, any> {
@@ -69,7 +69,7 @@ const circularDeepEqual = createCustomEqual<Cache>({
 
 const circularShallowEqual = createCustomEqual<Cache>({
   circular: true,
-  comparator: sameValueZeroEqual,
+  comparator: sameValueEqual,
   createState: () => ({
     cache: getCache(),
     meta,

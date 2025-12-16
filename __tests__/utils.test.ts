@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { sameValueZeroEqual } from '../src/utils.js';
+import { sameValueEqual } from '../src/utils.js';
 import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 
-describe('isSameValueZero', () => {
+describe('sameValueEqual', () => {
   Object.keys(primitiveValues).forEach((key) => {
-    it(`should have ${key} be equal by SameValueZero`, () => {
+    it(`should have ${key} be equal by SameValue`, () => {
       expect(
-        sameValueZeroEqual(
+        sameValueEqual(
           primitiveValues[key as keyof typeof primitiveValues],
           mainValues[key as keyof typeof primitiveValues],
         ),
@@ -16,9 +16,9 @@ describe('isSameValueZero', () => {
 
   Object.keys(mainValues).forEach((key) => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
-      it(`should have ${key} be equal by SameValueZero`, () => {
+      it(`should have ${key} be equal by SameValue`, () => {
         expect(
-          sameValueZeroEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
+          sameValueEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
         ).toBe(true);
       });
     }
@@ -26,9 +26,9 @@ describe('isSameValueZero', () => {
 
   Object.keys(alternativeValues).forEach((key) => {
     if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
-      it(`should have ${key} not be equal by SameValueZero`, () => {
+      it(`should have ${key} not be equal by SameValue`, () => {
         expect(
-          sameValueZeroEqual(
+          sameValueEqual(
             alternativeValues[key as keyof typeof alternativeValues],
             mainValues[key as keyof typeof alternativeValues],
           ),

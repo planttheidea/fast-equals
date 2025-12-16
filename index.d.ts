@@ -179,7 +179,7 @@ interface CustomEqualCreatorOptions<Meta> {
 /**
  * Whether the values passed are strictly equal or both NaN.
  */
-declare function sameValueZeroEqual(a: any, b: any): boolean;
+declare const sameValueEqual: (value1: any, value2: any) => boolean;
 
 /**
  * Whether the items passed are deeply-equal in value.
@@ -232,7 +232,7 @@ export {
   circularShallowEqual,
   createCustomEqual,
   deepEqual,
-  sameValueZeroEqual,
+  sameValueEqual,
   shallowEqual,
   strictCircularDeepEqual,
   strictCircularShallowEqual,
