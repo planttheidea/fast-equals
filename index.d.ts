@@ -158,7 +158,7 @@ interface CustomEqualCreatorOptions<Meta> {
 /**
  * Whether the values passed are strictly equal or both NaN.
  */
-declare function sameValueZeroEqual(a: any, b: any): boolean;
+declare const sameValueEqual: (value1: any, value2: any) => boolean;
 
 /**
  * Whether the items passed are deeply-equal in value.
@@ -204,5 +204,5 @@ declare const strictCircularShallowEqual: <A, B>(a: A, b: B) => boolean;
  */
 declare function createCustomEqual<Meta = undefined>(options?: CustomEqualCreatorOptions<Meta>): <A, B>(a: A, b: B) => boolean;
 
-export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueZeroEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictShallowEqual };
+export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictShallowEqual };
 export type { AnyEqualityComparator, Cache, CircularState, ComparatorConfig, CreateCustomComparatorConfig, CreateState, CustomEqualCreatorOptions, DefaultState, Dictionary, EqualityComparator, EqualityComparatorCreator, InternalEqualityComparator, PrimitiveWrapper, State, TypeEqualityComparator, TypedArray };

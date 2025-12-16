@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { areArraysEqual, areMapsEqual, areObjectsEqual, areRegExpsEqual, areSetsEqual } from '../src/equals.js';
 import { deepEqual } from '../src/index.js';
-import { sameValueZeroEqual } from '../src/utils.js';
+import { sameValueEqual } from '../src/utils.js';
 
 const shallowState = {
   cache: undefined,
-  equals: sameValueZeroEqual,
+  equals: sameValueEqual,
   meta: undefined,
   strict: false,
 };

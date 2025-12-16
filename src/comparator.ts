@@ -74,7 +74,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     }
 
     if (type !== 'object') {
-      if (type === 'number') {
+      if (type === 'number' || type === 'bigint') {
         return areNumbersEqual(a, b, state);
       }
 
@@ -103,24 +103,19 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return false;
     }
 
-    // `isPlainObject` only checks against the object's own realm. Cross-realm
-    // comparisons are rare, and will be handled in the ultimate fallback, so
-    // we can avoid capturing the string tag.
-    if (constructor === Object) {
-      return areObjectsEqual(a, b, state);
-    }
-
-    // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
-    // the string tag or doing an `instanceof` check.
-    if (constructor === Array || Array.isArray(a)) {
-      return areArraysEqual(a, b, state);
-    }
-
     // Try to fast-path equality checks for other complex object types in the
     // same realm to avoid capturing the string tag. Strict equality is used
     // instead of `instanceof` because it is more performant for the common
     // use-case. If someone is subclassing a native class, it will be handled
     // with the string tag comparison.
+
+    if (constructor === Object) {
+      return areObjectsEqual(a, b, state);
+    }
+
+    if (constructor === Array) {
+      return areArraysEqual(a, b, state);
+    }
 
     if (constructor === Date) {
       return areDatesEqual(a, b, state);
@@ -136,6 +131,18 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
 
     if (constructor === Set) {
       return areSetsEqual(a, b, state);
+    }
+
+    if (constructor === Promise) {
+      // Avoid tag checks for promise values, since we know if they are not referentially equal
+      // then they are not equal.
+      return false;
+    }
+
+    // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
+    // the string tag or doing an `instanceof` in edge cases.
+    if (Array.isArray(a)) {
+      return areArraysEqual(a, b, state);
     }
 
     // Since this is a custom object, capture the string tag to determing its type.
@@ -288,6 +295,7 @@ function createSupportedComparatorMap<Meta>({
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
+  areNumbersEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
@@ -299,6 +307,7 @@ function createSupportedComparatorMap<Meta>({
     '[object Arguments]': areObjectsEqual,
     '[object Array]': areArraysEqual,
     '[object ArrayBuffer]': areArrayBuffersEqual,
+    '[object BigInt]': areNumbersEqual,
     '[object BigInt64Array]': areTypedArraysEqual,
     '[object BigUint64Array]': areTypedArraysEqual,
     '[object Boolean]': arePrimitiveWrappersEqual,

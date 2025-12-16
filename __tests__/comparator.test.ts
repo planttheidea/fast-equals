@@ -16,7 +16,7 @@ import {
   areUrlsEqual,
 } from '../src/equals.js';
 import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
-import { createIsCircular, sameValueZeroEqual } from '../src/utils.js';
+import { createIsCircular, sameValueEqual } from '../src/utils.js';
 
 const STANDARD_COMPARATOR_OPTIONS = {
   areArrayBuffersEqual,
@@ -26,7 +26,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
-  areNumbersEqual: sameValueZeroEqual,
+  areNumbersEqual: sameValueEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,

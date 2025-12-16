@@ -5,9 +5,9 @@ import {
   createIsEqual,
 } from './comparator.js';
 import type { CustomEqualCreatorOptions } from './internalTypes.js';
-import { sameValueZeroEqual } from './utils.js';
+import { sameValueEqual } from './utils.js';
 
-export { sameValueZeroEqual };
+export { sameValueEqual };
 export type {
   AnyEqualityComparator,
   Cache,
@@ -55,7 +55,7 @@ export const strictCircularDeepEqual = createCustomEqual({
  * Whether the items passed are shallowly-equal in value.
  */
 export const shallowEqual = createCustomEqual({
-  createInternalComparator: () => sameValueZeroEqual,
+  createInternalComparator: () => sameValueEqual,
 });
 
 /**
@@ -63,7 +63,7 @@ export const shallowEqual = createCustomEqual({
  */
 export const strictShallowEqual = createCustomEqual({
   strict: true,
-  createInternalComparator: () => sameValueZeroEqual,
+  createInternalComparator: () => sameValueEqual,
 });
 
 /**
@@ -71,7 +71,7 @@ export const strictShallowEqual = createCustomEqual({
  */
 export const circularShallowEqual = createCustomEqual({
   circular: true,
-  createInternalComparator: () => sameValueZeroEqual,
+  createInternalComparator: () => sameValueEqual,
 });
 
 /**
@@ -80,7 +80,7 @@ export const circularShallowEqual = createCustomEqual({
  */
 export const strictCircularShallowEqual = createCustomEqual({
   circular: true,
-  createInternalComparator: () => sameValueZeroEqual,
+  createInternalComparator: () => sameValueEqual,
   strict: true,
 });
 

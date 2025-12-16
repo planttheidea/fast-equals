@@ -6,7 +6,7 @@ If you need to support such an environment and polyfilling is not an option, cre
 more verbose comparison of all possible flags is a simple solution.
 
 ```ts
-import { createCustomEqual, sameValueZeroEqual } from 'deep-Equals';
+import { createCustomEqual, sameValueEqual } from 'deep-Equals';
 
 const areRegExpsEqual = (a: RegExp, b: RegExp) =>
   a.source === b.source
@@ -21,7 +21,7 @@ const deepEqual = createCustomEqual({
   createCustomConfig: () => ({ areRegExpsEqual }),
 });
 const shallowEqual = createCustomEqual({
-  comparator: sameValueZero,
+  comparator: sameValueEqual,
   createCustomConfig: () => ({ areRegExpsEqual }),
 });
 ```
