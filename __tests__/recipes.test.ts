@@ -370,5 +370,36 @@ describe('recipes', () => {
       expect(deepEqual(a, b)).toBe(true);
       expect(deepEqual(a, c)).toBe(false);
     });
+
+    it('should get a custom comparator based on a custom logic', () => {
+      // Emulate something like a private property
+      const hiddenData = new WeakMap<Thing, number>();
+
+      class Thing {
+        [Symbol.toStringTag] = 'Thing';
+        constructor(value: number) {
+          hiddenData.set(this, value);
+        }
+        equals(other: Thing) {
+          return hiddenData.get(this) === hiddenData.get(other);
+        }
+      }
+
+      const deepEqual = createCustomEqual({
+        createCustomConfig: () => ({
+          getUnsupportedCustomComparator(a, b) {
+            if (a instanceof Thing && b instanceof Thing) {
+              return (a: Thing, b: Thing) => a.equals(b);
+            }
+          },
+        }),
+      });
+
+      const a = new Thing(1);
+      const b = new Thing(1);
+      const c = new Thing(2);
+      expect(deepEqual(a, b)).toBe(true);
+      expect(deepEqual(a, c)).toBe(false);
+    });
   });
 });

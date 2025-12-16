@@ -42,7 +42,7 @@ customize any specific type comparison based on your application's use-cases.
     - [strictCircularDeepEqual](#strictcirculardeepequal)
     - [strictCircularShallowEqual](#strictcircularshallowequal)
     - [createCustomEqual](#createcustomequal)
-      - [unknownTagComparators](#unknowntagcomparators)
+      - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
       - [Recipes](#recipes)
   - [Benchmarks](#benchmarks)
   - [Development](#development)
@@ -309,7 +309,7 @@ interface ComparatorConfig<Meta> {
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
   areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;
   areUrlsEqual: TypeEqualityComparator<URL, Meta>;
-  unknownTagComparators: Record<string, TypeEqualityComparator<string, any>>;
+  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, tag: string) => TypeEqualityComparator<Type, Meta>;
 }
 
 function createCustomEqual<Meta>(options: {
@@ -332,10 +332,11 @@ _**NOTE**: `Map` implementations compare equality for both keys and value. When 
 equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where
 ordering of keys matters to equality._
 
-#### unknownTagComparators
+#### getUnsupportedCustomComparator
 
 If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to
-support via the `unknownTagComparators` option. See [this recipe]('./recipes/special-objects.md) for an example.
+support via the `getUnsupportedCustomComparator` option. See [this recipe]('./recipes/special-objects.md) for an
+example.
 
 #### Recipes
 
@@ -348,7 +349,7 @@ to the problem you are solving, they can offer guidance of how to structure your
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
 - [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 - [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
-- [Custom `@@toStringTag` support](./recipes/special-objects.md)
+- [Custom comparator support](./recipes/special-objects.md)
 
 ## Benchmarks
 
@@ -369,70 +370,70 @@ Testing mixed objects equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 1471168.85239  │
+│ fast-equals (passed)                   │ 1510836.028275 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 1264411.715504 │
+│ react-fast-compare (passed)            │ 1274703.158832 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 1235813.948078 │
+│ fast-deep-equal (passed)               │ 1274189.383277 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (passed)           │ 1195217.518662 │
+│ shallow-equal-fuzzy (passed)           │ 1226914.582379 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (failed)                    │ 929655.723691  │
+│ nano-equal (failed)                    │ 933496.656805  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 768374.864723  │
+│ fast-equals (circular) (passed)        │ 764461.446623  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 749160.907628  │
+│ dequal (passed)                        │ 753321.452015  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 740882.587206  │
+│ dequal/lite (passed)                   │ 731549.230576  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 467972.831138  │
+│ underscore.isEqual (passed)            │ 482251.504398  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 456382.679161  │
+│ assert.deepStrictEqual (passed)        │ 455608.002109  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 282297.235782  │
+│ lodash.isEqual (passed)                │ 287185.021658  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 220734.769522  │
+│ fast-equals (strict) (passed)          │ 223101.575281  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 189596.947233  │
+│ fast-equals (strict circular) (passed) │ 187700.193987  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 158949.470907  │
+│ deep-eql (passed)                      │ 162160.721895  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 931.202904     │
+│ deep-equal (passed)                    │ 925.576389     │
 └────────────────────────────────────────┴────────────────┘
 
 Testing mixed objects not equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 4883771.025591 │
+│ fast-equals (passed)                   │ 4983966.492422 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 3362424.550861 │
+│ fast-equals (circular) (passed)        │ 3434629.761148 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 3306303.044165 │
+│ fast-deep-equal (passed)               │ 3369885.314933 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 3300745.158967 │
+│ react-fast-compare (passed)            │ 3322999.39514  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 1751872.739657 │
+│ fast-equals (strict) (passed)          │ 1760254.035295 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 1471593.397923 │
+│ fast-equals (strict circular) (passed) │ 1480270.29222  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 1273861.597445 │
+│ dequal/lite (passed)                   │ 1325903.703309 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 1261221.076835 │
+│ dequal (passed)                        │ 1313388.133343 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (failed)           │ 1204782.793725 │
+│ shallow-equal-fuzzy (failed)           │ 1218682.349751 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (passed)                    │ 1057687.404263 │
+│ nano-equal (passed)                    │ 1049565.218011 │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 914381.600279  │
+│ underscore.isEqual (passed)            │ 893287.689781  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 379275.641803  │
+│ lodash.isEqual (passed)                │ 380418.890446  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 184686.007866  │
+│ deep-eql (passed)                      │ 185546.584606  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 20593.021064   │
+│ assert.deepStrictEqual (passed)        │ 20645.182086   │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 3696.234609    │
+│ deep-equal (passed)                    │ 3661.818251    │
 └────────────────────────────────────────┴────────────────┘
 ```
 
