@@ -156,9 +156,20 @@ interface CustomEqualCreatorOptions<Meta> {
 }
 
 /**
- * Whether the values passed are strictly equal or both NaN.
+ * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`) or both are `NaN`.
+ *
+ * @note
+ * When available in the environment, this is just a re-export of the global
+ * [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is) method.
  */
 declare const sameValueEqual: (value1: any, value2: any) => boolean;
+/**
+ * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevaluezero) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`), both are `NaN`, or both
+ * are either positive or negative zero.
+ */
+declare function sameValueZeroEqual(a: any, b: any): boolean;
 
 /**
  * Whether the items passed are deeply-equal in value.
@@ -204,5 +215,5 @@ declare const strictCircularShallowEqual: <A, B>(a: A, b: B) => boolean;
  */
 declare function createCustomEqual<Meta = undefined>(options?: CustomEqualCreatorOptions<Meta>): <A, B>(a: A, b: B) => boolean;
 
-export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictShallowEqual };
+export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueEqual, sameValueZeroEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictShallowEqual };
 export type { AnyEqualityComparator, Cache, CircularState, ComparatorConfig, CreateCustomComparatorConfig, CreateState, CustomEqualCreatorOptions, DefaultState, Dictionary, EqualityComparator, EqualityComparatorCreator, InternalEqualityComparator, PrimitiveWrapper, State, TypeEqualityComparator, TypedArray };

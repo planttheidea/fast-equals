@@ -1,11 +1,35 @@
 import type { Dictionary, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
-import { getStrictProperties, hasOwn, sameValueEqual } from './utils.js';
+import { getStrictProperties, hasOwn } from './utils.js';
 
 const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
 const { getOwnPropertyDescriptor, keys } = Object;
+
+/**
+ * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`) or both are `NaN`.
+ *
+ * @note
+ * When available in the environment, this is just a re-export of the global
+ * [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is) method.
+ */
+export const sameValueEqual =
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  Object.is
+  || function sameValueEqual(a: any, b: any): boolean {
+    return a === b ? a !== 0 || 1 / a === 1 / b : a !== a && b !== b;
+  };
+
+/**
+ * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevaluezero) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`), both are `NaN`, or both
+ * are either positive or negative zero.
+ */
+export function sameValueZeroEqual(a: any, b: any): boolean {
+  return a === b || (a !== a && b !== b);
+}
 
 /**
  * Whether the array buffers are equal in value.
@@ -64,6 +88,13 @@ export function areErrorsEqual(a: Error, b: Error): boolean {
  * Whether the functions passed are equal in value.
  */
 export function areFunctionsEqual(a: (...args: any[]) => any, b: (...args: any[]) => any): boolean {
+  return a === b;
+}
+
+/**
+ * Whether the generator objects passed are equal in value.
+ */
+export function areGeneratorsEqual(a: AsyncGenerator | Generator, b: AsyncGenerator | Generator): boolean {
   return a === b;
 }
 

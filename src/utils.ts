@@ -71,13 +71,3 @@ export function getStrictProperties(object: Dictionary): Array<string | symbol> 
 export const hasOwn =
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   Object.hasOwn || ((object: Dictionary, property: number | string | symbol) => hasOwnProperty.call(object, property));
-
-/**
- * Whether the values passed are strictly equal or both NaN.
- */
-export const sameValueEqual =
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  Object.is
-  || function sameValueEqual(a: any, b: any): boolean {
-    return a === b ? a !== 0 || 1 / a === 1 / b : a !== a && b !== b;
-  };
