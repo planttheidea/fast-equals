@@ -298,13 +298,16 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
-  areArraysEqual: TypeEqualityComparator<any[], Meta>;
+  areArrayBuffersEcqual: TypeEqualityComparator<ArrayBuffer, Meta>;
+  areArraysEcqual: TypeEqualityComparator<any[], Meta>;
+  areDataViewsEqual: TypeEqualityComparator<DataView, Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;
   areErrorsEqual: TypeEqualityComparator<Error, Meta>;
   areFunctionsEqual: TypeEqualityComparator<(...args: any[]) => any, Meta>;
   areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
+  areNumbersEqual: TypeEqualityComparator<number, Meta>;
   areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  arePrimitiveWrappersEqual: TypeEqualityComparator<boolean | string | number, Meta>;
+  arePrimitiveWrappersEqual: TypeEqualityComparator<Boolean | Number | String, Meta>;
   areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
   areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
   areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;

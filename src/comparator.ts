@@ -74,7 +74,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     }
 
     if (type !== 'object') {
-      if (type === 'number') {
+      if (type === 'number' || type === 'bigint') {
         return areNumbersEqual(a, b, state);
       }
 
@@ -295,6 +295,7 @@ function createSupportedComparatorMap<Meta>({
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
+  areNumbersEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
@@ -306,6 +307,7 @@ function createSupportedComparatorMap<Meta>({
     '[object Arguments]': areObjectsEqual,
     '[object Array]': areArraysEqual,
     '[object ArrayBuffer]': areArrayBuffersEqual,
+    '[object BigInt]': areNumbersEqual,
     '[object BigInt64Array]': areTypedArraysEqual,
     '[object BigUint64Array]': areTypedArraysEqual,
     '[object Boolean]': arePrimitiveWrappersEqual,
