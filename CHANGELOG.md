@@ -8,8 +8,8 @@
   [#161](https://github.com/planttheidea/fast-equals/pull/164) for reasoning)
 - [#166](https://github.com/planttheidea/fast-equals/pull/166) - Remove `unsupportedTagComparators` object in favor of
   `getUnsupportedCustomComparator` method
-- [#167](https://github.com/planttheidea/fast-equals/pull/167) - Remove `sameValueZeroEqual` in favor of
-  `sameValueEqual` (which is just `Object.is` with a ponyfill fallback)
+- Add `sameValueEqual` method (`Object.is` with ponyfill for legacy environments) and make it the default number
+  comparison (formerly used `sameValueZeroEqual`)
 
 ### Enhancements
 
