@@ -133,6 +133,12 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return areSetsEqual(a, b, state);
     }
 
+    if (constructor === Promise) {
+      // Avoid tag checks for promise values, since we know if they are not referentially equal
+      // then they are not equal.
+      return false;
+    }
+
     // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
     // the string tag or doing an `instanceof` in edge cases.
     if (Array.isArray(a)) {
