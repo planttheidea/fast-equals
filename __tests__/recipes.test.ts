@@ -307,13 +307,12 @@ describe('recipes', () => {
   });
 
   describe('special-objects', () => {
-    it('should call unknownTagComparators based on a custom `@@toStringTag`', () => {
+    it('should get a custom comparator based on a custom `@@toStringTag`', () => {
       // Emulate something like a private property
       const hiddenData = new WeakMap<Thing, number>();
-      const tag = 'Thing';
 
       class Thing {
-        [Symbol.toStringTag] = tag;
+        [Symbol.toStringTag] = 'Thing';
         constructor(value: number) {
           hiddenData.set(this, value);
         }
@@ -324,8 +323,12 @@ describe('recipes', () => {
 
       const deepEqual = createCustomEqual({
         createCustomConfig: () => ({
-          unknownTagComparators: {
-            [tag]: (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b),
+          getUnsupportedCustomComparator(a) {
+            const shortTag = a?.[Symbol.toStringTag];
+
+            if (shortTag === 'Thing') {
+              return (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b);
+            }
           },
         }),
       });
@@ -337,13 +340,12 @@ describe('recipes', () => {
       expect(deepEqual(a, c)).toBe(false);
     });
 
-    it('should call unknownTagComparators based on a custom class name fallback object tag', () => {
+    it('should get a custom comparator based on a custom class name fallback object tag', () => {
       // Emulate something like a private property
       const hiddenData = new WeakMap<Thing, number>();
-      const tag = 'Thing';
 
       class Thing {
-        [Symbol.toStringTag] = tag;
+        [Symbol.toStringTag] = 'Thing';
         constructor(value: number) {
           hiddenData.set(this, value);
         }
@@ -354,8 +356,10 @@ describe('recipes', () => {
 
       const deepEqual = createCustomEqual({
         createCustomConfig: () => ({
-          unknownTagComparators: {
-            [`[object ${tag}]`]: (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b),
+          getUnsupportedCustomComparator(_a, _b, tag) {
+            if (tag === '[object Thing]') {
+              return (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b);
+            }
           },
         }),
       });

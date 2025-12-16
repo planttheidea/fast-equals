@@ -58,13 +58,6 @@ export function createIsCircular<AreItemsEqual extends TypeEqualityComparator<an
 }
 
 /**
- * Get the `@@toStringTag` of the value, if it exists.
- */
-export function getShortTag(value: any): string | undefined {
-  return value != null ? (value[Symbol.toStringTag] as string) : undefined;
-}
-
-/**
  * Get the properties to strictly examine, which include both own properties that are
  * not enumerable and symbol properties.
  */
