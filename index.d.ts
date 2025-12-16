@@ -101,12 +101,11 @@ interface ComparatorConfig<Meta> {
    */
   areUrlsEqual: TypeEqualityComparator<any, Meta>;
   /**
-   * Whether two values with unknown `@@toStringTag` are equal in value. This comparator is
-   * called when no other comparator applies.
-   *
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toStringTag
+   * Get a custom comparator based on the objects passed.
    */
-  unknownTagComparators: Record<string, TypeEqualityComparator<any, Meta>> | undefined;
+  getUnsupportedCustomComparator:
+    | ((a: any, b: any, tag: string) => TypeEqualityComparator<any, Meta> | undefined)
+    | undefined;
 }
 type CreateCustomComparatorConfig<Meta> = (config: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
 type CreateState<Meta> = () => {
