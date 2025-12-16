@@ -23,7 +23,7 @@ import type {
   InternalEqualityComparator,
   State,
 } from './internalTypes.js';
-import { combineComparators, createIsCircular, getShortTag } from './utils.js';
+import { combineComparators, createIsCircular } from './utils.js';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const toString = Object.prototype.toString;
@@ -50,7 +50,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     areObjectsEqual,
     areRegExpsEqual,
     areSetsEqual,
-    unknownTagComparators,
+    getUnsupportedCustomComparator,
   } = config;
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -147,22 +147,10 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return supportedComparator(a, b, state);
     }
 
-    if (unknownTagComparators) {
-      let unknownTagComparator = unknownTagComparators[tag];
+    const unsupportedCustomComparator = getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, tag);
 
-      if (!unknownTagComparator) {
-        const shortTag = getShortTag(a);
-
-        if (shortTag) {
-          unknownTagComparator = unknownTagComparators[shortTag];
-        }
-      }
-
-      // If the custom config has an unknown tag comparator that matches the captured tag or the
-      // @@toStringTag, it is the source of truth for whether the values are equal.
-      if (unknownTagComparator) {
-        return unknownTagComparator(a, b, state);
-      }
+    if (unsupportedCustomComparator) {
+      return unsupportedCustomComparator(a, b, state);
     }
 
     // If not matching any tags that require a specific type of comparison, then we hard-code false because
@@ -205,7 +193,7 @@ export function createEqualityComparatorConfig<Meta>({
       ? combineComparators(areTypedArraysEqualDefault, areObjectsEqualStrictDefault)
       : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
-    unknownTagComparators: undefined,
+    getUnsupportedCustomComparator: undefined,
   };
 
   if (createCustomConfig) {
