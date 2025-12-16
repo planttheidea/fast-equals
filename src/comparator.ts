@@ -25,34 +25,6 @@ import type {
 } from './internalTypes.js';
 import { combineComparators, createIsCircular, getShortTag } from './utils.js';
 
-const ARRAY_BUFFER_TAG = '[object ArrayBuffer]';
-const ARGUMENTS_TAG = '[object Arguments]';
-const BOOLEAN_TAG = '[object Boolean]';
-const DATA_VIEW_TAG = '[object DataView]';
-const DATE_TAG = '[object Date]';
-const ERROR_TAG = '[object Error]';
-const MAP_TAG = '[object Map]';
-const NUMBER_TAG = '[object Number]';
-const OBJECT_TAG = '[object Object]';
-const REG_EXP_TAG = '[object RegExp]';
-const SET_TAG = '[object Set]';
-const STRING_TAG = '[object String]';
-const TYPED_ARRAY_TAGS: Record<string, boolean> = {
-  '[object Int8Array]': true,
-  '[object Uint8Array]': true,
-  '[object Uint8ClampedArray]': true,
-  '[object Int16Array]': true,
-  '[object Uint16Array]': true,
-  '[object Int32Array]': true,
-  '[object Uint32Array]': true,
-  '[object Float16Array]': true,
-  '[object Float32Array]': true,
-  '[object Float64Array]': true,
-  '[object BigInt64Array]': true,
-  '[object BigUint64Array]': true,
-};
-const URL_TAG = '[object URL]';
-
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const toString = Object.prototype.toString;
 
@@ -67,23 +39,19 @@ interface CreateIsEqualOptions<Meta> {
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
-export function createEqualityComparator<Meta>({
-  areArrayBuffersEqual,
-  areArraysEqual,
-  areDataViewsEqual,
-  areDatesEqual,
-  areErrorsEqual,
-  areFunctionsEqual,
-  areMapsEqual,
-  areNumbersEqual,
-  areObjectsEqual,
-  arePrimitiveWrappersEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-  areTypedArraysEqual,
-  areUrlsEqual,
-  unknownTagComparators,
-}: ComparatorConfig<Meta>): EqualityComparator<Meta> {
+export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): EqualityComparator<Meta> {
+  const supportedComparatorMap = createSupportedComparatorMap(config);
+  const {
+    areArraysEqual,
+    areDatesEqual,
+    areFunctionsEqual,
+    areMapsEqual,
+    areNumbersEqual,
+    areObjectsEqual,
+    areRegExpsEqual,
+    areSetsEqual,
+    unknownTagComparators,
+  } = config;
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
@@ -144,7 +112,7 @@ export function createEqualityComparator<Meta>({
 
     // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
     // the string tag or doing an `instanceof` check.
-    if (Array.isArray(a)) {
+    if (constructor === Array || Array.isArray(a)) {
       return areArraysEqual(a, b, state);
     }
 
@@ -173,66 +141,10 @@ export function createEqualityComparator<Meta>({
     // Since this is a custom object, capture the string tag to determing its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
     const tag = toString.call(a);
+    const supportedComparator = supportedComparatorMap[tag];
 
-    if (tag === DATE_TAG) {
-      return areDatesEqual(a, b, state);
-    }
-
-    // For RegExp, the properties are not enumerable, and therefore will give false positives if
-    // tested like a standard object.
-    if (tag === REG_EXP_TAG) {
-      return areRegExpsEqual(a, b, state);
-    }
-
-    if (tag === MAP_TAG) {
-      return areMapsEqual(a, b, state);
-    }
-
-    if (tag === SET_TAG) {
-      return areSetsEqual(a, b, state);
-    }
-
-    if (tag === OBJECT_TAG) {
-      // The exception for value comparison is custom `Promise`-like class instances. These should
-      // be treated the same as standard `Promise` objects, which means strict equality, and if
-      // it reaches this point then that strict equality comparison has already failed.
-      return typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state);
-    }
-
-    // If a URL tag, it should be tested explicitly. Like RegExp, the properties are not
-    // enumerable, and therefore will give false positives if tested like a standard object.
-    if (tag === URL_TAG) {
-      return areUrlsEqual(a, b, state);
-    }
-
-    // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
-    // enumerable, and therefore will give false positives if tested like a standard object.
-    if (tag === ERROR_TAG) {
-      return areErrorsEqual(a, b, state);
-    }
-
-    // If an arguments tag, it should be treated as a standard object.
-    if (tag === ARGUMENTS_TAG) {
-      return areObjectsEqual(a, b, state);
-    }
-
-    if (TYPED_ARRAY_TAGS[tag]) {
-      return areTypedArraysEqual(a, b, state);
-    }
-
-    if (tag === ARRAY_BUFFER_TAG) {
-      return areArrayBuffersEqual(a, b, state);
-    }
-
-    if (tag === DATA_VIEW_TAG) {
-      return areDataViewsEqual(a, b, state);
-    }
-
-    // As the penultimate fallback, check if the values passed are primitive wrappers. This
-    // is very rare in modern JS, which is why it is deprioritized compared to all other object
-    // types.
-    if (tag === BOOLEAN_TAG || tag === NUMBER_TAG || tag === STRING_TAG) {
-      return arePrimitiveWrappersEqual(a, b, state);
+    if (supportedComparator) {
+      return supportedComparator(a, b, state);
     }
 
     if (unknownTagComparators) {
@@ -374,5 +286,63 @@ export function createIsEqual<Meta>({ circular, comparator, createState, equals,
 
   return function isEqual<A, B>(a: A, b: B): boolean {
     return comparator(a, b, state);
+  };
+}
+
+/**
+ * Create a map of `toString()` values to their respective handlers for `tag`-based lookups.
+ */
+function createSupportedComparatorMap<Meta>({
+  areArrayBuffersEqual,
+  areArraysEqual,
+  areDataViewsEqual,
+  areDatesEqual,
+  areErrorsEqual,
+  areFunctionsEqual,
+  areMapsEqual,
+  areObjectsEqual,
+  arePrimitiveWrappersEqual,
+  areRegExpsEqual,
+  areSetsEqual,
+  areTypedArraysEqual,
+  areUrlsEqual,
+}: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
+  return {
+    '[object Arguments]': areObjectsEqual,
+    '[object Array]': areArraysEqual,
+    '[object ArrayBuffer]': areArrayBuffersEqual,
+    '[object BigInt64Array]': areTypedArraysEqual,
+    '[object BigUint64Array]': areTypedArraysEqual,
+    '[object Boolean]': arePrimitiveWrappersEqual,
+    '[object DataView]': areDataViewsEqual,
+    '[object Date]': areDatesEqual,
+    // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
+    // enumerable, and therefore will give false positives if tested like a standard object.
+    '[object Error]': areErrorsEqual,
+    '[object Float16Array]': areTypedArraysEqual,
+    '[object Float32Array]': areTypedArraysEqual,
+    '[object Float64Array]': areTypedArraysEqual,
+    '[object Function]': areFunctionsEqual,
+    '[object GeneratorFunction]': areFunctionsEqual,
+    '[object Int8Array]': areTypedArraysEqual,
+    '[object Int16Array]': areTypedArraysEqual,
+    '[object Int32Array]': areTypedArraysEqual,
+    '[object Map]': areMapsEqual,
+    '[object Number]': arePrimitiveWrappersEqual,
+    '[object Object]': (a: any, b: any, state: any) =>
+      // The exception for value comparison is custom `Promise`-like class instances. These should
+      // be treated the same as standard `Promise` objects, which means strict equality, and if
+      // it reaches this point then that strict equality comparison has already failed.
+      typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state),
+    // For RegExp, the properties are not enumerable, and therefore will give false positives if
+    // tested like a standard object.
+    '[object RegExp]': areRegExpsEqual,
+    '[object Set]': areSetsEqual,
+    '[object String]': arePrimitiveWrappersEqual,
+    '[object URL]': areUrlsEqual,
+    '[object Uint8Array]': areTypedArraysEqual,
+    '[object Uint8ClampedArray]': areTypedArraysEqual,
+    '[object Uint16Array]': areTypedArraysEqual,
+    '[object Uint32Array]': areTypedArraysEqual,
   };
 }
