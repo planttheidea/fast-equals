@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -14,38 +14,6 @@ import {
 } from '../src/index.js';
 import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 import { testSuites } from './__helpers__/testSuites.js';
-
-describe('exports', () => {
-  [
-    circularDeepEqual,
-    circularShallowEqual,
-    createCustomEqual,
-    deepEqual,
-    sameValueEqual,
-    shallowEqual,
-    strictCircularDeepEqual,
-    strictCircularShallowEqual,
-    strictDeepEqual,
-    strictShallowEqual,
-  ].forEach((fn) => {
-    it(`should have an export for ${fn.name}`, () => {
-      expect(typeof fn).toBe('function');
-    });
-  });
-});
-
-interface Test {
-  deepEqual: boolean;
-  description: string;
-  shallowEqual: boolean;
-  value1: any;
-  value2: any;
-}
-
-interface TestSuite {
-  description: string;
-  tests: Test[];
-}
 
 class DeepCircular {
   me: {
@@ -71,53 +39,207 @@ class DeepCircular {
   }
 }
 
-describe('test suites', () => {
-  testSuites.forEach(({ description: suiteDescription, tests }: TestSuite, testSuiteIndex: number) => {
-    describe(`Suite ${testSuiteIndex}: ${suiteDescription}`, () => {
-      tests.forEach(
-        (
-          { deepEqual: de, description: testDescription, shallowEqual: se, value1, value2 }: Test,
-          testIndex: number,
-        ) => {
-          it(`should return ${de} for deepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(deepEqual(value1, value2)).toBe(de);
-          });
-
-          it(`should return ${de} for strictDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(strictDeepEqual(value1, value2)).toBe(de);
-          });
-
-          it(`should return ${de} for circularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(circularDeepEqual(value1, value2)).toBe(de);
-          });
-
-          it(`should return ${de} for strictCircularDeepEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(strictCircularDeepEqual(value1, value2)).toBe(de);
-          });
-
-          it(`should return ${se} for shallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(shallowEqual(value1, value2)).toBe(se);
-          });
-
-          it(`should return ${se} for strictShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(strictShallowEqual(value1, value2)).toBe(se);
-          });
-
-          it(`should return ${se} for circularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(circularShallowEqual(value1, value2)).toBe(se);
-          });
-
-          it(`should return ${se} for strictCircularShallowEqual comparison of ${testDescription} (test ${testIndex})`, () => {
-            expect(strictCircularShallowEqual(value1, value2)).toBe(se);
-          });
-        },
-      );
+describe.each(testSuites.map(({ description, tests }, index) => ({ description, index, tests })))(
+  'Suite $index: $description',
+  ({ tests }) => {
+    test.each(
+      tests.map(({ deepEqual, description, value1, value2 }) => ({
+        equal: deepEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )('returns $equal for `deepEqual` comparison of $description (test $index)', ({ equal, value1, value2 }) => {
+      expect(deepEqual(value1, value2)).toBe(equal);
     });
-  });
-});
 
-describe('values', () => {
-  it('issue 118 - handle Error objects', () => {
+    test.each(
+      tests.map(({ deepEqual, description, value1, value2 }) => ({
+        equal: deepEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )('returns $equal for `strictDeepEqual` comparison of $description (test $index)', ({ equal, value1, value2 }) => {
+      expect(strictDeepEqual(value1, value2)).toBe(equal);
+    });
+
+    test.each(
+      tests.map(({ deepEqual, description, value1, value2 }) => ({
+        equal: deepEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )(
+      'returns $equal for `circularDeepEqual` comparison of $description (test $index)',
+      ({ equal, value1, value2 }) => {
+        expect(circularDeepEqual(value1, value2)).toBe(equal);
+      },
+    );
+
+    test.each(
+      tests.map(({ deepEqual, description, value1, value2 }) => ({
+        equal: deepEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )(
+      'returns $equal for `strictCircularDeepEqual` comparison of $description (test $index)',
+      ({ equal, value1, value2 }) => {
+        expect(strictCircularDeepEqual(value1, value2)).toBe(equal);
+      },
+    );
+
+    test.each(
+      tests.map(({ description, shallowEqual, value1, value2 }) => ({
+        equal: shallowEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )('returns $equal for `shallowEqual` comparison of $description (test $index)', ({ equal, value1, value2 }) => {
+      expect(shallowEqual(value1, value2)).toBe(equal);
+    });
+
+    test.each(
+      tests.map(({ description, shallowEqual, value1, value2 }) => ({
+        equal: shallowEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )(
+      'returns $equal for `strictShallowEqual` comparison of $description (test $index)',
+      ({ equal, value1, value2 }) => {
+        expect(strictShallowEqual(value1, value2)).toBe(equal);
+      },
+    );
+
+    test.each(
+      tests.map(({ description, shallowEqual, value1, value2 }) => ({
+        equal: shallowEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )(
+      'returns $equal for `circularShallowEqual` comparison of $description (test $index)',
+      ({ equal, value1, value2 }) => {
+        expect(circularShallowEqual(value1, value2)).toBe(equal);
+      },
+    );
+
+    test.each(
+      tests.map(({ description, shallowEqual, value1, value2 }) => ({
+        equal: shallowEqual,
+        description,
+        value1,
+        value2,
+      })),
+    )(
+      'returns $equal for `strictCircularShallowEqual` comparison of $description (test $index)',
+      ({ equal, value1, value2 }) => {
+        expect(strictCircularShallowEqual(value1, value2)).toBe(equal);
+      },
+    );
+  },
+);
+
+describe('Github issues', () => {
+  test('issue 91 - handles getters on classes', () => {
+    const fakePrivateProperty: string[] = [];
+    let index = 0;
+
+    class ClassWithPrivateJsField {
+      index = index++;
+
+      constructor(a: string) {
+        fakePrivateProperty[this.index] = a;
+      }
+
+      get a() {
+        return fakePrivateProperty[this.index];
+      }
+    }
+
+    const a = new ClassWithPrivateJsField('v1');
+    const b = new ClassWithPrivateJsField('v2');
+
+    const customEqual = createCustomEqual({
+      circular: true,
+      createCustomConfig: ({ areObjectsEqual }) => ({
+        areObjectsEqual: (a, b, state) => {
+          if (!areObjectsEqual(a, b, state)) {
+            return false;
+          }
+
+          const aInstance = a instanceof ClassWithPrivateJsField;
+          const bInstance = b instanceof ClassWithPrivateJsField;
+
+          if (aInstance || bInstance) {
+            return aInstance && bInstance && state.equals(a.a, b.a, undefined, undefined, undefined, undefined, state);
+          }
+
+          return false;
+        },
+      }),
+    });
+
+    expect(customEqual(a, b)).toBe(false);
+  });
+
+  test('issue 93 - handles global symbol properties', () => {
+    const obj1 = {
+      [Symbol.for('hi')]: 1,
+    };
+    const obj2 = {
+      [Symbol.for('hi')]: 2,
+    };
+
+    expect(strictDeepEqual(obj1, obj2)).toBe(false);
+  });
+
+  test('issue 93 - handles symbol properties', () => {
+    const symbol = Symbol('key');
+
+    const a = { [symbol]: { value: 'bar' } };
+    const b = { [symbol]: { value: 'bar' } };
+    const c = { [symbol]: { value: 'baz' } };
+
+    expect(strictDeepEqual(a, b)).toBe(true);
+    expect(strictDeepEqual(a, c)).toBe(false);
+    expect(strictDeepEqual(b, c)).toBe(false);
+  });
+
+  test('issue 112 - handle custom float comparison', () => {
+    const customEqual = createCustomEqual({
+      createCustomConfig: () => ({
+        areNumbersEqual(a, b) {
+          if (a === b) {
+            return true;
+          }
+
+          const diff = Math.abs(a - b);
+
+          if (diff < Number.EPSILON) {
+            return true;
+          }
+
+          return diff <= Number.EPSILON * Math.min(Math.abs(a), Math.abs(b));
+        },
+      }),
+    });
+
+    const a = 0.1 + 0.2;
+    const b = 0.3;
+
+    expect(deepEqual(a, b)).toBe(false);
+    expect(customEqual(a, b)).toBe(true);
+  });
+
+  test('issue 118 - handle Error objects', () => {
     const errorA = new Error('boom');
     const errorB = new Error('boom');
     const errorC = new Error('shakalaka');
@@ -129,7 +251,7 @@ describe('values', () => {
     expect(deepEqual(errorA, errorC)).toBe(false);
   });
 
-  it('issue 121 - handle URL objects', () => {
+  test('issue 121 - handle URL objects', () => {
     const urlA = new URL('https://www.foo.com');
     const urlB = new URL('https://www.foo.com');
     const urlC = new URL('https://www.foo.com:4000/bar?quz&blah=boo#baz');
@@ -139,16 +261,39 @@ describe('values', () => {
     expect(deepEqual(urlA, urlC)).toBe(false);
     expect(deepEqual(urlC, urlD)).toBe(true);
   });
+
+  test('issue 123 - custom function equality comparator', () => {
+    const customEqual = createCustomEqual({
+      createCustomConfig: () => ({
+        areFunctionsEqual(a, b) {
+          return a.name === b.name;
+        },
+      }),
+    });
+
+    const a = function foo() {
+      return 'a';
+    };
+    const b = function foo() {
+      return 'b';
+    };
+    const c = function bar() {
+      return 'c';
+    };
+
+    expect(customEqual(a, b)).toBe(true);
+    expect(customEqual(a, c)).toBe(false);
+  });
 });
 
 describe('circular', () => {
   describe('circularDeepEqual', () => {
-    it('should handles deeply-nested circular objects', () => {
+    test('handles deeply-nested circular objects', () => {
       expect(circularDeepEqual(new DeepCircular('foo'), new DeepCircular('foo'))).toBe(true);
       expect(circularDeepEqual(new DeepCircular('foo'), new DeepCircular('bar'))).toBe(false);
     });
 
-    it('should handle shared references between objects', () => {
+    test('handles shared references between objects', () => {
       const x = [1];
       const left = [{ a: [1], b: x }];
       const right = [{ a: x, b: [1] }];
@@ -157,7 +302,7 @@ describe('circular', () => {
       expect(circularDeepEqual(left, right)).toBe(true);
     });
 
-    it('should handle shared circular arrays constructed differently', () => {
+    test('handles shared circular arrays constructed differently', () => {
       type RecursiveArray = Array<number | RecursiveArray>;
       const x: RecursiveArray = [1];
       x.push(x);
@@ -169,7 +314,7 @@ describe('circular', () => {
   });
 
   describe('circularShallowEqual', () => {
-    it('should handle shallowly-nested circular objects', () => {
+    test('handles shallowly-nested circular objects', () => {
       const a: any[] = ['foo'];
 
       a.push(a);
@@ -242,7 +387,7 @@ describe('circular', () => {
       }),
     });
 
-    it('should handle the custom equality check', () => {
+    test('handles the custom equality check', () => {
       expect(customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('foo'))).toBe(true);
       expect(customDeepEqualCircular(new DeepCircular('foo'), new DeepCircular('bar'))).toBe(false);
     });
@@ -251,19 +396,7 @@ describe('circular', () => {
 
 describe('strict', () => {
   describe('strictDeepEqual', () => {
-    it('issue 93 - should handle symbol properties', () => {
-      const symbol = Symbol('key');
-
-      const a = { [symbol]: { value: 'bar' } };
-      const b = { [symbol]: { value: 'bar' } };
-      const c = { [symbol]: { value: 'baz' } };
-
-      expect(strictDeepEqual(a, b)).toBe(true);
-      expect(strictDeepEqual(a, c)).toBe(false);
-      expect(strictDeepEqual(b, c)).toBe(false);
-    });
-
-    it('should handle hidden properties', () => {
+    test('handles hidden properties', () => {
       const a = {};
       const b = {};
       const c = {};
@@ -292,7 +425,7 @@ describe('strict', () => {
       expect(strictDeepEqual(b, c)).toBe(false);
     });
 
-    it('should not be equal if property values are same but descriptors differ', () => {
+    test('should not be equal if property values are same but descriptors differ', () => {
       const a = { value: 'bar' };
       const b = {};
       const c = {};
@@ -316,7 +449,7 @@ describe('strict', () => {
       key: { value: string };
     };
 
-    it('should handle keys on arrays', () => {
+    test('handles keys on arrays', () => {
       type CustomArray = WithCustomProperty<string[]>;
 
       const a = ['foo', 'bar'] as CustomArray;
@@ -332,7 +465,7 @@ describe('strict', () => {
       expect(strictDeepEqual(b, c)).toBe(false);
     });
 
-    it('should handle keys on maps', () => {
+    test('handles keys on maps', () => {
       type CustomMap = WithCustomProperty<Map<string, string>>;
 
       const a = new Map([['foo', 'bar']]) as CustomMap;
@@ -348,7 +481,7 @@ describe('strict', () => {
       expect(strictDeepEqual(b, c)).toBe(false);
     });
 
-    it('should handle keys on sets', () => {
+    test('handles keys on sets', () => {
       type CustomSet = WithCustomProperty<Set<string>>;
 
       const a = new Set(['foo', 'bar']) as CustomSet;
@@ -363,118 +496,12 @@ describe('strict', () => {
       expect(strictDeepEqual(a, c)).toBe(false);
       expect(strictDeepEqual(b, c)).toBe(false);
     });
-
-    it('issue 93 - should handle symbol keys', () => {
-      const obj1 = {
-        [Symbol.for('hi')]: 1,
-      };
-      const obj2 = {
-        [Symbol.for('hi')]: 2,
-      };
-
-      expect(strictDeepEqual(obj1, obj2)).toBe(false);
-    });
-  });
-
-  describe('createCustomEqual', () => {
-    it('issue 91 - should handle getters on classes', () => {
-      const fakePrivateProperty: string[] = [];
-      let index = 0;
-
-      class ClassWithPrivateJsField {
-        index = index++;
-
-        constructor(a: string) {
-          fakePrivateProperty[this.index] = a;
-        }
-
-        get a() {
-          return fakePrivateProperty[this.index];
-        }
-      }
-
-      const a = new ClassWithPrivateJsField('v1');
-      const b = new ClassWithPrivateJsField('v2');
-
-      const customEqual = createCustomEqual({
-        circular: true,
-        createCustomConfig: ({ areObjectsEqual }) => ({
-          areObjectsEqual: (a, b, state) => {
-            if (!areObjectsEqual(a, b, state)) {
-              return false;
-            }
-
-            const aInstance = a instanceof ClassWithPrivateJsField;
-            const bInstance = b instanceof ClassWithPrivateJsField;
-
-            if (aInstance || bInstance) {
-              return (
-                aInstance && bInstance && state.equals(a.a, b.a, undefined, undefined, undefined, undefined, state)
-              );
-            }
-
-            return false;
-          },
-        }),
-      });
-
-      expect(customEqual(a, b)).toBe(false);
-    });
-
-    it('issue 112 - handle custom float comparison', () => {
-      const customEqual = createCustomEqual({
-        createCustomConfig: () => ({
-          areNumbersEqual(a, b) {
-            if (a === b) {
-              return true;
-            }
-
-            const diff = Math.abs(a - b);
-
-            if (diff < Number.EPSILON) {
-              return true;
-            }
-
-            return diff <= Number.EPSILON * Math.min(Math.abs(a), Math.abs(b));
-          },
-        }),
-      });
-
-      const a = 0.1 + 0.2;
-      const b = 0.3;
-
-      expect(deepEqual(a, b)).toBe(false);
-      expect(customEqual(a, b)).toBe(true);
-    });
-
-    it('issue 123 - custom function equality comparator', () => {
-      const customEqual = createCustomEqual({
-        createCustomConfig: () => ({
-          areFunctionsEqual(a, b) {
-            return a.name === b.name;
-          },
-        }),
-      });
-
-      const a = function foo() {
-        return 'a';
-      };
-      const b = function foo() {
-        return 'b';
-      };
-      const c = function bar() {
-        return 'c';
-      };
-
-      expect(customEqual(a, b)).toBe(true);
-      expect(customEqual(a, c)).toBe(false);
-    });
   });
 });
 
 describe('sameValueEqual', () => {
   Object.keys(primitiveValues).forEach((key) => {
-    it(`should have ${key} be equal by SameValue`, () => {
+    test(`has ${key} be equal by SameValue`, () => {
       expect(
         sameValueEqual(
           primitiveValues[key as keyof typeof primitiveValues],
@@ -486,7 +513,7 @@ describe('sameValueEqual', () => {
 
   Object.keys(mainValues).forEach((key) => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
-      it(`should have ${key} be equal by SameValue`, () => {
+      test(`has ${key} be equal by SameValue`, () => {
         expect(
           sameValueEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
         ).toBe(true);
@@ -496,7 +523,7 @@ describe('sameValueEqual', () => {
 
   Object.keys(alternativeValues).forEach((key) => {
     if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
-      it(`should have ${key} not be equal by SameValue`, () => {
+      test(`has ${key} not be equal by SameValue`, () => {
         expect(
           sameValueEqual(
             alternativeValues[key as keyof typeof alternativeValues],
@@ -510,7 +537,7 @@ describe('sameValueEqual', () => {
 
 describe('sameValueZeroEqual', () => {
   Object.keys(primitiveValues).forEach((key) => {
-    it(`should have ${key} be equal by SameValueZero`, () => {
+    test(`has ${key} be equal by SameValueZero`, () => {
       expect(
         sameValueZeroEqual(
           primitiveValues[key as keyof typeof primitiveValues],
@@ -522,7 +549,7 @@ describe('sameValueZeroEqual', () => {
 
   Object.keys(mainValues).forEach((key) => {
     if (!Object.prototype.hasOwnProperty.call(primitiveValues, key)) {
-      it(`should have ${key} be equal by SameValueZero`, () => {
+      test(`has ${key} be equal by SameValueZero`, () => {
         expect(
           sameValueZeroEqual(mainValues[key as keyof typeof mainValues], mainValues[key as keyof typeof mainValues]),
         ).toBe(true);
@@ -532,7 +559,7 @@ describe('sameValueZeroEqual', () => {
 
   Object.keys(alternativeValues).forEach((key) => {
     if (key === 'zero') {
-      it(`should have ${key} be equal by SameValueZero`, () => {
+      test(`has ${key} be equal by SameValueZero`, () => {
         expect(
           sameValueZeroEqual(
             alternativeValues[key as keyof typeof alternativeValues],
@@ -541,7 +568,7 @@ describe('sameValueZeroEqual', () => {
         ).toBe(true);
       });
     } else if (Object.prototype.hasOwnProperty.call(mainValues, key)) {
-      it(`should have ${key} not be equal by SameValueZero`, () => {
+      test(`has ${key} not be equal by SameValueZero`, () => {
         expect(
           sameValueZeroEqual(
             alternativeValues[key as keyof typeof alternativeValues],
