@@ -364,7 +364,7 @@ to the problem you are solving, they can offer guidance of how to structure your
 ## Benchmarks
 
 All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version
-`20.17.0`, and are based on averages of running comparisons based deep equality on the following object types:
+`24.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -376,74 +376,73 @@ All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64G
 - A mixed object with a combination of all the above types
 
 ```bash
-Testing mixed objects equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 1510836.028275 │
+│ fast-equals (passed)                   │ 1544237.29413  │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 1274703.158832 │
+│ fast-deep-equal (passed)               │ 1328583.767745 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 1274189.383277 │
+│ react-fast-compare (passed)            │ 1301727.296375 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (passed)           │ 1226914.582379 │
+│ shallow-equal-fuzzy (passed)           │ 1225981.400919 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (failed)                    │ 933496.656805  │
+│ nano-equal (failed)                    │ 969495.538753  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 764461.446623  │
+│ fast-equals (circular) (passed)        │ 813716.49516   │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 753321.452015  │
+│ dequal/lite (passed)                   │ 780805.627339  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 731549.230576  │
+│ dequal (passed)                        │ 767208.995048  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 482251.504398  │
+│ underscore.isEqual (passed)            │ 490695.830468  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 455608.002109  │
+│ assert.deepStrictEqual (passed)        │ 471011.425391  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 287185.021658  │
+│ lodash.isEqual (passed)                │ 296064.057382  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 223101.575281  │
+│ fast-equals (strict) (passed)          │ 225894.800964  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 187700.193987  │
+│ fast-equals (strict circular) (passed) │ 195657.732354  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 162160.721895  │
+│ deep-eql (passed)                      │ 162718.102328  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 925.576389     │
+│ deep-equal (passed)                    │ 954.172311     │
 └────────────────────────────────────────┴────────────────┘
 
 Testing mixed objects not equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 4983966.492422 │
+│ fast-equals (passed)                   │ 5112341.000979 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 3434629.761148 │
+│ fast-equals (circular) (passed)        │ 3501225.300307 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 3369885.314933 │
+│ fast-deep-equal (passed)               │ 3471838.735181 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 3322999.39514  │
+│ react-fast-compare (passed)            │ 3439612.908273 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 1760254.035295 │
+│ fast-equals (strict) (passed)          │ 1797319.423491 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 1480270.29222  │
+│ fast-equals (strict circular) (passed) │ 1534168.229167 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 1325903.703309 │
+│ dequal/lite (passed)                   │ 1357981.758571 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 1313388.133343 │
+│ dequal (passed)                        │ 1328078.173967 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (failed)           │ 1218682.349751 │
+│ shallow-equal-fuzzy (failed)           │ 1224747.272118 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (passed)                    │ 1049565.218011 │
+│ nano-equal (passed)                    │ 1087373.99615  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 893287.689781  │
+│ underscore.isEqual (passed)            │ 927298.592729  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 380418.890446  │
+│ lodash.isEqual (passed)                │ 387294.235476  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 185546.584606  │
+│ deep-eql (passed)                      │ 186028.168827  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 20645.182086   │
+│ assert.deepStrictEqual (passed)        │ 21261.312424   │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 3661.818251    │
+│ deep-equal (passed)                    │ 3782.329948    │
 └────────────────────────────────────────┴────────────────┘
 ```
 
