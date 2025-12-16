@@ -289,6 +289,9 @@ export function createIsEqual<Meta>({ circular, comparator, createState, equals,
   };
 }
 
+/**
+ * Create a map of `toString()` values to their respective handlers for `tag`-based lookups.
+ */
 function createSupportedComparatorMap<Meta>({
   areArrayBuffersEqual,
   areArraysEqual,
