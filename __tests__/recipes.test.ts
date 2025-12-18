@@ -1,6 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
 import { createCustomEqual, sameValueEqual } from '../src/index.js';
-import type { CreateState, TypeEqualityComparator } from '../src/internalTypes.ts';
 
 describe('createCustomEqual', () => {
   describe('legacy-regexp-support', () => {
@@ -47,11 +46,11 @@ describe('createCustomEqual', () => {
       };
     }
 
-    const areObjectsEqual: TypeEqualityComparator<SpecialObject> = (a, b) => {
+    const areObjectsEqual = (a: SpecialObject, b: SpecialObject) => {
       return a.foo === b.foo && a.bar.baz === b.bar.baz;
     };
 
-    const spy = vi.fn(areObjectsEqual) as TypeEqualityComparator<SpecialObject>;
+    const spy = vi.fn(areObjectsEqual);
 
     const isSpecialObjectEqual = createCustomEqual({
       createCustomConfig: () => ({
@@ -74,13 +73,11 @@ describe('createCustomEqual', () => {
       value: string;
     }
 
-    const createState: CreateState<Meta> = () => ({ meta: { value: 'baz' } });
-
     const deepEqual = createCustomEqual<Meta>({
       createInternalComparator: (deepEqual) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
         return deepEqual(a, b, state) || a === state.meta.value || b === state.meta.value;
       },
-      createState,
+      createState: () => ({ meta: { value: 'baz' } }),
     });
 
     test('verifies the object itself', () => {
@@ -120,7 +117,7 @@ describe('createCustomEqual', () => {
       return object;
     }
 
-    const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (a, b) => {
+    const areObjectsEqual = (a: Record<string | symbol, any>, b: Record<string | symbol, any>) => {
       const propertiesA = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)];
       const propertiesB = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)];
 
@@ -128,7 +125,7 @@ describe('createCustomEqual', () => {
         return false;
       }
 
-      return propertiesA.every((property) => a[property as any] === b[property as any]);
+      return propertiesA.every((property) => a[property] === b[property]);
     };
 
     const deepEqual = createCustomEqual({
@@ -147,7 +144,7 @@ describe('createCustomEqual', () => {
   });
 
   describe('strict-property-descriptor-check', () => {
-    const areObjectsEqual: TypeEqualityComparator<Record<any, any>> = (a, b) => {
+    const areObjectsEqual = (a: Record<string | symbol, any>, b: Record<string | symbol, any>) => {
       const propertiesA = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)];
       const propertiesB = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)];
 

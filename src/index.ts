@@ -9,21 +9,13 @@ import type { CustomEqualCreatorOptions } from './internalTypes.js';
 
 export { sameValueEqual, sameValueZeroEqual } from './equals.js';
 export type {
-  AnyEqualityComparator,
   Cache,
-  CircularState,
   ComparatorConfig,
-  CreateCustomComparatorConfig,
-  CreateState,
   CustomEqualCreatorOptions,
-  DefaultState,
-  Dictionary,
   EqualityComparator,
-  EqualityComparatorCreator,
   InternalEqualityComparator,
   PrimitiveWrapper,
   State,
-  TypeEqualityComparator,
   TypedArray,
 } from './internalTypes.js';
 

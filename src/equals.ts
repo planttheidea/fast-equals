@@ -1,4 +1,4 @@
-import type { Dictionary, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
+import type { AnyObject, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
 import { getStrictProperties, hasOwn } from './utils.js';
 
 const PREACT_VNODE = '__v';
@@ -173,7 +173,7 @@ export const areNumbersEqual = sameValueEqual;
 /**
  * Whether the objects are equal in value.
  */
-export function areObjectsEqual(a: Dictionary, b: Dictionary, state: State<any>): boolean {
+export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const properties = keys(a);
 
   let index = properties.length;
@@ -198,7 +198,7 @@ export function areObjectsEqual(a: Dictionary, b: Dictionary, state: State<any>)
 /**
  * Whether the objects are equal in value with strict property checking.
  */
-export function areObjectsEqualStrict(a: Dictionary, b: Dictionary, state: State<any>): boolean {
+export function areObjectsEqualStrict(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const properties = getStrictProperties(a);
 
   let index = properties.length;
@@ -344,7 +344,7 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
   );
 }
 
-function isPropertyEqual(a: Dictionary, b: Dictionary, state: State<any>, property: string | symbol) {
+function isPropertyEqual(a: AnyObject, b: AnyObject, state: State<any>, property: string | symbol) {
   if (
     (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
     && (a.$$typeof || b.$$typeof)
