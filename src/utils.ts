@@ -1,11 +1,4 @@
-import type {
-  AnyEqualityComparator,
-  Cache,
-  CircularState,
-  Dictionary,
-  State,
-  TypeEqualityComparator,
-} from './internalTypes.js';
+import type { AnyObject, Cache, CircularState, EqualityComparator, State } from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -14,10 +7,7 @@ const { hasOwnProperty } = Object.prototype;
 /**
  * Combine two comparators into a single comparators.
  */
-export function combineComparators<Meta>(
-  comparatorA: AnyEqualityComparator<Meta>,
-  comparatorB: AnyEqualityComparator<Meta>,
-) {
+export function combineComparators<Meta>(comparatorA: EqualityComparator<Meta>, comparatorB: EqualityComparator<Meta>) {
   return function isEqual<A, B>(a: A, b: B, state: State<Meta>) {
     return comparatorA(a, b, state) && comparatorB(a, b, state);
   };
@@ -28,7 +18,7 @@ export function combineComparators<Meta>(
  * for circular references to be safely included in the comparison without creating
  * stack overflows.
  */
-export function createIsCircular<AreItemsEqual extends TypeEqualityComparator<any, any>>(
+export function createIsCircular<AreItemsEqual extends EqualityComparator<any>>(
   areItemsEqual: AreItemsEqual,
 ): AreItemsEqual {
   return function isCircular(a: any, b: any, state: CircularState<Cache<any, any>>) {
@@ -61,7 +51,7 @@ export function createIsCircular<AreItemsEqual extends TypeEqualityComparator<an
  * Get the properties to strictly examine, which include both own properties that are
  * not enumerable and symbol properties.
  */
-export function getStrictProperties(object: Dictionary): Array<string | symbol> {
+export function getStrictProperties(object: AnyObject): Array<string | symbol> {
   return (getOwnPropertyNames(object) as Array<string | symbol>).concat(getOwnPropertySymbols(object));
 }
 
@@ -70,4 +60,4 @@ export function getStrictProperties(object: Dictionary): Array<string | symbol> 
  */
 export const hasOwn =
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  Object.hasOwn || ((object: Dictionary, property: number | string | symbol) => hasOwnProperty.call(object, property));
+  Object.hasOwn || ((object: AnyObject, property: number | string | symbol) => hasOwnProperty.call(object, property));
