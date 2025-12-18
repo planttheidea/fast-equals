@@ -17,7 +17,6 @@ import {
 } from './equals.js';
 import type {
   ComparatorConfig,
-  CreateState,
   CustomEqualCreatorOptions,
   EqualityComparator,
   InternalEqualityComparator,
@@ -28,12 +27,10 @@ import { combineComparators, createIsCircular } from './utils.js';
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const toString = Object.prototype.toString;
 
-interface CreateIsEqualOptions<Meta> {
-  circular: boolean;
+interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOptions<Meta>>, 'circular' | 'strict'> {
   comparator: EqualityComparator<Meta>;
-  createState: CreateState<Meta> | undefined;
+  createState: CustomEqualCreatorOptions<Meta>['createState'];
   equals: InternalEqualityComparator<Meta>;
-  strict: boolean;
 }
 
 /**

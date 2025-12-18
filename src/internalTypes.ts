@@ -33,97 +33,78 @@ export interface CircularState<Meta> extends State<Meta> {
   readonly cache: Cache<any, any>;
 }
 
-export interface DefaultState<Meta> extends State<Meta> {
-  readonly cache: undefined;
-}
-
-export interface Dictionary<Value = any> {
-  [key: string | symbol]: Value;
-  $$typeof?: any;
-}
+export type AnyObject = Record<number | string | symbol, any>;
 
 export interface ComparatorConfig<Meta> {
   /**
    * Whether the array buffers passed are equal in value. In strict mode, this includes
    * additional properties added to the array.
    */
-  areArrayBuffersEqual: TypeEqualityComparator<any, Meta>;
+  areArrayBuffersEqual: EqualityComparator<Meta>;
   /**
    * Whether the arrays passed are equal in value. In strict mode, this includes
    * additional properties added to the array.
    */
-  areArraysEqual: TypeEqualityComparator<any, Meta>;
+  areArraysEqual: EqualityComparator<Meta>;
   /**
    * Whether the data views passed are equal in value.
    */
-  areDataViewsEqual: TypeEqualityComparator<any, Meta>;
+  areDataViewsEqual: EqualityComparator<Meta>;
   /**
    * Whether the dates passed are equal in value.
    */
-  areDatesEqual: TypeEqualityComparator<any, Meta>;
+  areDatesEqual: EqualityComparator<Meta>;
   /**
    * Whether the errors passed are equal in value.
    */
-  areErrorsEqual: TypeEqualityComparator<any, Meta>;
+  areErrorsEqual: EqualityComparator<Meta>;
   /**
    * Whether the functions passed are equal in value.
    */
-  areFunctionsEqual: TypeEqualityComparator<any, Meta>;
+  areFunctionsEqual: EqualityComparator<Meta>;
   /**
    * Whether the maps passed are equal in value. In strict mode, this includes
    * additional properties added to the map.
    */
-  areMapsEqual: TypeEqualityComparator<any, Meta>;
+  areMapsEqual: EqualityComparator<Meta>;
   /**
    * Whether the numbers passed are equal in value.
    */
-  areNumbersEqual: TypeEqualityComparator<any, Meta>;
+  areNumbersEqual: EqualityComparator<Meta>;
   /**
    * Whether the objects passed are equal in value. In strict mode, this includes
    * non-enumerable properties added to the map, as well as symbol properties.
    */
-  areObjectsEqual: TypeEqualityComparator<any, Meta>;
+  areObjectsEqual: EqualityComparator<Meta>;
   /**
    * Whether the primitive wrappers passed are equal in value.
    */
-  arePrimitiveWrappersEqual: TypeEqualityComparator<any, Meta>;
+  arePrimitiveWrappersEqual: EqualityComparator<Meta>;
   /**
    * Whether the regexps passed are equal in value.
    */
-  areRegExpsEqual: TypeEqualityComparator<any, Meta>;
+  areRegExpsEqual: EqualityComparator<Meta>;
   /**
    * Whether the sets passed are equal in value. In strict mode, this includes
    * additional properties added to the set.
    */
-  areSetsEqual: TypeEqualityComparator<any, Meta>;
+  areSetsEqual: EqualityComparator<Meta>;
   /**
    * Whether the typed arrays passed are equal in value. In strict mode, this includes
    * additional properties added to the typed array.
    */
-  areTypedArraysEqual: TypeEqualityComparator<any, Meta>;
+  areTypedArraysEqual: EqualityComparator<Meta>;
   /**
    * Whether the URLs passed are equal in value.
    */
-  areUrlsEqual: TypeEqualityComparator<any, Meta>;
+  areUrlsEqual: EqualityComparator<Meta>;
   /**
    * Get a custom comparator based on the objects passed.
    */
-  getUnsupportedCustomComparator:
-    | ((a: any, b: any, tag: string) => TypeEqualityComparator<any, Meta> | undefined)
-    | undefined;
+  getUnsupportedCustomComparator: ((a: any, b: any, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
 }
 
-export type CreateCustomComparatorConfig<Meta> = (config: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
-
-export type CreateState<Meta> = () => {
-  cache?: Cache<any, any> | undefined;
-  meta?: Meta;
-};
-
-export type EqualityComparator<Meta> = <A, B>(a: A, b: B, state: State<Meta>) => boolean;
-export type AnyEqualityComparator<Meta> = (a: any, b: any, state: State<Meta>) => boolean;
-
-export type EqualityComparatorCreator<Meta> = (fn: EqualityComparator<Meta>) => InternalEqualityComparator<Meta>;
+export type EqualityComparator<Meta> = (a: any, b: any, state: State<Meta>) => boolean;
 
 export type InternalEqualityComparator<Meta> = (
   a: any,
@@ -156,8 +137,6 @@ export type TypedArray =
   | Uint8Array
   | Uint8ClampedArray;
 
-export type TypeEqualityComparator<Type, Meta = undefined> = (a: Type, b: Type, state: State<Meta>) => boolean;
-
 export interface CustomEqualCreatorOptions<Meta> {
   /**
    * Whether circular references should be supported. It causes the
@@ -170,7 +149,7 @@ export interface CustomEqualCreatorOptions<Meta> {
    * This receives the default configuration, which allows either replacement
    * or supersetting of the default methods.
    */
-  createCustomConfig?: CreateCustomComparatorConfig<Meta>;
+  createCustomConfig?: (config: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
   /**
    * Create a custom internal comparator, which is used as an override to the
    * default entry point for nested value equality comparisons. This is often
@@ -183,7 +162,10 @@ export interface CustomEqualCreatorOptions<Meta> {
    * Create a custom `state` object passed between the methods. This allows for
    * custom `cache` and/or `meta` values to be used.
    */
-  createState?: CreateState<Meta>;
+  createState?: () => {
+    cache?: Cache<any, any> | undefined;
+    meta?: Meta;
+  };
   /**
    * Whether the equality comparison is strict, meaning it matches
    * all properties (including symbols and non-enumerable properties)
