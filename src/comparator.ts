@@ -151,7 +151,8 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return supportedComparator(a, b, state);
     }
 
-    const unsupportedCustomComparator = getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, tag);
+    const unsupportedCustomComparator =
+      getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, state, tag);
 
     if (unsupportedCustomComparator) {
       return unsupportedCustomComparator(a, b, state);

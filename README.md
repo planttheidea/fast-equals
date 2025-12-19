@@ -344,21 +344,21 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
-  areArrayBuffersEqual: TypeEqualityComparator<ArrayBuffer, Meta>;
-  areArraysEqual: TypeEqualityComparator<any[], Meta>;
-  areDataViewsEqual: TypeEqualityComparator<DataView, Meta>;
-  areDatesEqual: TypeEqualityComparator<Date, Meta>;
-  areErrorsEqual: TypeEqualityComparator<Error, Meta>;
-  areFunctionsEqual: TypeEqualityComparator<(...args: any[]) => any, Meta>;
-  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
-  areNumbersEqual: TypeEqualityComparator<number, Meta>;
-  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  arePrimitiveWrappersEqual: TypeEqualityComparator<Boolean | Number | String, Meta>;
-  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
-  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;
-  areUrlsEqual: TypeEqualityComparator<URL, Meta>;
-  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, tag: string) => TypeEqualityComparator<Type, Meta>;
+  areArrayBuffersEqual: EqualityComparator<Meta>;
+  areArraysEqual: EqualityComparator<Meta>;
+  areDataViewsEqual: EqualityComparator<Meta>;
+  areDatesEqual: EqualityComparator<Meta>;
+  areErrorsEqual: EqualityComparator<Meta>;
+  areFunctionsEqual: EqualityComparator<Meta>;
+  areMapsEqual: EqualityComparator<Meta>;
+  areNumbersEqual: EqualityComparator<Meta>;
+  areObjectsEqual: EqualityComparator<Meta>;
+  arePrimitiveWrappersEqual: EqualityComparator<Meta>;
+  areRegExpsEqual: EqualityComparator<Meta>;
+  areSetsEqual: EqualityComparator<Meta>;
+  areTypedArraysEqual: EqualityComparator<Meta>;
+  areUrlsEqual: EqualityComparator<Meta>;
+  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
 }
 
 function createCustomEqual<Meta>(options: {

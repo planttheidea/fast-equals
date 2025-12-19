@@ -9,7 +9,6 @@ the `bar` property is a nested object:
 
 ```ts
 import { createCustomEqual } from 'fast-equals';
-import type { TypeEqualityComparator } from 'fast-equals';
 
 interface SpecialObject {
   foo: string;
@@ -18,8 +17,7 @@ interface SpecialObject {
   };
 }
 
-const areObjectsEqual: TypeEqualityComparator<SpecialObject, undefined> = (a, b) =>
-  a.foo === b.foo && a.bar.baz === b.bar.baz;
+const areObjectsEqual = (a: SpecialObject, b: SpecialObject) => a.foo === b.foo && a.bar.baz === b.bar.baz;
 
 const isSpecialObjectEqual = createCustomEqual({
   createCustomConfig: () => ({ areObjectsEqual }),
