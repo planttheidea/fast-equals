@@ -5,25 +5,26 @@ custom object comparator with `createCustomEqual` allows these kinds of comparis
 
 ```ts
 import { createCustomEqual } from 'fast-equals';
-import type { TypeEqualityComparator } from 'fast-equals';
+import type { EqualityComparator } from 'fast-equals';
 
-type AreObjectsEqual = TypeEqualityComparator<Record<any, any>, undefined>;
+const hiddenReferences = new WeakMap();
 
 class HiddenProperty {
+  hidden!: string;
   visible: boolean;
-  #hidden: string;
 
   constructor(value: string) {
     this.visible = true;
-    this.#hidden = value;
-  }
 
-  get hidden() {
-    return this.#hidden;
+    hiddenReferences.set(this, value);
   }
 }
 
-function createAreObjectsEqual(areObjectsEqual: AreObjectsEqual): AreObjectsEqual {
+HiddenProperty.prototype.hidden = 'foo';
+
+function createAreObjectsEqual<AreObjectsEqual extends EqualityComparator<any>>(
+  areObjectsEqual: AreObjectsEqual,
+): AreObjectsEqual {
   return function (a, b, state) {
     if (!areObjectsEqual(a, b, state)) {
       return false;
@@ -33,7 +34,13 @@ function createAreObjectsEqual(areObjectsEqual: AreObjectsEqual): AreObjectsEqua
     const bInstance = b instanceof HiddenProperty;
 
     if (aInstance || bInstance) {
-      return aInstance && bInstance && a.hidden === b.hidden;
+      return (
+        aInstance
+        && bInstance
+        && a.hidden === 'foo'
+        && b.hidden === 'foo'
+        && hiddenReferences.get(a) === hiddenReferences.get(b)
+      );
     }
 
     return true;
@@ -41,6 +48,8 @@ function createAreObjectsEqual(areObjectsEqual: AreObjectsEqual): AreObjectsEqua
 }
 
 const deepEqual = createCustomEqual({
-  createCustomConfig: ({ areObjectsEqual }) => createAreObjectsEqual(areObjectsEqual),
+  createCustomConfig: ({ areObjectsEqual }) => ({
+    areObjectsEqual: createAreObjectsEqual(areObjectsEqual),
+  }),
 });
 ```

@@ -1,12 +1,7 @@
-# fast-equals
+> fast-equals
 
-<img src="https://img.shields.io/badge/build-passing-brightgreen.svg"/>
-<img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg"/>
-<img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
-
-Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also
-maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when
-minified and gzipped.
+Perform [blazing fast](#benchmarks) equality comparisons between two objects, while also allowing for flexibility for
+various use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -16,7 +11,7 @@ The following types are handled out-of-the-box:
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
-- `Promise` objects and thenables
+- `Promise` objects and then-ables
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
 - Custom class instances, including subclasses of native classes
 
@@ -32,32 +27,27 @@ you want to force use of a specific build, they can be located here:
 - ESM => `fast-equals/dist/es/index.mjs`
 - CommonJS => `fast-equals/dist/cjs/index.cjs`
 
-If you are having issues loading a specific build type,
+If you are having any problems, want to request a new feature, or have any questions,
 [please file an issue](https://github.com/planttheidea/fast-equals/issues).
 
-## Table of contents
-
-- [fast-equals](#fast-equals)
-  - [Table of contents](#table-of-contents)
-  - [Usage](#usage)
-    - [Specific builds](#specific-builds)
-  - [Available methods](#available-methods)
-    - [deepEqual](#deepequal)
-      - [Comparing `Map`s](#comparing-maps)
-    - [shallowEqual](#shallowequal)
-    - [sameValueEqual](#samevalueequal)
-    - [sameValueZeroEqual](#samevaluezeroequal)
-    - [strictEqual](#strictEqual)
-    - [circularDeepEqual](#circulardeepequal)
-    - [circularShallowEqual](#circularshallowequal)
-    - [strictDeepEqual](#strictdeepequal)
-    - [strictShallowEqual](#strictshallowequal)
-    - [strictCircularDeepEqual](#strictcirculardeepequal)
-    - [strictCircularShallowEqual](#strictcircularshallowequal)
-    - [createCustomEqual](#createcustomequal)
-      - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
-      - [Recipes](#recipes)
-  - [Benchmarks](#benchmarks)
+- [Usage](#usage)
+- [Available methods](#available-methods)
+  - [deepEqual](#deepequal)
+    - [Comparing `Map`s](#comparing-maps)
+  - [shallowEqual](#shallowequal)
+  - [sameValueEqual](#samevalueequal)
+  - [sameValueZeroEqual](#samevaluezeroequal)
+  - [strictEqual](#strictequal)
+  - [circularDeepEqual](#circulardeepequal)
+  - [circularShallowEqual](#circularshallowequal)
+  - [strictDeepEqual](#strictdeepequal)
+  - [strictShallowEqual](#strictshallowequal)
+  - [strictCircularDeepEqual](#strictcirculardeepequal)
+  - [strictCircularShallowEqual](#strictcircularshallowequal)
+  - [createCustomEqual](#createcustomequal)
+    - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
+    - [Recipes](#recipes)
+- [Benchmarks](#benchmarks)
 
 ## Usage
 
@@ -173,19 +163,23 @@ console.log(sameValueEqual(mainObject, objectC)); // false
 
 Performs a [Strict Equality](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) comparison on the
 two objects passed and returns a boolean representing the referential equality of the objects. In simple terms, this
-means `a === b`.
+means:
+
+- `+0` and `-0` are equal
+- `NaN` is not equal to `NaN`
+- All other items are based on referential equality (`a === b`)
 
 ```ts
 import { strictEqual } from 'fast-equals';
 
-const mainObject = { foo: 12, bar: 'baz' };
+const mainObject = { foo: NaN, bar: 'baz' };
 
 const objectA = 'baz';
-const objectB = 12;
-const objectC = { foo: 12, bar: 'baz' };
+const objectB = NaN;
+const objectC = { foo: NaN, bar: 'baz' };
 
 console.log(sameValueEqual(mainObject.bar, objectA)); // true
-console.log(sameValueEqual(mainObject.foo, objectB)); // true
+console.log(sameValueEqual(mainObject.foo, objectB)); // false
 console.log(sameValueEqual(mainObject, objectC)); // false
 ```
 
@@ -350,21 +344,21 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
-  areArrayBuffersEqual: TypeEqualityComparator<ArrayBuffer, Meta>;
-  areArraysEqual: TypeEqualityComparator<any[], Meta>;
-  areDataViewsEqual: TypeEqualityComparator<DataView, Meta>;
-  areDatesEqual: TypeEqualityComparator<Date, Meta>;
-  areErrorsEqual: TypeEqualityComparator<Error, Meta>;
-  areFunctionsEqual: TypeEqualityComparator<(...args: any[]) => any, Meta>;
-  areMapsEqual: TypeEqualityComparator<Map<any, any>, Meta>;
-  areNumbersEqual: TypeEqualityComparator<number, Meta>;
-  areObjectsEqual: TypeEqualityComparator<Record<string, any>, Meta>;
-  arePrimitiveWrappersEqual: TypeEqualityComparator<Boolean | Number | String, Meta>;
-  areRegExpsEqual: TypeEqualityComparator<RegExp, Meta>;
-  areSetsEqual: TypeEqualityComparator<Set<any>, Meta>;
-  areTypedArraysEqual: TypeEqualityComparator<TypedArray, Meta>;
-  areUrlsEqual: TypeEqualityComparator<URL, Meta>;
-  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, tag: string) => TypeEqualityComparator<Type, Meta>;
+  areArrayBuffersEqual: EqualityComparator<Meta>;
+  areArraysEqual: EqualityComparator<Meta>;
+  areDataViewsEqual: EqualityComparator<Meta>;
+  areDatesEqual: EqualityComparator<Meta>;
+  areErrorsEqual: EqualityComparator<Meta>;
+  areFunctionsEqual: EqualityComparator<Meta>;
+  areMapsEqual: EqualityComparator<Meta>;
+  areNumbersEqual: EqualityComparator<Meta>;
+  areObjectsEqual: EqualityComparator<Meta>;
+  arePrimitiveWrappersEqual: EqualityComparator<Meta>;
+  areRegExpsEqual: EqualityComparator<Meta>;
+  areSetsEqual: EqualityComparator<Meta>;
+  areTypedArraysEqual: EqualityComparator<Meta>;
+  areUrlsEqual: EqualityComparator<Meta>;
+  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
 }
 
 function createCustomEqual<Meta>(options: {

@@ -12,9 +12,8 @@ equality comparators for those unsupported values.
 
 ```ts
 import { createCustomEqual } from 'fast-equals';
-import type { TypeEqualityComparator } from 'fast-equals';
 
-const areZonedDateTimesEqual: TypeEqualityComparator<unknown, undefined> = (a, b) =>
+const areZonedDateTimesEqual = (a: unknown, b: unknown) =>
   a instanceof Temporal.ZonedDateTime && b instanceof Temporal.ZonedDateTime && a.equals(b);
 
 const isSpecialObjectEqual = createCustomEqual({

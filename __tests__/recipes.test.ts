@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
+import type { EqualityComparator } from '../src/index.js';
 import { createCustomEqual, sameValueEqual } from '../src/index.js';
 
 describe('createCustomEqual', () => {
@@ -101,41 +102,56 @@ describe('createCustomEqual', () => {
   });
 
   describe('non-standard-properties', () => {
-    const symbolKey = Symbol('key');
+    const hiddenReferences = new WeakMap();
 
-    function createObjectWithDifferentPropertyTypes(value: string) {
-      const object: Record<any, any> = {
-        [symbolKey]: 'symbol',
-      };
+    class HiddenProperty {
+      hidden!: string;
+      visible: boolean;
 
-      Object.defineProperty(object, 'hidden', {
-        enumerable: false,
-        writable: true,
-        value,
-      });
+      constructor(value: string) {
+        this.visible = true;
 
-      return object;
+        hiddenReferences.set(this, value);
+      }
     }
 
-    const areObjectsEqual = (a: Record<string | symbol, any>, b: Record<string | symbol, any>) => {
-      const propertiesA = [...Object.getOwnPropertyNames(a), ...Object.getOwnPropertySymbols(a)];
-      const propertiesB = [...Object.getOwnPropertyNames(b), ...Object.getOwnPropertySymbols(b)];
+    HiddenProperty.prototype.hidden = 'foo';
 
-      if (propertiesA.length !== propertiesB.length) {
-        return false;
-      }
+    function createAreObjectsEqual<AreObjectsEqual extends EqualityComparator<any>>(
+      areObjectsEqual: AreObjectsEqual,
+    ): AreObjectsEqual {
+      return function (a, b, state) {
+        if (!areObjectsEqual(a, b, state)) {
+          return false;
+        }
 
-      return propertiesA.every((property) => a[property] === b[property]);
-    };
+        const aInstance = a instanceof HiddenProperty;
+        const bInstance = b instanceof HiddenProperty;
+
+        if (aInstance || bInstance) {
+          return (
+            aInstance
+            && bInstance
+            && a.hidden === 'foo'
+            && b.hidden === 'foo'
+            && hiddenReferences.get(a) === hiddenReferences.get(b)
+          );
+        }
+
+        return true;
+      } as AreObjectsEqual;
+    }
 
     const deepEqual = createCustomEqual({
-      createCustomConfig: () => ({ areObjectsEqual }),
+      createCustomConfig: ({ areObjectsEqual }) => ({
+        areObjectsEqual: createAreObjectsEqual(areObjectsEqual),
+      }),
     });
 
     test('verifies the object with non-standard properties', () => {
-      const a = createObjectWithDifferentPropertyTypes('bar');
-      const b = createObjectWithDifferentPropertyTypes('bar');
-      const c = createObjectWithDifferentPropertyTypes('baz');
+      const a = new HiddenProperty('bar');
+      const b = new HiddenProperty('bar');
+      const c = new HiddenProperty('baz');
 
       expect(deepEqual(a, b)).toBe(true);
       expect(deepEqual(a, c)).toBe(false);
@@ -352,7 +368,7 @@ describe('special-objects', () => {
 
     const deepEqual = createCustomEqual({
       createCustomConfig: () => ({
-        getUnsupportedCustomComparator(_a, _b, tag) {
+        getUnsupportedCustomComparator(_a, _b, _state, tag) {
           if (tag === '[object Thing]') {
             return (a, b) => a instanceof Thing && b instanceof Thing && a.equals(b);
           }
