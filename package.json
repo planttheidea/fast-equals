@@ -109,5 +109,5 @@
   "sideEffects": false,
   "type": "module",
   "types": "./index.d.ts",
-  "version": "6.0.0-rc.1"
+  "version": "6.0.0"
 }
