@@ -6,7 +6,6 @@ import {
   areDataViewsEqual,
   areDatesEqual,
   areErrorsEqual,
-  areFunctionsEqual,
   areMapsEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
@@ -15,6 +14,7 @@ import {
   areTypedArraysEqual,
   areUrlsEqual,
   sameValueEqual,
+  strictEqual,
 } from '../src/equals.js';
 import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
 import { createIsCircular } from '../src/utils.js';
@@ -25,7 +25,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areDataViewsEqual,
   areDatesEqual,
   areErrorsEqual,
-  areFunctionsEqual,
+  areFunctionsEqual: strictEqual,
   areMapsEqual,
   areNumbersEqual: sameValueEqual,
   areObjectsEqual,

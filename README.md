@@ -35,6 +35,8 @@ customize any specific type comparison based on your application's use-cases.
       - [Comparing `Map`s](#comparing-maps)
     - [shallowEqual](#shallowequal)
     - [sameValueEqual](#samevalueequal)
+    - [sameValueZeroEqual](#samevaluezeroequal)
+    - [strictEqual](#strictEqual)
     - [circularDeepEqual](#circulardeepequal)
     - [circularShallowEqual](#circularshallowequal)
     - [strictDeepEqual](#strictdeepequal)
@@ -143,9 +145,9 @@ console.log(sameValueEqual(mainObject.foo, objectB)); // true
 console.log(sameValueEqual(mainObject, objectC)); // false
 ```
 
-**NOTE**: In environments that support
+_**NOTE**: In environments that support
 [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is),
-`sameValueEqual` is just a re-export of that method.
+`sameValueEqual` is just a re-export of that method._
 
 ### sameValueZeroEqual
 
@@ -169,6 +171,29 @@ console.log(sameValueEqual(mainObject.bar, objectA)); // true
 console.log(sameValueEqual(mainObject.foo, objectB)); // true
 console.log(sameValueEqual(mainObject, objectC)); // false
 ```
+
+### strictEqual
+
+Performs a [Strict Equality](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) comparison on the
+two objects passed and returns a boolean representing the referential equality of the objects. In simple terms, this
+means `a === b`.
+
+```ts
+import { strictEqual } from 'fast-equals';
+
+const mainObject = { foo: 12, bar: 'baz' };
+
+const objectA = 'baz';
+const objectB = 12;
+const objectC = { foo: 12, bar: 'baz' };
+
+console.log(sameValueEqual(mainObject.bar, objectA)); // true
+console.log(sameValueEqual(mainObject.foo, objectB)); // true
+console.log(sameValueEqual(mainObject, objectC)); // false
+```
+
+_**NOTE**: This is mainly a convenience function, such as needing a default functional equality comparator. Naturally,
+it is faster to simply compare `a === b`. :)_
 
 ### circularDeepEqual
 
