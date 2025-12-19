@@ -147,7 +147,7 @@ export interface CustomEqualCreatorOptions<Meta> {
   /**
    * Create a custom configuration of type-specific equality comparators.
    * This receives the default configuration, which allows either replacement
-   * or supersetting of the default methods.
+   * or a superset of the default methods.
    */
   createCustomConfig?: (config: ComparatorConfig<Meta>) => Partial<ComparatorConfig<Meta>>;
   /**
