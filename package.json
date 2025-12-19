@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/planttheidea/fast-equals/issues"
   },
-  "description": "A blazing fast equality comparison, either shallow or deep",
+  "description": "A blazing-fast equality comparison utility for a variety of use-cases",
   "devDependencies": {
     "@planttheidea/build-tools": "^2.0.0",
     "@types/lodash": "^4.17.21",
