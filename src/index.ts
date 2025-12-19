@@ -7,7 +7,7 @@ import {
 import { sameValueEqual } from './equals.js';
 import type { CustomEqualCreatorOptions } from './internalTypes.js';
 
-export { sameValueEqual, sameValueZeroEqual } from './equals.js';
+export { sameValueEqual, sameValueZeroEqual, strictEqual } from './equals.js';
 export type {
   Cache,
   ComparatorConfig,

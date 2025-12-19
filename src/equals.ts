@@ -32,6 +32,19 @@ export function sameValueZeroEqual(a: any, b: any): boolean {
 }
 
 /**
+ * Whether the values passed are equal based on a
+ * [Strict Equality Comparison](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`).
+ *
+ * @note
+ * This is mainly available as a convenience function, such as being a default when a function to determine equality between
+ * two objects is used.
+ */
+export function strictEqual(a: any, b: any): boolean {
+  return a === b;
+}
+
+/**
  * Whether the array buffers are equal in value.
  */
 export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
@@ -82,20 +95,6 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  */
 export function areErrorsEqual(a: Error, b: Error): boolean {
   return a.name === b.name && a.message === b.message && a.cause === b.cause && a.stack === b.stack;
-}
-
-/**
- * Whether the functions passed are equal in value.
- */
-export function areFunctionsEqual(a: (...args: any[]) => any, b: (...args: any[]) => any): boolean {
-  return a === b;
-}
-
-/**
- * Whether the generator objects passed are equal in value.
- */
-export function areGeneratorsEqual(a: AsyncGenerator | Generator, b: AsyncGenerator | Generator): boolean {
-  return a === b;
 }
 
 /**
@@ -164,11 +163,6 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 
   return true;
 }
-
-/**
- * Whether the numbers are equal in value.
- */
-export const areNumbersEqual = sameValueEqual;
 
 /**
  * Whether the objects are equal in value.

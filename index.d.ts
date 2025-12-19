@@ -155,6 +155,16 @@ declare const sameValueEqual: (value1: any, value2: any) => boolean;
  * are either positive or negative zero.
  */
 declare function sameValueZeroEqual(a: any, b: any): boolean;
+/**
+ * Whether the values passed are equal based on a
+ * [Strict Equality Comparison](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) basis.
+ * Simplified, this maps to if the two values are referentially equal to one another (`a === b`).
+ *
+ * @note
+ * This is mainly available as a convenience function, such as being a default when a function to determine equality between
+ * two objects is used.
+ */
+declare function strictEqual(a: any, b: any): boolean;
 
 /**
  * Whether the items passed are deeply-equal in value.
@@ -200,5 +210,5 @@ declare const strictCircularShallowEqual: <A, B>(a: A, b: B) => boolean;
  */
 declare function createCustomEqual<Meta = undefined>(options?: CustomEqualCreatorOptions<Meta>): <A, B>(a: A, b: B) => boolean;
 
-export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueEqual, sameValueZeroEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictShallowEqual };
+export { circularDeepEqual, circularShallowEqual, createCustomEqual, deepEqual, sameValueEqual, sameValueZeroEqual, shallowEqual, strictCircularDeepEqual, strictCircularShallowEqual, strictDeepEqual, strictEqual, strictShallowEqual };
 export type { Cache, ComparatorConfig, CustomEqualCreatorOptions, EqualityComparator, InternalEqualityComparator, PrimitiveWrapper, State, TypedArray };
