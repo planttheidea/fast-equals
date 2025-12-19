@@ -29,7 +29,7 @@ or both. You can also customize any specific type comparison based on your appli
 By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if
 you want to force use of a specific build, they can be located here:
 
-- ESM => `fast-equals/dist/esm/index.mjs`
+- ESM => `fast-equals/dist/es/index.mjs`
 - CommonJS => `fast-equals/dist/cjs/index.cjs`
 
 If you are having issues loading a specific build type,
