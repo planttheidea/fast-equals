@@ -93,7 +93,7 @@ interface ComparatorConfig<Meta> {
     /**
      * Get a custom comparator based on the objects passed.
      */
-    getUnsupportedCustomComparator: ((a: any, b: any, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
+    getUnsupportedCustomComparator: ((a: any, b: any, state: State<Meta>, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
 }
 type EqualityComparator<Meta> = (a: any, b: any, state: State<Meta>) => boolean;
 type InternalEqualityComparator<Meta> = (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<Meta>) => boolean;
