@@ -103,8 +103,8 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     // Try to fast-path equality checks for other complex object types in the
     // same realm to avoid capturing the string tag. Strict equality is used
     // instead of `instanceof` because it is more performant for the common
-    // use-case. If someone is subclassing a native class, it will be handled
-    // with the string tag comparison.
+    // use-case. If someone is creating a subclass from a native class, it will be
+    // handled with the string tag comparison.
 
     if (constructor === Object) {
       return areObjectsEqual(a, b, state);
@@ -142,7 +142,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return areArraysEqual(a, b, state);
     }
 
-    // Since this is a custom object, capture the string tag to determing its type.
+    // Since this is a custom object, capture the string tag to determining its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
     const tag = toString.call(a);
     const supportedComparator = supportedComparatorMap[tag];

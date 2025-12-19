@@ -1,20 +1,23 @@
 {
-  "author": "tony_quetano@planttheidea.com",
-  "browser": "dist/umd/index.js",
+  "author": {
+    "email": "tony.quetano@planttheidea.com",
+    "name": "Tony Quetano",
+    "url": "https://www.planttheidea.com/"
+  },
   "bugs": {
     "url": "https://github.com/planttheidea/fast-equals/issues"
   },
   "description": "A blazing fast equality comparison, either shallow or deep",
   "devDependencies": {
-    "@planttheidea/build-tools": "^1.2.3",
+    "@planttheidea/build-tools": "^2.0.0",
     "@types/lodash": "^4.17.21",
-    "@types/node": "^24.10.3",
+    "@types/node": "^24.10.4",
     "@types/ramda": "^0.31.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.49.0",
-    "@typescript-eslint/parser": "^8.49.0",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "@vitest/coverage-v8": "^4.0.16",
     "cli-table3": "^0.6.5",
     "decircularize": "^1.0.0",
     "deep-eql": "^5.0.2",
@@ -32,14 +35,14 @@
     "react-dom": "^19.2.3",
     "react-fast-compare": "^3.2.2",
     "release-it": "^19.1.0",
-    "rollup": "^4.53.3",
+    "rollup": "^4.53.5",
     "shallow-equal-fuzzy": "^0.0.2",
     "tinybench": "^6.0.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0",
+    "typescript-eslint": "^8.50.0",
     "underscore": "^1.13.7",
-    "vite": "^7.2.7",
-    "vitest": "^4.0.15"
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
   },
   "engines": {
     "node": ">=6.0.0"
@@ -53,10 +56,6 @@
       "require": {
         "types": "./dist/cjs/index.d.cts",
         "default": "./dist/cjs/index.cjs"
-      },
-      "default": {
-        "types": "./dist/umd/index.d.ts",
-        "default": "./dist/umd/index.js"
       }
     }
   },
@@ -76,22 +75,23 @@
     "equivalent"
   ],
   "license": "MIT",
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/es/index.mjs",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/es/index.mjs",
   "name": "fast-equals",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planttheidea/fast-equals.git"
   },
   "scripts": {
     "benchmark": "npm run build && node benchmark/index.js",
-    "build": "npm run clean && npm run build:dist && npm run build:types",
+    "build": "npm run clean && npm run build:dist",
     "build:dist": "NODE_ENV=production rollup -c config/rollup.config.js",
-    "build:types": "pti fix-types -l dist",
     "clean": "rm -rf dist",
     "clean:cjs": "rm -rf dist/cjs",
     "clean:es": "rm -rf dist/es",
-    "clean:umd": "rm -rf dist/umd",
     "dev": "vite --config=config/vite.config.ts",
     "format": "prettier . --log-level=warn --write",
     "format:check": "prettier . --log-level=warn --check",
@@ -109,5 +109,5 @@
   "sideEffects": false,
   "type": "module",
   "types": "./index.d.ts",
-  "version": "5.4.0"
+  "version": "6.0.0-rc.1"
 }

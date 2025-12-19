@@ -1,5 +1,24 @@
 # fast-equals CHANGELOG
 
+## 6.0.0
+
+### Breaking changes
+
+- [#164](https://github.com/planttheidea/fast-equals/pull/164) - Drop UMD support and distribution of source maps (see
+  [#161](https://github.com/planttheidea/fast-equals/pull/164) for reasoning)
+- [#166](https://github.com/planttheidea/fast-equals/pull/166) - Remove `unsupportedTagComparators` object in favor of
+  `getUnsupportedCustomComparator` method
+- Add `sameValueEqual` method (`Object.is` with ponyfill for legacy environments) and make it the default number
+  comparison (formerly used `sameValueZeroEqual`)
+- [#170](https://github.com/planttheidea/fast-equals/pull/170) - Add `strictEqual` method for convenience and
+  completeness
+
+### Enhancements
+
+- `BigInt` support added (uses same handlers as normal numbers)
+- Faster!
+- More flexibility for methods not included by default via `getUnsupportedCustomComparator`
+
 ## 5.4.0
 
 - [#163](https://github.com/planttheidea/fast-equals/pull/163) - Fix handling of `TypedArray`-based checks, and add

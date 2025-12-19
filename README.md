@@ -16,13 +16,24 @@ The following types are handled out-of-the-box:
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
-- `Promise` objects
+- `Promise` objects and thenables
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
 - Custom class instances, including subclasses of native classes
 
-Methods are available for deep, shallow, or referential equality comparison. In addition, you can opt into support for
-circular objects, or performing a "strict" comparison with unconventional property definition, or both. You can also
-customize any specific type comparison based on your application's use-cases.
+Methods are available for deep, shallow, [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue),
+[`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero), or
+[strict equality](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) comparison. In addition, you
+can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition,
+or both. You can also customize any specific type comparison based on your application's use-cases.
+
+By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if
+you want to force use of a specific build, they can be located here:
+
+- ESM => `fast-equals/dist/es/index.mjs`
+- CommonJS => `fast-equals/dist/cjs/index.cjs`
+
+If you are having issues loading a specific build type,
+[please file an issue](https://github.com/planttheidea/fast-equals/issues).
 
 ## Table of contents
 
@@ -47,7 +58,6 @@ customize any specific type comparison based on your application's use-cases.
       - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
       - [Recipes](#recipes)
   - [Benchmarks](#benchmarks)
-  - [Development](#development)
 
 ## Usage
 
@@ -56,19 +66,6 @@ import { deepEqual } from 'fast-equals';
 
 console.log(deepEqual({ foo: 'bar' }, { foo: 'bar' })); // true
 ```
-
-### Specific builds
-
-By default, npm should resolve the correct build of the package based on your consumption (ESM vs CommonJS). However, if
-you want to force use of a specific build, they can be located here:
-
-- ESM => `fast-equals/dist/esm/index.mjs`
-- CommonJS => `fast-equals/dist/cjs/index.cjs`
-- UMD => `fast-equals/dist/umd/index.js`
-- Minified UMD => `fast-equals/dist/min/index.js`
-
-If you are having issues loading a specific build type,
-[please file an issue](https://github.com/planttheidea/fast-equals/issues).
 
 ## Available methods
 
@@ -101,7 +98,7 @@ deepEqual(mapA, mapB);
 ```
 
 To support true deep equality of all contents, `fast-equals` will perform a deep equality comparison for key and value
-parirs. Therefore, the above would be `true`.
+pairs. Therefore, the above would be `true`.
 
 ### shallowEqual
 
@@ -353,8 +350,8 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
-  areArrayBuffersEcqual: TypeEqualityComparator<ArrayBuffer, Meta>;
-  areArraysEcqual: TypeEqualityComparator<any[], Meta>;
+  areArrayBuffersEqual: TypeEqualityComparator<ArrayBuffer, Meta>;
+  areArraysEqual: TypeEqualityComparator<any[], Meta>;
   areDataViewsEqual: TypeEqualityComparator<DataView, Meta>;
   areDatesEqual: TypeEqualityComparator<Date, Meta>;
   areErrorsEqual: TypeEqualityComparator<Error, Meta>;
@@ -406,7 +403,7 @@ to the problem you are solving, they can offer guidance of how to structure your
 - [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
 - [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
-- [Legacy environment support for circualr equal comparators](./recipes/legacy-circular-equal-support.md)
+- [Legacy environment support for circular equal comparators](./recipes/legacy-circular-equal-support.md)
 - [Custom comparator support](./recipes/special-objects.md)
 
 ## Benchmarks
@@ -516,20 +513,3 @@ All of these have the potential of inflating the respective library's numbers in
 the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react`
 elements can be circular objects, however simple elements are not; I kept the `react` comparison very basic to allow it
 to be included.
-
-## Development
-
-Standard practice, clone the repo and `npm i` to get the dependencies. The following npm scripts are available:
-
-- benchmark => run benchmark tests against other equality libraries
-- build => build `main`, `module`, and `browser` distributables with `rollup`
-- clean => run `rimraf` on the `dist` folder
-- dev => start `vite` playground App
-- dist => run `build`
-- lint => run ESLint on all files in `src` folder (also runs on `dev` script)
-- lint:fix => run `lint` script, but with auto-fixer
-- prepublish:compile => run `lint`, `test:coverage`, `transpile:lib`, `transpile:es`, and `dist` scripts
-- start => run `dev`
-- test => run AVA with NODE_ENV=test on all files in `test` folder
-- test:coverage => run same script as `test` with code coverage calculation via `nyc`
-- test:watch => run same script as `test` but keep persistent watcher
