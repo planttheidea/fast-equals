@@ -10,6 +10,8 @@
   `getUnsupportedCustomComparator` method
 - Add `sameValueEqual` method (`Object.is` with ponyfill for legacy environments) and make it the default number
   comparison (formerly used `sameValueZeroEqual`)
+- [#170](https://github.com/planttheidea/fast-equals/pull/170) - Add `strictEqual` method for convenience and
+  completeness
 
 ### Enhancements
 
