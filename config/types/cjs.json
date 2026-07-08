@@ -26,5 +26,5 @@
     "outDir": "../../dist/cjs"
   },
   "exclude": ["**/node_modules/**", "**/__tests__/**"],
-  "include": ["../../src/**/*.ts"]
+  "include": ["../../src/**/*.ts", "../../src/**/*.tsx"]
 }
