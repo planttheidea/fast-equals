@@ -21,7 +21,6 @@
     "target": "ES2015",
     "verbatimModuleSyntax": true,
     "types": ["node", "react"],
-    "baseUrl": "src",
     "inlineSources": true,
     "jsx": "react-jsx",
     "outDir": "dist",
