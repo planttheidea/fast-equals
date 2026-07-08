@@ -308,9 +308,9 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
  * Whether the TypedArray instances are equal in value.
  */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
-  let index = a.byteLength;
+  let index = a.length;
 
-  if (b.byteLength !== index || a.byteOffset !== b.byteOffset) {
+  if (b.length !== index || a.byteOffset !== b.byteOffset) {
     return false;
   }
 
