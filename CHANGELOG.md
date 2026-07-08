@@ -1,10 +1,14 @@
 # fast-equals CHANGELOG
 
+## 6.0.2
+
+- [#197](https://github.com/planttheidea/fast-equals/pull/197) - Remove transitive dependencies with security vulnerabilities
+
 ## 6.0.1
 
-- Use `.length` instead of `byteLength` for TypedArrays, which avoids V8 slow path on non-8-bit arrays
-- Use `Uint8Array` instead of `Array` for `matchedIndices` storage for denser uninitialized loads
-- Avoid unnecessary `concat` when no symbols exist on strict comparisons
+- [#195](https://github.com/planttheidea/fast-equals/pull/195) - Use `.length` instead of `byteLength` for TypedArrays, which avoids V8 slow path on non-8-bit arrays
+- [#195](https://github.com/planttheidea/fast-equals/pull/195) - Use `Uint8Array` instead of `Array` for `matchedIndices` storage for denser uninitialized loads
+- [#195](https://github.com/planttheidea/fast-equals/pull/195) - Avoid unnecessary `concat` when no symbols exist on strict comparisons
 
 ## 6.0.0
 
