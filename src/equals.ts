@@ -111,7 +111,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
     return true;
   }
 
-  const matchedIndices = new Array<true | undefined>(size);
+  const matchedIndices = new Uint8Array(size);
   const aIterable = a.entries();
 
   let aResult: IteratorResult<[any, any]>;
@@ -126,7 +126,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 
     const bIterable = b.entries();
 
-    let hasMatch = false;
+    let hasMatch = 0;
     let matchIndex = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -147,7 +147,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
         state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
         && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
       ) {
-        hasMatch = matchedIndices[matchIndex] = true;
+        hasMatch = matchedIndices[matchIndex] = 1;
         break;
       }
 
@@ -262,7 +262,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
     return true;
   }
 
-  const matchedIndices = new Array<true | undefined>(size);
+  const matchedIndices = new Uint8Array(size);
   const aIterable = a.values();
 
   let aResult: IteratorResult<any>;
@@ -276,7 +276,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
 
     const bIterable = b.values();
 
-    let hasMatch = false;
+    let hasMatch = 0;
     let matchIndex = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -289,7 +289,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
         !matchedIndices[matchIndex]
         && state.equals(aResult.value, bResult.value, aResult.value, bResult.value, a, b, state)
       ) {
-        hasMatch = matchedIndices[matchIndex] = true;
+        hasMatch = matchedIndices[matchIndex] = 1;
         break;
       }
 
@@ -308,9 +308,9 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
  * Whether the TypedArray instances are equal in value.
  */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
-  let index = a.byteLength;
+  let index = a.length;
 
-  if (b.byteLength !== index || a.byteOffset !== b.byteOffset) {
+  if (b.length !== index || a.byteOffset !== b.byteOffset) {
     return false;
   }
 
