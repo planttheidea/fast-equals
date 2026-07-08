@@ -6,6 +6,7 @@ import deepEql from 'deep-eql';
 import deepEqual from 'deep-equal';
 import { dequal } from 'dequal';
 import { dequal as dequalLite } from 'dequal/lite';
+import { isEqual as isEqualEsToolkit } from 'es-toolkit';
 import fastDeepEqual from 'fast-deep-equal/es6/react.js';
 import isEqualLodash from 'lodash/isEqual.js';
 import orderBy from 'lodash/orderBy.js';
@@ -38,8 +39,9 @@ const packages = {
   },
   'deep-eql': deepEql,
   'deep-equal': deepEqual,
-  dequal: dequal,
+  dequal,
   'dequal/lite': dequalLite,
+  'es-toolkit': isEqualEsToolkit,
   'fast-deep-equal': fastDeepEqual,
   'fast-equals': fastEqualsDeepEqual,
   'fast-equals (circular)': fastEqualsCircularDeepEqual,
