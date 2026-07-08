@@ -263,7 +263,7 @@ export function createIsEqual<Meta>({ circular, comparator, createState, equals,
         equals,
         meta: undefined as Meta,
         strict,
-      } as State<Meta>);
+      });
     };
   }
 
