@@ -53,8 +53,10 @@ export function createIsCircular<AreItemsEqual extends EqualityComparator<any>>(
  */
 export function getStrictProperties(object: AnyObject): Array<string | symbol> {
   const symbols = getOwnPropertySymbols(object);
-  
-  return symbols.length ? (getOwnPropertyNames(object) as Array<string | symbol>).concat(symbols) : getOwnPropertyNames(object);
+
+  return symbols.length
+    ? (getOwnPropertyNames(object) as Array<string | symbol>).concat(symbols)
+    : getOwnPropertyNames(object);
 }
 
 /**
