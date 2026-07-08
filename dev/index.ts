@@ -10,3 +10,5 @@ document.body.style.padding = '0px';
 const div = document.createElement('div');
 
 div.textContent = 'Check the console for details.';
+
+document.body.appendChild(div);
