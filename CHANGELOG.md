@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## 5.4.1
+
+- [#198](https://github.com/planttheidea/fast-equals/pull/198) - Update build tools to improve consumer typings
+
 ## 5.4.0
 
 - [#163](https://github.com/planttheidea/fast-equals/pull/163) - Fix handling of `TypedArray`-based checks, and add
