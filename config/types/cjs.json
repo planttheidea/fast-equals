@@ -18,13 +18,14 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "inlineSources": true,
     "target": "ES2015",
     "verbatimModuleSyntax": true,
     "types": ["node", "react"],
+    "inlineSources": true,
+    "declarationDir": "../../dist/cjs/types",
     "jsx": "react-jsx",
     "outDir": "../../dist/cjs"
   },
   "exclude": ["**/node_modules/**", "**/__tests__/**"],
-  "include": ["../../src/**/*.ts"]
+  "include": ["../../src/**/*.ts", "../../src/**/*.tsx"]
 }

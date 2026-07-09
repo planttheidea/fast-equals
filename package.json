@@ -1,6 +1,10 @@
 {
-  "author": "tony_quetano@planttheidea.com",
-  "browser": "dist/umd/index.js",
+  "author": {
+    "email": "tony.quetano@planttheidea.com",
+    "name": "Tony Quetano",
+    "url": "https://www.planttheidea.com/"
+  },
+  "browser": "./dist/umd/index.js",
   "bugs": {
     "url": "https://github.com/planttheidea/fast-equals/issues"
   },
@@ -76,16 +80,19 @@
     "equivalent"
   ],
   "license": "MIT",
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/es/index.mjs",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/es/index.mjs",
   "name": "fast-equals",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planttheidea/fast-equals.git"
   },
   "scripts": {
     "benchmark": "npm run build && node benchmark/index.js",
-    "build": "npm run clean && npm run build:dist && npm run build:types",
+    "build": "npm run clean && npm run build:dist",
     "build:dist": "NODE_ENV=production rollup -c config/rollup.config.js",
     "build:types": "pti fix-types -l dist",
     "clean": "rm -rf dist",
