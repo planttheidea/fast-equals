@@ -24,7 +24,6 @@ import type {
 } from './internalTypes.js';
 import { combineComparators, createIsCircular } from './utils.js';
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
 const toString = Object.prototype.toString;
 
 interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOptions<Meta>>, 'circular' | 'strict'> {
