@@ -1,7 +1,6 @@
 import type { AnyObject, Cache, CircularState, EqualityComparator, State } from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
-// eslint-disable-next-line @typescript-eslint/unbound-method
 const { hasOwnProperty } = Object.prototype;
 
 /**
