@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `Map` and `Set` comparisons resolve entries by key / value lookup before falling back to the exhaustive scan. Entry
+  order is not significant, so matching previously required scanning all of `b` for every entry of `a`; the common cases
+  (primitive keys, and object keys held by shared reference) now resolve in constant time instead, leaving only what
+  cannot be resolved that way to the scan. Measured against the previous implementation: `Set` of 200 strings is ~27x
+  faster, `Map` of 200 string keys ~6x, and the worst case (every key a distinct object, so no lookup ever hits) is
+  still ~1.1-1.5x faster because the remaining scan is smaller.
+
+  This is not applied when a custom `createInternalComparator` is supplied. The comparisons the lookup skips are ones
+  the default comparator provably resolves the same way, but a custom comparator receives the iteration index of the key
+  within `b` and is not guaranteed to be transitive, so it keeps the exhaustive scan and its exact previous behavior.
+
+- Integer `TypedArray`, `ArrayBuffer` and `DataView` comparisons compare the underlying bytes eight at a time for
+  buffers of at least 128 bytes. Integer views hold no padding and no values with multiple representations, so this is
+  equivalent to comparing elements. A 64KB `Uint8Array` is ~9x faster, 4KB ~6x, and buffers below the threshold are
+  unaffected. Float views are excluded, since a bitwise comparison does not match the `NaN` semantics they require.
+
 ### Bugfixes
 
 - `URL` comparisons now include the query string. `areUrlsEqual` compared each component individually but omitted

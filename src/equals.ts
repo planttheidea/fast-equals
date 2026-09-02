@@ -5,6 +5,10 @@ const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
+// Below this size the cost of building the views needed for a chunked comparison outweighs what
+// the wider comparison saves.
+const CHUNKED_COMPARISON_MIN_BYTES = 128;
+
 const { getOwnPropertyDescriptor, keys } = Object;
 
 /**
@@ -177,6 +181,91 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 }
 
 /**
+ * Whether the `Map`s are equal in value, resolving entries by key lookup where possible.
+ *
+ * @note
+ * `areMapsEqual` must scan all of `b` for every entry of `a` because entry order is not
+ * significant, which is quadratic. `Map.prototype.has` resolves the common cases -- primitive keys,
+ * and object keys held by shared reference -- in constant time instead, leaving only the entries it
+ * cannot resolve to the exhaustive scan.
+ *
+ * This is only installed when the default internal comparator is in use. The comparisons it skips
+ * are ones that comparator provably resolves the same way: an identity key comparison always
+ * returns `true` (the comparator short-circuits on `a === b`), and the key comparisons against
+ * non-matching entries of `b` always return `false`. A custom internal comparator can observe the
+ * difference, because it receives the iteration index of the key within `b` and is not guaranteed
+ * to be transitive, so it keeps the exhaustive scan.
+ */
+export function areMapsEqualByLookup(a: Map<any, any>, b: Map<any, any>, state: State<any>): boolean {
+  const size = a.size;
+
+  if (size !== b.size) {
+    return false;
+  }
+
+  if (!size) {
+    return true;
+  }
+
+  let unmatchedA: Array<[any, any]> | undefined;
+  let claimedB: Set<any> | undefined;
+
+  for (const aEntry of a) {
+    const key = aEntry[0];
+
+    // `has` uses SameValueZero, which is the same result the comparator produces for the keys it
+    // resolves here, since it short-circuits on reference equality before any value comparison.
+    if (b.has(key) && state.equals(aEntry[1], b.get(key), key, key, a, b, state)) {
+      (claimedB ||= new Set()).add(key);
+    } else {
+      (unmatchedA ||= []).push(aEntry);
+    }
+  }
+
+  if (!unmatchedA) {
+    return true;
+  }
+
+  const unmatchedB: Array<[any, any]> = [];
+
+  for (const bEntry of b) {
+    if (!claimedB || !claimedB.has(bEntry[0])) {
+      unmatchedB.push(bEntry);
+    }
+  }
+
+  const matchedIndices = new Uint8Array(unmatchedB.length);
+
+  for (let index = 0; index < unmatchedA.length; index++) {
+    const aEntry = unmatchedA[index]!;
+
+    let hasMatch = 0;
+
+    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
+      if (matchedIndices[matchIndex]) {
+        continue;
+      }
+
+      const bEntry = unmatchedB[matchIndex]!;
+
+      if (
+        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
+        && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
+      ) {
+        hasMatch = matchedIndices[matchIndex] = 1;
+        break;
+      }
+    }
+
+    if (!hasMatch) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Whether the objects are equal in value.
  */
 export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
@@ -317,6 +406,69 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
 }
 
 /**
+ * Whether the `Set`s are equal in value, resolving values by lookup where possible.
+ *
+ * @note
+ * See `areMapsEqualByLookup` for why this is only installed for the default internal comparator.
+ * Because `Set` values are unique, each lookup hit claims exactly one entry of `b`, so the entries
+ * left for the exhaustive scan are precisely those each set does not share with the other.
+ */
+export function areSetsEqualByLookup(a: Set<any>, b: Set<any>, state: State<any>): boolean {
+  const size = a.size;
+
+  if (size !== b.size) {
+    return false;
+  }
+
+  if (!size) {
+    return true;
+  }
+
+  let unmatchedA: any[] | undefined;
+
+  for (const aValue of a) {
+    if (!b.has(aValue)) {
+      (unmatchedA ||= []).push(aValue);
+    }
+  }
+
+  if (!unmatchedA) {
+    return true;
+  }
+
+  const unmatchedB: any[] = [];
+
+  for (const bValue of b) {
+    if (!a.has(bValue)) {
+      unmatchedB.push(bValue);
+    }
+  }
+
+  const matchedIndices = new Uint8Array(unmatchedB.length);
+
+  for (let index = 0; index < unmatchedA.length; index++) {
+    const aValue = unmatchedA[index];
+
+    let hasMatch = 0;
+
+    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
+      const bValue = unmatchedB[matchIndex];
+
+      if (!matchedIndices[matchIndex] && state.equals(aValue, bValue, aValue, bValue, a, b, state)) {
+        hasMatch = matchedIndices[matchIndex] = 1;
+        break;
+      }
+    }
+
+    if (!hasMatch) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Whether the TypedArray instances are equal in value.
  */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
@@ -325,6 +477,8 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   if (b.length !== index || a.byteOffset !== b.byteOffset) {
     return false;
   }
+
+  const byteLength = a.byteLength;
 
   // Only float-backed views can hold `NaN`, and the additional check needed to treat it as equal
   // to itself measurably slows the loop, so integer views keep the plain comparison. This is
@@ -335,6 +489,43 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
       // the SameValueZero semantics used for every other numeric comparison in the library.
       if (a[index] !== b[index] && (a[index] === a[index] || b[index] === b[index])) {
         return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Integer views hold no padding and no values with multiple representations, so comparing the
+  // underlying bytes eight at a time is equivalent to comparing elements, and substantially faster
+  // for large buffers. `BigUint64Array` requires an 8-byte-aligned offset, and the byte offsets are
+  // already known to match, so only `a` needs to be checked.
+  if (byteLength >= CHUNKED_COMPARISON_MIN_BYTES && (a.byteOffset & 7) === 0) {
+    const words = byteLength >>> 3;
+    const wordsA = new BigUint64Array(a.buffer, a.byteOffset, words);
+    const wordsB = new BigUint64Array(b.buffer, b.byteOffset, words);
+
+    let wordIndex = words;
+
+    while (wordIndex-- > 0) {
+      if (wordsA[wordIndex] !== wordsB[wordIndex]) {
+        return false;
+      }
+    }
+
+    // Whatever does not fill a whole word is compared as bytes.
+    const remainder = byteLength & 7;
+
+    if (remainder) {
+      const offset = a.byteOffset + (words << 3);
+      const bytesA = new Uint8Array(a.buffer, offset, remainder);
+      const bytesB = new Uint8Array(b.buffer, b.byteOffset + (words << 3), remainder);
+
+      let byteIndex = remainder;
+
+      while (byteIndex-- > 0) {
+        if (bytesA[byteIndex] !== bytesB[byteIndex]) {
+          return false;
+        }
       }
     }
 

@@ -5,11 +5,13 @@ import {
   areDatesEqual as areDatesEqualDefault,
   areErrorsEqual as areErrorsEqualDefault,
   areMapsEqual as areMapsEqualDefault,
+  areMapsEqualByLookup as areMapsEqualByLookupDefault,
   areObjectsEqual as areObjectsEqualDefault,
   areObjectsEqualStrict as areObjectsEqualStrictDefault,
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
+  areSetsEqualByLookup as areSetsEqualByLookupDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
   sameValueEqual,
@@ -175,8 +177,15 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
 export function createEqualityComparatorConfig<Meta>({
   circular,
   createCustomConfig,
+  createInternalComparator,
   strict,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
+  // The `Map` / `Set` lookup comparators skip comparisons that the default internal comparator
+  // provably resolves the same way, but a custom one can observe the difference. See the note on
+  // `areMapsEqualByLookup` for the reasoning.
+  const areMapsEqualBase = createInternalComparator ? areMapsEqualDefault : areMapsEqualByLookupDefault;
+  const areSetsEqualBase = createInternalComparator ? areSetsEqualDefault : areSetsEqualByLookupDefault;
+
   let config = {
     areArrayBuffersEqual,
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
@@ -190,12 +199,12 @@ export function createEqualityComparatorConfig<Meta>({
     // question from whether they are equal in value.
     areErrorsEqual: combineComparators(areErrorsEqualDefault, areObjectsEqualDefault),
     areFunctionsEqual: strictEqual,
-    areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
+    areMapsEqual: strict ? combineComparators(areMapsEqualBase, areObjectsEqualStrictDefault) : areMapsEqualBase,
     areNumbersEqual: sameValueEqual,
     areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
     arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
-    areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
+    areSetsEqual: strict ? combineComparators(areSetsEqualBase, areObjectsEqualStrictDefault) : areSetsEqualBase,
     areTypedArraysEqual: strict
       ? combineComparators(areTypedArraysEqualDefault, areObjectsEqualStrictDefault)
       : areTypedArraysEqualDefault,
