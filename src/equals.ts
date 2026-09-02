@@ -92,9 +92,21 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 
 /**
  * Whether the errors passed are equal in value.
+ *
+ * @note
+ * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
+ * explicitly. `cause` is compared by value rather than by reference, matching how every other
+ * nested value in the comparison is treated. Own enumerable properties (which custom `Error`
+ * subclasses commonly add) are compared by composing this with the object comparator in the
+ * comparator config, so that the strict and circular variants apply to them as well.
  */
-export function areErrorsEqual(a: Error, b: Error): boolean {
-  return a.name === b.name && a.message === b.message && a.cause === b.cause && a.stack === b.stack;
+export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
+  return (
+    a.name === b.name
+    && a.message === b.message
+    && a.stack === b.stack
+    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
+  );
 }
 
 /**
@@ -314,6 +326,21 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
     return false;
   }
 
+  // Only float-backed views can hold `NaN`, and the additional check needed to treat it as equal
+  // to itself measurably slows the loop, so integer views keep the plain comparison. This is
+  // hoisted out of the loop so the cost is paid once per call rather than once per element.
+  if (a instanceof Float64Array || a instanceof Float32Array || isFloat16Array(a)) {
+    while (index-- > 0) {
+      // `NaN` is the only value not equal to itself, and it is treated as equal here to match
+      // the SameValueZero semantics used for every other numeric comparison in the library.
+      if (a[index] !== b[index] && (a[index] === a[index] || b[index] === b[index])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   while (index-- > 0) {
     if (a[index] !== b[index]) {
       return false;
@@ -327,15 +354,17 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  * Whether the URL instances are equal in value.
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
-  return (
-    a.hostname === b.hostname
-    && a.pathname === b.pathname
-    && a.protocol === b.protocol
-    && a.port === b.port
-    && a.hash === b.hash
-    && a.username === b.username
-    && a.password === b.password
-  );
+  // `href` is the normalized serialization of every component of the URL, so comparing it is both
+  // more complete than comparing components individually (the query string was previously omitted,
+  // making `?a=1` equal to `?a=2`) and cheaper, being a single string comparison.
+  return a.href === b.href;
+}
+
+/**
+ * Whether the value is a `Float16Array`, guarded for environments that predate it.
+ */
+function isFloat16Array(value: TypedArray): boolean {
+  return typeof Float16Array !== 'undefined' && value instanceof Float16Array;
 }
 
 function isPropertyEqual(a: AnyObject, b: AnyObject, state: State<any>, property: string | symbol) {

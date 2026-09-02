@@ -1,5 +1,26 @@
 # fast-equals CHANGELOG
 
+## Unreleased
+
+### Bugfixes
+
+- `URL` comparisons now include the query string. `areUrlsEqual` compared each component individually but omitted
+  `search`, so `https://foo.com/?a=1` and `https://foo.com/?a=2` were considered equal. It now compares `href`, which is
+  the normalized serialization of every component, and is also faster than the previous seven comparisons.
+- `Error` comparisons now include own enumerable properties. `Error` subclasses commonly carry data (`status`, `code`,
+  ...), and previously only `name` / `message` / `cause` / `stack` were compared, so two errors differing only in those
+  properties were considered equal.
+- `Error.cause` is now compared by value rather than by reference, consistent with how every other nested value is
+  compared. Errors are now also tracked for circular references, so an error that references itself through `cause` or
+  an own property is safe under `circularDeepEqual` / `strictCircularDeepEqual`.
+- Boxed `BigInt` values (`Object(1n)`) are now compared as primitive wrappers rather than by identity, matching how
+  boxed `Number`, `String` and `Boolean` values are handled.
+- Boxed `Symbol` values (`Object(Symbol())`) are now compared as primitive wrappers, which was the one remaining
+  primitive wrapper type with no handling.
+- `TypedArray` comparisons now treat `NaN` as equal to itself, matching the SameValueZero semantics documented for every
+  other numeric comparison. Only float-backed views take the additional check, so integer views and `ArrayBuffer` /
+  `DataView` are unaffected.
+
 ## 6.0.2
 
 - [#197](https://github.com/planttheidea/fast-equals/pull/197) - Remove transitive dependencies with security
