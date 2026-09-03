@@ -11,12 +11,29 @@
 - [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed boxed `BigInt` values to compare by value rather
   than identity.
 - [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `TypedArray` comparisons to treat `NaN` as equal
+  to itself, matching SameValueZero semantics.## 5.4.2
+
+## 5.4.2
+
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `URL` comparisons ignoring query strings. Query
+  parameter order remains insignificant, with repeated keys counted.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `Error` comparisons ignoring own enumerable
+  properties.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `Error.cause` to compare by value and added
+  circular reference tracking for errors.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `TypedArray` comparisons to treat `NaN` as equal
   to itself, matching SameValueZero semantics.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Use `length` instead of `byteLength` to bound
+  `TypedArray` comparisons, avoiding redundant iterations on non-8-bit views.
 
 ## 6.0.2
 
 - [#197](https://github.com/planttheidea/fast-equals/pull/197) - Remove transitive dependencies with security
   vulnerabilities
+
+## 5.4.1
+
+- [#198](https://github.com/planttheidea/fast-equals/pull/198) - Update build tools to improve consumer typings
 
 ## 6.0.1
 
