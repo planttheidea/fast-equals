@@ -24,6 +24,16 @@ const error = new Error('boom');
 const typeError = new TypeError('boom');
 const rangeError = new RangeError('boom');
 
+// Errors equal in value to the above. `stack` is location-dependent, so it is copied rather than
+// left to differ; the errors are otherwise constructed normally, so they own the same properties.
+const equalError = new Error('boom');
+const equalTypeError = new TypeError('boom');
+const equalRangeError = new RangeError('boom');
+
+equalError.stack = error.stack;
+equalTypeError.stack = typeError.stack;
+equalRangeError.stack = rangeError.stack;
+
 export const testSuites = [
   {
     description: 'primitives',
@@ -629,7 +639,7 @@ export const testSuites = [
         description: 'errors are equal',
         shallowEqual: true,
         value1: error,
-        value2: Object.create(error),
+        value2: equalError,
       },
       {
         deepEqual: false,
@@ -643,7 +653,7 @@ export const testSuites = [
         description: 'range errors are equal',
         shallowEqual: true,
         value1: rangeError,
-        value2: Object.create(rangeError),
+        value2: equalRangeError,
       },
       {
         deepEqual: false,
@@ -657,7 +667,7 @@ export const testSuites = [
         description: 'type errors are equal',
         shallowEqual: true,
         value1: typeError,
-        value2: Object.create(typeError),
+        value2: equalTypeError,
       },
       {
         deepEqual: false,

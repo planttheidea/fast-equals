@@ -469,3 +469,158 @@ describe('strict', () => {
     });
   });
 });
+
+describe('correctness fixes', () => {
+  describe('URL', () => {
+    it('compares the query string', () => {
+      expect(deepEqual(new URL('https://foo.com/?a=1'), new URL('https://foo.com/?a=2'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1'), new URL('https://foo.com/?a=1'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/'), new URL('https://foo.com/?a=1'))).toBe(false);
+    });
+
+    it('compares every other component', () => {
+      const base = new URL('https://user:pass@foo.com:4000/bar?a=1#baz');
+
+      expect(deepEqual(base, new URL('https://user:pass@foo.com:4000/bar?a=1#baz'))).toBe(true);
+      expect(deepEqual(base, new URL('https://user:nope@foo.com:4000/bar?a=1#baz'))).toBe(false);
+      expect(deepEqual(base, new URL('https://user:pass@foo.com:4001/bar?a=1#baz'))).toBe(false);
+      expect(deepEqual(base, new URL('https://user:pass@foo.com:4000/oof?a=1#baz'))).toBe(false);
+      expect(deepEqual(base, new URL('https://user:pass@foo.com:4000/bar?a=1#zab'))).toBe(false);
+    });
+
+    it('respects parser normalization', () => {
+      expect(deepEqual(new URL('https://foo.com'), new URL('https://foo.com/'))).toBe(true);
+    });
+
+    it('keeps percent-encoded separators distinct from real ones', () => {
+      // Comparison relies on the serializer encoding `&` and `=` wherever they appear inside a
+      // name or a value, so that the query can be split back into exactly its pairs.
+      expect(deepEqual(new URL('https://foo.com/?a=x%26y'), new URL('https://foo.com/?a=x%26y'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/?a=x%26y'), new URL('https://foo.com/?a=x&y='))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a%3Db=1'), new URL('https://foo.com/?a%3Db=1'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/?a%3Db=1'), new URL('https://foo.com/?a=b%3D1'))).toBe(false);
+    });
+
+    it('does not treat query parameter order as significant', () => {
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2'), new URL('https://foo.com/?b=2&a=1'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/?a=1&a=2'), new URL('https://foo.com/?a=2&a=1'))).toBe(true);
+      // Repeated keys are counted, so this compares multisets rather than sets.
+      expect(deepEqual(new URL('https://foo.com/?a=1&a=2'), new URL('https://foo.com/?a=1&a=1'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=b'), new URL('https://foo.com/?b=a'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2'), new URL('https://foo.com/?b=2&a=3'))).toBe(false);
+
+      // Reordering the query must not mask a difference elsewhere in the URL.
+      expect(deepEqual(new URL('https://foo.com/x?a=1&b=2'), new URL('https://foo.com/y?b=2&a=1'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2#x'), new URL('https://foo.com/?b=2&a=1#y'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com:1/?a=1&b=2'), new URL('https://foo.com:2/?b=2&a=1'))).toBe(false);
+    });
+  });
+
+  describe('Error', () => {
+    function createError<Value>(message: string, property?: Value) {
+      const error = new Error(message) as Error & { property?: Value };
+
+      // Stacks are location-dependent, so they are normalized to isolate what is being tested.
+      error.stack = 'STACK';
+
+      if (arguments.length > 1) {
+        error.property = property;
+      }
+
+      return error;
+    }
+
+    it('compares own enumerable properties', () => {
+      expect(deepEqual(createError('boom', 404), createError('boom', 404))).toBe(true);
+      expect(deepEqual(createError('boom', 404), createError('boom', 500))).toBe(false);
+      expect(deepEqual(createError('boom', 404), createError('boom'))).toBe(false);
+    });
+
+    it('compares own enumerable properties deeply', () => {
+      expect(deepEqual(createError('boom', { code: 'E' }), createError('boom', { code: 'E' }))).toBe(true);
+      expect(deepEqual(createError('boom', { code: 'E' }), createError('boom', { code: 'F' }))).toBe(false);
+    });
+
+    it('compares properties of subclasses', () => {
+      class HttpError extends Error {
+        status: number;
+
+        constructor(message: string, status: number) {
+          super(message);
+
+          this.stack = 'STACK';
+          this.status = status;
+        }
+      }
+
+      expect(deepEqual(new HttpError('boom', 404), new HttpError('boom', 404))).toBe(true);
+      expect(deepEqual(new HttpError('boom', 404), new HttpError('boom', 500))).toBe(false);
+    });
+
+    it('compares `cause` by value rather than by reference', () => {
+      const a = new Error('boom', { cause: { code: 'E' } });
+      const b = new Error('boom', { cause: { code: 'E' } });
+      const c = new Error('boom', { cause: { code: 'F' } });
+
+      a.stack = b.stack = c.stack = 'STACK';
+
+      expect(deepEqual(a, b)).toBe(true);
+      expect(deepEqual(a, c)).toBe(false);
+    });
+
+    it('handles self-referential errors when circular', () => {
+      function createSelfReferential() {
+        const error = new Error('boom') as Error & { self?: unknown };
+
+        error.stack = 'STACK';
+        error.cause = error;
+        error.self = error;
+
+        return error;
+      }
+
+      expect(circularDeepEqual(createSelfReferential(), createSelfReferential())).toBe(true);
+      expect(strictCircularDeepEqual(createSelfReferential(), createSelfReferential())).toBe(true);
+    });
+
+    it('compares own enumerable properties in strict mode', () => {
+      expect(strictDeepEqual(createError('boom', 404), createError('boom', 404))).toBe(true);
+      expect(strictDeepEqual(createError('boom', 404), createError('boom', 500))).toBe(false);
+    });
+
+    it('compares symbol, non-enumerable and descriptor differences in strict mode only', () => {
+      const symbol = Symbol('tag');
+      const withSymbol = (value: string) => Object.assign(createError('boom'), { [symbol]: value });
+      const withHidden = (value: string) =>
+        Object.defineProperty(createError('boom'), 'hidden', { configurable: true, enumerable: false, value });
+
+      expect(deepEqual(withSymbol('a'), withSymbol('b'))).toBe(true);
+      expect(strictDeepEqual(withSymbol('a'), withSymbol('b'))).toBe(false);
+
+      expect(deepEqual(withHidden('a'), withHidden('b'))).toBe(true);
+      expect(strictDeepEqual(withHidden('a'), withHidden('b'))).toBe(false);
+
+      const withDescriptor = (enumerable: boolean) =>
+        Object.defineProperty(createError('boom'), 'code', { configurable: true, enumerable, value: 'X' });
+
+      expect(strictDeepEqual(withDescriptor(true), withDescriptor(false))).toBe(false);
+    });
+  });
+
+  describe('TypedArray', () => {
+    it('treats `NaN` as equal to itself, matching all other numeric comparisons', () => {
+      expect(deepEqual(new Float64Array([NaN, 1]), new Float64Array([NaN, 1]))).toBe(true);
+      expect(deepEqual(new Float32Array([NaN]), new Float32Array([NaN]))).toBe(true);
+      expect(deepEqual({ value: NaN }, { value: NaN })).toBe(true);
+    });
+
+    it('still reports `NaN` as unequal to a number', () => {
+      expect(deepEqual(new Float64Array([NaN]), new Float64Array([1]))).toBe(false);
+      expect(deepEqual(new Float64Array([1]), new Float64Array([NaN]))).toBe(false);
+    });
+
+    it('treats `-0` and `0` as equal, matching SameValueZero', () => {
+      expect(deepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
+    });
+  });
+});

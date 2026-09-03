@@ -5,8 +5,8 @@
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
 
 Perform [blazing fast](#benchmarks) equality comparisons (either deep or shallow) on two objects passed, while also
-maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2kB when
-minified and gzipped.
+maintaining a high degree of flexibility for various implementation use-cases. It has no dependencies, and is ~2.3kB
+when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -17,6 +17,8 @@ The following types are handled out-of-the-box:
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects
+- `Error` objects, including subclasses and their own properties
+- `URL` objects
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
 - Custom class instances, including subclasses of native classes
 

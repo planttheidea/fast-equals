@@ -56,8 +56,13 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 /**
  * Whether the errors passed are equal in value.
  */
-export function areErrorsEqual(a: Error, b: Error): boolean {
-  return a.name === b.name && a.message === b.message && a.cause === b.cause && a.stack === b.stack;
+export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
+  return (
+    a.name === b.name
+    && a.message === b.message
+    && a.stack === b.stack
+    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
+  );
 }
 
 /**
@@ -289,6 +294,21 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
     return false;
   }
 
+  // Only float-backed views can hold `NaN`, and the additional check needed to treat it as equal
+  // to itself measurably slows the loop, so integer views keep the plain comparison. This is
+  // hoisted out of the loop so the cost is paid once per call rather than once per element.
+  if (a instanceof Float64Array || a instanceof Float32Array || isFloat16Array(a)) {
+    while (index-- > 0) {
+      // `NaN` is the only value not equal to itself, and it is treated as equal here to match
+      // the SameValueZero semantics used for every other numeric comparison in the library.
+      if (a[index] !== b[index] && (a[index] === a[index] || b[index] === b[index])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   while (index-- > 0) {
     if (a[index] !== b[index]) {
       return false;
@@ -302,15 +322,58 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  * Whether the URL instances are equal in value.
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
+  // `href` is the normalized serialization of every component, so matching hrefs are equal without
+  // any further work. Only a difference in query parameter ordering can survive a mismatch here.
+  if (a.href === b.href) {
+    return true;
+  }
+
   return (
-    a.hostname === b.hostname
-    && a.pathname === b.pathname
-    && a.protocol === b.protocol
-    && a.port === b.port
-    && a.hash === b.hash
+    a.protocol === b.protocol
     && a.username === b.username
     && a.password === b.password
+    // `host` covers both the hostname and the port.
+    && a.host === b.host
+    && a.pathname === b.pathname
+    && a.hash === b.hash
+    && areSearchParamsEqual(a.searchParams, b.searchParams)
   );
+}
+
+/**
+ * Whether the search params passed are equal in value.
+ *
+ * @note
+ * Order is not significant, matching how the other unordered collections in the library are
+ * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
+ * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
+ */
+function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+  const serializedA = a.toString();
+  const serializedB = b.toString();
+
+  // Identical serializations are equal under any ordering, and this is by far the common case, so
+  // it is worth checking before sorting anything.
+  return serializedA === serializedB || sortSearchParams(serializedA) === sortSearchParams(serializedB);
+}
+
+/**
+ * Reorder a serialized query string so that params holding the same pairs compare as equal
+ * regardless of the order they appear in.
+ *
+ * @note
+ * The serializer percent-encodes `&` and `=` wherever they appear inside a name or a value, so
+ * splitting on `&` recovers exactly the pairs and nothing else.
+ */
+function sortSearchParams(serialized: string): string {
+  return serialized.split('&').sort().join('&');
+}
+
+/**
+ * Whether the value is a `Float16Array`, guarded for environments that predate it.
+ */
+function isFloat16Array(value: TypedArray): boolean {
+  return typeof Float16Array !== 'undefined' && value instanceof Float16Array;
 }
 
 function isPropertyEqual(a: Dictionary, b: Dictionary, state: State<any>, property: string | symbol) {

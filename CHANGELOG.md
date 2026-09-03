@@ -1,5 +1,13 @@
 # fast-equals CHANGELOG
 
+## 5.4.2
+
+- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant, with repeated keys
+  counted.
+- Fixed `Error` comparisons ignoring own enumerable properties.
+- Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
+- Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching SameValueZero semantics.
+
 ## 5.4.1
 
 - [#198](https://github.com/planttheidea/fast-equals/pull/198) - Update build tools to improve consumer typings
