@@ -2,11 +2,14 @@
 
 ## 5.4.2
 
-- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant, with repeated keys
-  counted.
-- Fixed `Error` comparisons ignoring own enumerable properties.
-- Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
-- Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching SameValueZero semantics.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `URL` comparisons ignoring query strings. Query
+  parameter order remains insignificant, with repeated keys counted.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `Error` comparisons ignoring own enumerable
+  properties.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `Error.cause` to compare by value and added
+  circular reference tracking for errors.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `TypedArray` comparisons to treat `NaN` as equal
+  to itself, matching SameValueZero semantics.
 
 ## 5.4.1
 
