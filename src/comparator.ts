@@ -182,7 +182,13 @@ export function createEqualityComparatorConfig<Meta>({
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
     areDataViewsEqual,
     areDatesEqual: areDatesEqualDefault,
-    areErrorsEqual: areErrorsEqualDefault,
+    // `Error` subclasses routinely carry their own enumerable properties (`status`, `code`, ...),
+    // which the error comparator alone does not see, so it is composed with the object comparator.
+    // `name` / `message` / `stack` are own but not enumerable, which is why errors need a
+    // comparator of their own rather than being treated as plain objects in the first place.
+    areErrorsEqual: strict
+      ? combineComparators(areErrorsEqualDefault, areObjectsEqualStrictDefault)
+      : combineComparators(areErrorsEqualDefault, areObjectsEqualDefault),
     areFunctionsEqual: strictEqual,
     areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
     areNumbersEqual: sameValueEqual,
@@ -203,12 +209,16 @@ export function createEqualityComparatorConfig<Meta>({
 
   if (circular) {
     const areArraysEqual = createIsCircular(config.areArraysEqual);
+    // Errors are included because comparing `cause` and own properties by value means an error
+    // that references itself would otherwise recurse without bound.
+    const areErrorsEqual = createIsCircular(config.areErrorsEqual);
     const areMapsEqual = createIsCircular(config.areMapsEqual);
     const areObjectsEqual = createIsCircular(config.areObjectsEqual);
     const areSetsEqual = createIsCircular(config.areSetsEqual);
 
     config = Object.assign({}, config, {
       areArraysEqual,
+      areErrorsEqual,
       areMapsEqual,
       areObjectsEqual,
       areSetsEqual,
@@ -289,7 +299,6 @@ function createSupportedComparatorMap<Meta>({
   areErrorsEqual,
   areFunctionsEqual,
   areMapsEqual,
-  areNumbersEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,
@@ -302,7 +311,7 @@ function createSupportedComparatorMap<Meta>({
     '[object Array]': areArraysEqual,
     '[object ArrayBuffer]': areArrayBuffersEqual,
     '[object AsyncGeneratorFunction]': areFunctionsEqual,
-    '[object BigInt]': areNumbersEqual,
+    '[object BigInt]': arePrimitiveWrappersEqual,
     '[object BigInt64Array]': areTypedArraysEqual,
     '[object BigUint64Array]': areTypedArraysEqual,
     '[object Boolean]': arePrimitiveWrappersEqual,

@@ -24,6 +24,16 @@ const error = new Error('boom');
 const typeError = new TypeError('boom');
 const rangeError = new RangeError('boom');
 
+// Errors equal in value to the above. `stack` is location-dependent, so it is copied rather than
+// left to differ; the errors are otherwise constructed normally, so they own the same properties.
+const equalError = new Error('boom');
+const equalTypeError = new TypeError('boom');
+const equalRangeError = new RangeError('boom');
+
+equalError.stack = error.stack;
+equalTypeError.stack = typeError.stack;
+equalRangeError.stack = rangeError.stack;
+
 export const testSuites = [
   {
     description: 'primitives',
@@ -554,6 +564,41 @@ export const testSuites = [
         value2: new Map().set('foo', new Map().set('bar', 'baz')),
       },
       {
+        deepEqual: true,
+        description: 'deep equal Map objects (keys are deeply equal but not identical)',
+        shallowEqual: false,
+        value1: new Map().set({ key: 'foo' }, new Map().set(['bar'], 'baz')),
+        value2: new Map().set({ key: 'foo' }, new Map().set(['bar'], 'baz')),
+      },
+      {
+        deepEqual: false,
+        description: 'not deep equal Map objects (outer key differs)',
+        shallowEqual: false,
+        value1: new Map().set({ key: 'foo' }, new Map().set(['bar'], 'baz')),
+        value2: new Map().set({ key: 'oof' }, new Map().set(['bar'], 'baz')),
+      },
+      {
+        deepEqual: false,
+        description: 'not deep equal Map objects (nested key differs)',
+        shallowEqual: false,
+        value1: new Map().set({ key: 'foo' }, new Map().set(['bar'], 'baz')),
+        value2: new Map().set({ key: 'foo' }, new Map().set(['qux'], 'baz')),
+      },
+      {
+        deepEqual: true,
+        description: 'deep equal Map objects (deeply equal keys, entries out of order)',
+        shallowEqual: false,
+        value1: new Map().set({ key: 'foo' }, 'one').set({ key: 'oof' }, 'two'),
+        value2: new Map().set({ key: 'oof' }, 'two').set({ key: 'foo' }, 'one'),
+      },
+      {
+        deepEqual: false,
+        description: 'not deep equal Map objects (deeply equal keys, values swapped)',
+        shallowEqual: false,
+        value1: new Map().set({ key: 'foo' }, 'one').set({ key: 'oof' }, 'two'),
+        value2: new Map().set({ key: 'oof' }, 'one').set({ key: 'foo' }, 'two'),
+      },
+      {
         deepEqual: false,
         description: 'Map and object are not equal',
         shallowEqual: false,
@@ -594,6 +639,20 @@ export const testSuites = [
         value2: new Set().add({ foo: 'bar' }),
       },
       {
+        deepEqual: true,
+        description: 'deep equal Set objects (nested, members out of order)',
+        shallowEqual: false,
+        value1: new Set().add({ foo: ['bar'] }).add(new Map().set(['baz'], 'quz')),
+        value2: new Set().add(new Map().set(['baz'], 'quz')).add({ foo: ['bar'] }),
+      },
+      {
+        deepEqual: false,
+        description: 'not deep equal Set objects (nested member differs)',
+        shallowEqual: false,
+        value1: new Set().add({ foo: ['bar'] }),
+        value2: new Set().add({ foo: ['baz'] }),
+      },
+      {
         deepEqual: false,
         description: 'Set and array are not equal',
         shallowEqual: false,
@@ -629,7 +688,7 @@ export const testSuites = [
         description: 'errors are equal',
         shallowEqual: true,
         value1: error,
-        value2: Object.create(error),
+        value2: equalError,
       },
       {
         deepEqual: false,
@@ -643,7 +702,7 @@ export const testSuites = [
         description: 'range errors are equal',
         shallowEqual: true,
         value1: rangeError,
-        value2: Object.create(rangeError),
+        value2: equalRangeError,
       },
       {
         deepEqual: false,
@@ -657,7 +716,7 @@ export const testSuites = [
         description: 'type errors are equal',
         shallowEqual: true,
         value1: typeError,
-        value2: Object.create(typeError),
+        value2: equalTypeError,
       },
       {
         deepEqual: false,
