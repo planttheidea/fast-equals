@@ -6,7 +6,6 @@
 
 - Added `SharedArrayBuffer` support, compared by contents like `ArrayBuffer`.
 - Added order-independent `URLSearchParams` comparison, with repeated keys preserved.
-- Updated `engines.node` to >=12.17.0, the first version supporting both ESM and CommonJS entry points via exports.
 - Optimized `Map` and `Set` comparisons with key/value lookup before exhaustive scanning. `Set` comparisons are ~27x
   faster and `Map` comparisons ~6x faster for 200 primitive entries.
 - Optimized large integer `TypedArray`, `ArrayBuffer`, and `DataView` comparisons by comparing underlying bytes in
@@ -20,6 +19,7 @@
 - Fixed boxed `BigInt` values to compare by value rather than identity.
 - Added comparison support for boxed `Symbol` values.
 - Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching `SameValueZero` semantics.
+- Updated `engines.node` to >=12.17.0, the first version supporting both ESM and CommonJS entry points via exports.
 
 ## 6.0.2
 
