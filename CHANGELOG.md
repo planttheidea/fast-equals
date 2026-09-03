@@ -10,6 +10,8 @@
   circular reference tracking for errors.
 - [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `TypedArray` comparisons to treat `NaN` as equal
   to itself, matching SameValueZero semantics.
+- [#202](https://github.com/planttheidea/fast-equals/pull/202) - Use `length` instead of `byteLength` to bound
+  `TypedArray` comparisons, avoiding redundant iterations on non-8-bit views.
 
 ## 5.4.1
 
