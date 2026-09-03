@@ -95,6 +95,10 @@ export interface ComparatorConfig<Meta> {
    */
   areTypedArraysEqual: EqualityComparator<Meta>;
   /**
+   * Whether the URL search params passed are equal in value.
+   */
+  areUrlSearchParamsEqual: EqualityComparator<Meta>;
+  /**
    * Whether the URLs passed are equal in value.
    */
   areUrlsEqual: EqualityComparator<Meta>;

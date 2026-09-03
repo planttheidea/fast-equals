@@ -13,6 +13,7 @@ import {
   areSetsEqual as areSetsEqualDefault,
   areSetsEqualByLookup as areSetsEqualByLookupDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
+  areUrlSearchParamsEqual as areUrlSearchParamsEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
   sameValueEqual,
   strictEqual,
@@ -208,6 +209,7 @@ export function createEqualityComparatorConfig<Meta>({
     areTypedArraysEqual: strict
       ? combineComparators(areTypedArraysEqualDefault, areObjectsEqualStrictDefault)
       : areTypedArraysEqualDefault,
+    areUrlSearchParamsEqual: areUrlSearchParamsEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
     getUnsupportedCustomComparator: undefined,
   };
@@ -313,6 +315,7 @@ function createSupportedComparatorMap<Meta>({
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlSearchParamsEqual,
   areUrlsEqual,
 }: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
   return {
@@ -348,9 +351,13 @@ function createSupportedComparatorMap<Meta>({
     // tested like a standard object.
     '[object RegExp]': areRegExpsEqual,
     '[object Set]': areSetsEqual,
+    // `SharedArrayBuffer` holds bytes exactly as `ArrayBuffer` does, so it compares identically.
+    // Its contents can be mutated by another agent mid-comparison, which is inherent to the type.
+    '[object SharedArrayBuffer]': areArrayBuffersEqual,
     '[object String]': arePrimitiveWrappersEqual,
     '[object Symbol]': arePrimitiveWrappersEqual,
     '[object URL]': areUrlsEqual,
+    '[object URLSearchParams]': areUrlSearchParamsEqual,
     '[object Uint8Array]': areTypedArraysEqual,
     '[object Uint8ClampedArray]': areTypedArraysEqual,
     '[object Uint16Array]': areTypedArraysEqual,

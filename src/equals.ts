@@ -9,6 +9,11 @@ const REACT_OWNER = '_owner';
 // the wider comparison saves.
 const CHUNKED_COMPARISON_MIN_BYTES = 128;
 
+// The chunked comparison is the only use of `BigUint64Array`, which post-dates the ES2015 target
+// the bundles are built to. Capturing its availability once keeps the element-wise loop as a
+// working fallback rather than making the whole comparator throw where it is missing.
+const HAS_BIG_UINT_64_ARRAY = typeof BigUint64Array !== 'undefined';
+
 const { getOwnPropertyDescriptor, keys } = Object;
 
 /**
@@ -51,7 +56,7 @@ export function strictEqual(a: any, b: any): boolean {
 /**
  * Whether the array buffers are equal in value.
  */
-export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
+export function areArrayBuffersEqual(a: ArrayBufferLike, b: ArrayBufferLike): boolean {
   return a.byteLength === b.byteLength && areTypedArraysEqual(new Uint8Array(a), new Uint8Array(b));
 }
 
@@ -499,7 +504,7 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   // underlying bytes eight at a time is equivalent to comparing elements, and substantially faster
   // for large buffers. `BigUint64Array` requires an 8-byte-aligned offset, and the byte offsets are
   // already known to match, so only `a` needs to be checked.
-  if (byteLength >= CHUNKED_COMPARISON_MIN_BYTES && (a.byteOffset & 7) === 0) {
+  if (HAS_BIG_UINT_64_ARRAY && byteLength >= CHUNKED_COMPARISON_MIN_BYTES && (a.byteOffset & 7) === 0) {
     const words = byteLength >>> 3;
     const wordsA = new BigUint64Array(a.buffer, a.byteOffset, words);
     const wordsB = new BigUint64Array(b.buffer, b.byteOffset, words);
@@ -542,13 +547,84 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
 }
 
 /**
+ * Whether the URL search params passed are equal in value.
+ *
+ * @note
+ * Order is not significant, matching how the other unordered collections in the library are
+ * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
+ * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
+ */
+export function areUrlSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+  // Identical serializations are equal under any ordering, and this is by far the common case, so
+  // it is worth avoiding the entry arrays entirely when it holds.
+  if (a.toString() === b.toString()) {
+    return true;
+  }
+
+  const entriesA = Array.from(a);
+  const entriesB = Array.from(b);
+
+  let index = entriesA.length;
+
+  if (entriesB.length !== index) {
+    return false;
+  }
+
+  entriesA.sort(compareEntries);
+  entriesB.sort(compareEntries);
+
+  while (index-- > 0) {
+    const entryA = entriesA[index]!;
+    const entryB = entriesB[index]!;
+
+    if (entryA[0] !== entryB[0] || entryA[1] !== entryB[1]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Whether the URL instances are equal in value.
+ *
+ * @note
+ * Every component is compared, including the query string, which is compared without regard to
+ * parameter order. See `areUrlSearchParamsEqual`.
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
-  // `href` is the normalized serialization of every component of the URL, so comparing it is both
-  // more complete than comparing components individually (the query string was previously omitted,
-  // making `?a=1` equal to `?a=2`) and cheaper, being a single string comparison.
-  return a.href === b.href;
+  // `href` is the normalized serialization of every component, so matching hrefs are equal without
+  // any further work. Only a difference in query parameter ordering can survive a mismatch here.
+  if (a.href === b.href) {
+    return true;
+  }
+
+  return (
+    a.protocol === b.protocol
+    && a.username === b.username
+    && a.password === b.password
+    // `host` covers both the hostname and the port.
+    && a.host === b.host
+    && a.pathname === b.pathname
+    && a.hash === b.hash
+    && areUrlSearchParamsEqual(a.searchParams, b.searchParams)
+  );
+}
+
+/**
+ * Order search param entries by key, then by value, so that two sets of entries holding the same
+ * pairs in different orders align for a positional comparison.
+ */
+function compareEntries(a: [string, string], b: [string, string]): number {
+  if (a[0] !== b[0]) {
+    return a[0] < b[0] ? -1 : 1;
+  }
+
+  if (a[1] !== b[1]) {
+    return a[1] < b[1] ? -1 : 1;
+  }
+
+  return 0;
 }
 
 /**

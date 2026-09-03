@@ -4,40 +4,22 @@
 
 ### Enhancements
 
-- `Map` and `Set` comparisons resolve entries by key / value lookup before falling back to the exhaustive scan. Entry
-  order is not significant, so matching previously required scanning all of `b` for every entry of `a`; the common cases
-  (primitive keys, and object keys held by shared reference) now resolve in constant time instead, leaving only what
-  cannot be resolved that way to the scan. Measured against the previous implementation: `Set` of 200 strings is ~27x
-  faster, `Map` of 200 string keys ~6x, and the worst case (every key a distinct object, so no lookup ever hits) is
-  still ~1.1-1.5x faster because the remaining scan is smaller.
-
-  This is not applied when a custom `createInternalComparator` is supplied. The comparisons the lookup skips are ones
-  the default comparator provably resolves the same way, but a custom comparator receives the iteration index of the key
-  within `b` and is not guaranteed to be transitive, so it keeps the exhaustive scan and its exact previous behavior.
-
-- Integer `TypedArray`, `ArrayBuffer` and `DataView` comparisons compare the underlying bytes eight at a time for
-  buffers of at least 128 bytes. Integer views hold no padding and no values with multiple representations, so this is
-  equivalent to comparing elements. A 64KB `Uint8Array` is ~9x faster, 4KB ~6x, and buffers below the threshold are
-  unaffected. Float views are excluded, since a bitwise comparison does not match the `NaN` semantics they require.
+- Added `SharedArrayBuffer` support, compared by contents like `ArrayBuffer`.
+- Added order-independent `URLSearchParams` comparison, with repeated keys preserved.
+- Updated `engines.node` to >=12.17.0, the first version supporting both ESM and CommonJS entry points via exports.
+- Optimized `Map` and `Set` comparisons with key/value lookup before exhaustive scanning. `Set` comparisons are ~27x
+  faster and `Map` comparisons ~6x faster for 200 primitive entries.
+- Optimized large integer `TypedArray`, `ArrayBuffer`, and `DataView` comparisons by comparing underlying bytes in
+  8-byte chunks. A 64KB `Uint8Array` is ~9x faster and a 4KB buffer ~6x faster.
 
 ### Bugfixes
 
-- `URL` comparisons now include the query string. `areUrlsEqual` compared each component individually but omitted
-  `search`, so `https://foo.com/?a=1` and `https://foo.com/?a=2` were considered equal. It now compares `href`, which is
-  the normalized serialization of every component, and is also faster than the previous seven comparisons.
-- `Error` comparisons now include own enumerable properties. `Error` subclasses commonly carry data (`status`, `code`,
-  ...), and previously only `name` / `message` / `cause` / `stack` were compared, so two errors differing only in those
-  properties were considered equal.
-- `Error.cause` is now compared by value rather than by reference, consistent with how every other nested value is
-  compared. Errors are now also tracked for circular references, so an error that references itself through `cause` or
-  an own property is safe under `circularDeepEqual` / `strictCircularDeepEqual`.
-- Boxed `BigInt` values (`Object(1n)`) are now compared as primitive wrappers rather than by identity, matching how
-  boxed `Number`, `String` and `Boolean` values are handled.
-- Boxed `Symbol` values (`Object(Symbol())`) are now compared as primitive wrappers, which was the one remaining
-  primitive wrapper type with no handling.
-- `TypedArray` comparisons now treat `NaN` as equal to itself, matching the SameValueZero semantics documented for every
-  other numeric comparison. Only float-backed views take the additional check, so integer views and `ArrayBuffer` /
-  `DataView` are unaffected.
+- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant.
+- Fixed `Error` comparisons ignoring own enumerable properties.
+- Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
+- Fixed boxed `BigInt` values to compare by value rather than identity.
+- Added comparison support for boxed `Symbol` values.
+- Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching `SameValueZero` semantics.
 
 ## 6.0.2
 

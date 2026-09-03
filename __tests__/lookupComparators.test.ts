@@ -27,6 +27,7 @@ function build(useLookup: boolean) {
     areRegExpsEqual: equals.areRegExpsEqual,
     areSetsEqual: useLookup ? equals.areSetsEqualByLookup : equals.areSetsEqual,
     areTypedArraysEqual: equals.areTypedArraysEqual,
+    areUrlSearchParamsEqual: equals.areUrlSearchParamsEqual,
     areUrlsEqual: equals.areUrlsEqual,
     getUnsupportedCustomComparator: undefined,
   } as ComparatorConfig<undefined>;

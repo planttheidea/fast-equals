@@ -520,6 +520,17 @@ describe('correctness fixes', () => {
     test('respects parser normalization', () => {
       expect(deepEqual(new URL('https://foo.com'), new URL('https://foo.com/'))).toBe(true);
     });
+
+    test('does not treat query parameter order as significant', () => {
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2'), new URL('https://foo.com/?b=2&a=1'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/?a=1&a=2'), new URL('https://foo.com/?a=2&a=1'))).toBe(true);
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2'), new URL('https://foo.com/?b=2&a=3'))).toBe(false);
+
+      // Reordering the query must not mask a difference elsewhere in the URL.
+      expect(deepEqual(new URL('https://foo.com/x?a=1&b=2'), new URL('https://foo.com/y?b=2&a=1'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2#x'), new URL('https://foo.com/?b=2&a=1#y'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com:1/?a=1&b=2'), new URL('https://foo.com:2/?b=2&a=1'))).toBe(false);
+    });
   });
 
   describe('Error', () => {
@@ -624,6 +635,96 @@ describe('correctness fixes', () => {
     test('treats `-0` and `0` as equal, matching SameValueZero', () => {
       expect(deepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
     });
+  });
+});
+
+describe('SharedArrayBuffer', () => {
+  function build(bytes: number[]) {
+    const buffer = new SharedArrayBuffer(bytes.length);
+
+    new Uint8Array(buffer).set(bytes);
+
+    return buffer;
+  }
+
+  test('compares contents, like `ArrayBuffer`', () => {
+    expect(deepEqual(build([1, 2, 3]), build([1, 2, 3]))).toBe(true);
+    expect(deepEqual(build([1, 2, 3]), build([1, 2, 4]))).toBe(false);
+    expect(deepEqual(build([1, 2, 3]), build([1, 2]))).toBe(false);
+    expect(deepEqual(build([]), build([]))).toBe(true);
+  });
+
+  test('is not equal to an `ArrayBuffer` holding the same bytes', () => {
+    expect(deepEqual(build([1, 2, 3]), new Uint8Array([1, 2, 3]).buffer)).toBe(false);
+  });
+
+  test('compares buffers large enough to take the chunked path', () => {
+    const bytes = new Array(2048).fill(7) as number[];
+    const changed = bytes.slice();
+
+    changed[2047] = 8;
+
+    expect(deepEqual(build(bytes), build(bytes))).toBe(true);
+    expect(deepEqual(build(bytes), build(changed))).toBe(false);
+  });
+
+  test('is supported by every variant', () => {
+    expect(strictDeepEqual(build([1, 2, 3]), build([1, 2, 3]))).toBe(true);
+    expect(circularDeepEqual(build([1, 2, 3]), build([1, 2, 3]))).toBe(true);
+    expect(strictCircularDeepEqual(build([1, 2, 3]), build([1, 2, 3]))).toBe(true);
+    expect(strictDeepEqual(build([1, 2, 3]), build([1, 2, 4]))).toBe(false);
+  });
+});
+
+describe('URLSearchParams', () => {
+  test('compares the params', () => {
+    expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams('a=1&b=2'))).toBe(true);
+    expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=2'))).toBe(false);
+    expect(deepEqual(new URLSearchParams(''), new URLSearchParams(''))).toBe(true);
+    expect(deepEqual(new URLSearchParams(''), new URLSearchParams('a=1'))).toBe(false);
+  });
+
+  test('does not treat order as significant, matching the other unordered collections', () => {
+    expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams('b=2&a=1'))).toBe(true);
+    expect(deepEqual(new URLSearchParams('a=1&b=2&c=3'), new URLSearchParams('c=3&a=1&b=2'))).toBe(true);
+    expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams('b=2&a=3'))).toBe(false);
+  });
+
+  test('counts repeated keys, comparing multisets rather than sets', () => {
+    expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=2&a=1'))).toBe(true);
+    expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=1&a=1'))).toBe(false);
+    expect(deepEqual(new URLSearchParams('a=1&a=1'), new URLSearchParams('a=1'))).toBe(false);
+    expect(deepEqual(new URLSearchParams('a=1&a=1'), new URLSearchParams('a=1&a=1'))).toBe(true);
+  });
+
+  test('distinguishes a key from a value with the same text', () => {
+    expect(deepEqual(new URLSearchParams('a=b'), new URLSearchParams('b=a'))).toBe(false);
+    expect(deepEqual(new URLSearchParams('a=b&b=a'), new URLSearchParams('b=a&a=b'))).toBe(true);
+  });
+
+  test('agrees with the `URL` the params belong to', () => {
+    // A `URL` compares by `href`, which embeds the query as written. If these disagreed, the same
+    // pair of URLs would be equal or unequal depending on which half was compared.
+    const pairs: Array<[string, string]> = [
+      ['https://foo.com/?a=1&b=2', 'https://foo.com/?a=1&b=2'],
+      ['https://foo.com/?a=1&b=2', 'https://foo.com/?b=2&a=1'],
+      ['https://foo.com/?a=1', 'https://foo.com/?a=2'],
+      ['https://foo.com/', 'https://foo.com/?a=1'],
+    ];
+
+    for (const [left, right] of pairs) {
+      const urlA = new URL(left);
+      const urlB = new URL(right);
+
+      expect(deepEqual(urlA.searchParams, urlB.searchParams)).toBe(deepEqual(urlA, urlB));
+    }
+  });
+
+  test('is supported by every variant', () => {
+    expect(strictDeepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1'))).toBe(true);
+    expect(circularDeepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1'))).toBe(true);
+    expect(strictCircularDeepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1'))).toBe(true);
+    expect(strictDeepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=2'))).toBe(false);
   });
 });
 

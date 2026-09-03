@@ -7,12 +7,14 @@ The following types are handled out-of-the-box:
 
 - Plain objects (including `react` elements and `Arguments`)
 - Arrays
-- `ArrayBuffer` / `TypedArray` / `DataView` instances
+- `ArrayBuffer` / `SharedArrayBuffer` / `TypedArray` / `DataView` instances
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects and then-ables
-- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
+- `Error` objects, including subclasses and their own properties
+- `URL` / `URLSearchParams` objects
+- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()` / `new BigInt()` / `new Symbol()`)
 - Custom class instances, including subclasses of native classes
 
 Methods are available for deep, shallow, [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue),
@@ -357,6 +359,7 @@ interface ComparatorConfig<Meta> {
   areRegExpsEqual: EqualityComparator<Meta>;
   areSetsEqual: EqualityComparator<Meta>;
   areTypedArraysEqual: EqualityComparator<Meta>;
+  areUrlSearchParamsEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
   getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
 }
@@ -402,8 +405,8 @@ to the problem you are solving, they can offer guidance of how to structure your
 
 ## Benchmarks
 
-All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version
-`24.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i9-11900H Manjaro Linux laptop with 64GB of memory using NodeJS version `24.15.0`,
+and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -419,74 +422,74 @@ Testing mixed objects equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 1478330.935014 │
+│ fast-equals (passed)                   │ 1447117.599507 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 1246644.004889 │
+│ react-fast-compare (passed)            │ 1211764.403379 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 1223991.602206 │
+│ fast-deep-equal (passed)               │ 1209289.975799 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (passed)           │ 1192746.28367  │
+│ shallow-equal-fuzzy (passed)           │ 1145466.599817 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (failed)                    │ 917825.058845  │
+│ nano-equal (failed)                    │ 913809.045845  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 734269.031473  │
+│ fast-equals (circular) (passed)        │ 763757.936244  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 702632.334945  │
+│ dequal/lite (passed)                   │ 746564.809529  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 676206.685725  │
+│ dequal (passed)                        │ 729226.510054  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 413859.810046  │
+│ underscore.isEqual (passed)            │ 434249.694469  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 384573.330742  │
+│ assert.deepStrictEqual (passed)        │ 422148.743756  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 333634.454044  │
+│ es-toolkit (passed)                    │ 341776.243158  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 285124.652706  │
+│ fast-equals (strict) (passed)          │ 292355.401566  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 272221.340481  │
+│ lodash.isEqual (passed)                │ 282701.169145  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 236878.960045  │
+│ fast-equals (strict circular) (passed) │ 244443.598633  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 154390.610864  │
+│ deep-eql (passed)                      │ 150192.967432  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 905.343563     │
+│ deep-equal (passed)                    │ 925.931141     │
 └────────────────────────────────────────┴────────────────┘
 
 Testing mixed objects not equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 4962887.909706 │
+│ fast-equals (passed)                   │ 4721022.8661   │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 3362453.019363 │
+│ fast-equals (circular) (passed)        │ 3443878.528629 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 3359178.728738 │
+│ fast-deep-equal (passed)               │ 3172606.336882 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 3240226.145634 │
+│ react-fast-compare (passed)            │ 3147328.862313 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 2895230.420069 │
+│ fast-equals (strict) (passed)          │ 2963420.313723 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 2178891.848559 │
+│ fast-equals (strict circular) (passed) │ 2314447.485717 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 1271343.172786 │
+│ dequal/lite (passed)                   │ 1255724.360923 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 1249090.305916 │
+│ dequal (passed)                        │ 1211839.610042 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (failed)           │ 1197792.018762 │
+│ shallow-equal-fuzzy (failed)           │ 1149875.529896 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (passed)                    │ 1041772.816799 │
+│ nano-equal (passed)                    │ 1030992.381718 │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 642874.802948  │
+│ underscore.isEqual (passed)            │ 637044.418582  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 360803.14264   │
+│ lodash.isEqual (passed)                │ 372169.840664  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 353678.240503  │
+│ es-toolkit (passed)                    │ 353920.004475  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 177224.890296  │
+│ deep-eql (passed)                      │ 173505.040371  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 19507.749026   │
+│ assert.deepStrictEqual (passed)        │ 21317.221958   │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 3559.100155    │
+│ deep-equal (passed)                    │ 3666.451355    │
 └────────────────────────────────────────┴────────────────┘
 ```
 
