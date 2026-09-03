@@ -110,22 +110,12 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * comparator config, so that the strict and circular variants apply to them as well.
  */
 export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
-  if (a.name !== b.name || a.message !== b.message || a.stack !== b.stack) {
-    return false;
-  }
-
-  // `AggregateError` stores the errors it aggregates in an own `errors` property that is not
-  // enumerable, which leaves it invisible both to the checks above and to the object comparator
-  // this is composed with. Only one of the two needs to have it for it to be significant, because
-  // its absence on the other is itself an inequality.
-  if (
-    (hasOwn(a, 'errors') || hasOwn(b, 'errors'))
-    && !state.equals((a as AggregateError).errors, (b as AggregateError).errors, 'errors', 'errors', a, b, state)
-  ) {
-    return false;
-  }
-
-  return state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state);
+  return (
+    a.name === b.name
+    && a.message === b.message
+    && a.stack === b.stack
+    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
+  );
 }
 
 /**

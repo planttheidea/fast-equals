@@ -12,7 +12,7 @@ The following types are handled out-of-the-box:
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects and then-ables
-- `Error` objects, including subclasses, their own properties, and the `errors` of an `AggregateError`
+- `Error` objects, including subclasses and their own properties
 - `URL` and `URLSearchParams` objects
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes

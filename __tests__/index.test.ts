@@ -665,51 +665,6 @@ describe('correctness fixes', () => {
       expect(deepEqual(a, c)).toBe(false);
     });
 
-    test('compares the `errors` of an `AggregateError`', () => {
-      function createAggregateError(errors: unknown[]) {
-        const error = new AggregateError(errors, 'boom');
-
-        // Stacks are location-dependent, so they are normalized to isolate what is being tested.
-        error.stack = 'STACK';
-
-        return error;
-      }
-
-      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1, 2]))).toBe(true);
-      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1, 3]))).toBe(false);
-      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1]))).toBe(false);
-      // `errors` is an own but non-enumerable property, so it is invisible to the object
-      // comparator the error comparator is composed with, and must be compared explicitly.
-      expect(strictDeepEqual(createAggregateError([1, 2]), createAggregateError([1, 3]))).toBe(false);
-    });
-
-    test('compares the `errors` of an `AggregateError` by value', () => {
-      function createAggregateError(errors: unknown[]) {
-        const error = new AggregateError(errors, 'boom');
-
-        error.stack = 'STACK';
-
-        return error;
-      }
-
-      expect(deepEqual(createAggregateError([{ code: 'E' }]), createAggregateError([{ code: 'E' }]))).toBe(true);
-      expect(deepEqual(createAggregateError([{ code: 'E' }]), createAggregateError([{ code: 'F' }]))).toBe(false);
-    });
-
-    test('handles self-referential `AggregateError` errors when circular', () => {
-      function createSelfReferential() {
-        const errors: unknown[] = [];
-        const error = new AggregateError(errors, 'boom');
-
-        error.stack = 'STACK';
-        errors.push(error);
-
-        return error;
-      }
-
-      expect(circularDeepEqual(createSelfReferential(), createSelfReferential())).toBe(true);
-    });
-
     test('handles self-referential errors when circular', () => {
       function createSelfReferential() {
         const error = new Error('boom') as Error & { self?: unknown };
