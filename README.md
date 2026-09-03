@@ -1,7 +1,7 @@
 > fast-equals
 
 Perform [blazing fast](#benchmarks) equality comparisons between two objects, while also allowing for flexibility for
-various use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
+various use-cases. It has no dependencies, and is ~2.3kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -12,7 +12,9 @@ The following types are handled out-of-the-box:
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects and then-ables
-- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`)
+- `Error` objects, including subclasses and their own properties
+- `URL` objects
+- Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes
 
 Methods are available for deep, shallow, [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue),
