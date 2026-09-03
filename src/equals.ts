@@ -50,8 +50,13 @@ export function strictEqual(a: any, b: any): boolean {
 
 /**
  * Whether the array buffers are equal in value.
+ *
+ * @note
+ * `SharedArrayBuffer` is handled here as well, since it is byte-compatible with `ArrayBuffer` for
+ * the purposes of comparison. The two are never compared against one another, because the
+ * constructor check performed before this is reached will have already rejected the pairing.
  */
-export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
+export function areArrayBuffersEqual(a: ArrayBufferLike, b: ArrayBufferLike): boolean {
   return a.byteLength === b.byteLength && areTypedArraysEqual(new Uint8Array(a), new Uint8Array(b));
 }
 
@@ -105,12 +110,22 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * comparator config, so that the strict and circular variants apply to them as well.
  */
 export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
-  return (
-    a.name === b.name
-    && a.message === b.message
-    && a.stack === b.stack
-    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
-  );
+  if (a.name !== b.name || a.message !== b.message || a.stack !== b.stack) {
+    return false;
+  }
+
+  // `AggregateError` stores the errors it aggregates in an own `errors` property that is not
+  // enumerable, which leaves it invisible both to the checks above and to the object comparator
+  // this is composed with. Only one of the two needs to have it for it to be significant, because
+  // its absence on the other is itself an inequality.
+  if (
+    (hasOwn(a, 'errors') || hasOwn(b, 'errors'))
+    && !state.equals((a as AggregateError).errors, (b as AggregateError).errors, 'errors', 'errors', a, b, state)
+  ) {
+    return false;
+  }
+
+  return state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state);
 }
 
 /**
@@ -357,7 +372,7 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
 /**
  * Whether the URL instances are equal in value.
  */
-export function areUrlsEqual(a: URL, b: URL): boolean {
+export function areUrlsEqual(a: URL, b: URL, state: State<any>): boolean {
   // `href` is the normalized serialization of every component, so matching hrefs are equal without
   // any further work. Only a difference in query parameter ordering can survive a mismatch here.
   if (a.href === b.href) {
@@ -372,7 +387,10 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
     && a.host === b.host
     && a.pathname === b.pathname
     && a.hash === b.hash
-    && areSearchParamsEqual(a.searchParams, b.searchParams)
+    // Deferring to `state.equals` rather than calling `areUrlSearchParamsEqual` directly means a
+    // custom `areUrlSearchParamsEqual` in the comparator config applies to the query string of a
+    // `URL` exactly as it does to a standalone `URLSearchParams`.
+    && state.equals(a.searchParams, b.searchParams, 'searchParams', 'searchParams', a, b, state)
   );
 }
 
@@ -384,13 +402,13 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
  * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
  * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
  */
-function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+export function areUrlSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
   const serializedA = a.toString();
   const serializedB = b.toString();
 
   // Identical serializations are equal under any ordering, and this is by far the common case, so
   // it is worth checking before sorting anything.
-  return serializedA === serializedB || sortSearchParams(serializedA) === sortSearchParams(serializedB);
+  return serializedA === serializedB || sortUrlSearchParams(serializedA) === sortUrlSearchParams(serializedB);
 }
 
 /**
@@ -401,7 +419,7 @@ function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
  * The serializer percent-encodes `&` and `=` wherever they appear inside a name or a value, so
  * splitting on `&` recovers exactly the pairs and nothing else.
  */
-function sortSearchParams(serialized: string): string {
+function sortUrlSearchParams(serialized: string): string {
   return serialized.split('&').sort().join('&');
 }
 

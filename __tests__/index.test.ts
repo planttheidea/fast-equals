@@ -545,6 +545,74 @@ describe('correctness fixes', () => {
     });
   });
 
+  describe('SharedArrayBuffer', () => {
+    function createSharedArrayBuffer(bytes: number[]) {
+      const buffer = new SharedArrayBuffer(bytes.length);
+
+      new Uint8Array(buffer).set(bytes);
+
+      return buffer;
+    }
+
+    test('compares the bytes held', () => {
+      expect(deepEqual(createSharedArrayBuffer([1, 2, 3]), createSharedArrayBuffer([1, 2, 3]))).toBe(true);
+      expect(deepEqual(createSharedArrayBuffer([1, 2, 3]), createSharedArrayBuffer([1, 2, 4]))).toBe(false);
+      expect(deepEqual(createSharedArrayBuffer([1, 2, 3]), createSharedArrayBuffer([1, 2]))).toBe(false);
+      expect(deepEqual(createSharedArrayBuffer([]), createSharedArrayBuffer([]))).toBe(true);
+    });
+
+    test('is never equal to an `ArrayBuffer` holding the same bytes', () => {
+      const arrayBuffer = new ArrayBuffer(3);
+
+      new Uint8Array(arrayBuffer).set([1, 2, 3]);
+
+      expect(deepEqual(createSharedArrayBuffer([1, 2, 3]), arrayBuffer)).toBe(false);
+    });
+
+    test('compares when nested', () => {
+      expect(deepEqual({ buffer: createSharedArrayBuffer([1]) }, { buffer: createSharedArrayBuffer([1]) })).toBe(true);
+      expect(deepEqual({ buffer: createSharedArrayBuffer([1]) }, { buffer: createSharedArrayBuffer([2]) })).toBe(false);
+    });
+  });
+
+  describe('URLSearchParams', () => {
+    test('compares the pairs held', () => {
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1'))).toBe(true);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=2'))).toBe(false);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('b=1'))).toBe(false);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams(''))).toBe(false);
+      expect(deepEqual(new URLSearchParams(''), new URLSearchParams(''))).toBe(true);
+    });
+
+    test('does not treat parameter order as significant', () => {
+      expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams('b=2&a=1'))).toBe(true);
+      expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=2&a=1'))).toBe(true);
+      // Repeated keys are counted, so this compares multisets rather than sets.
+      expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=1&a=1'))).toBe(false);
+    });
+
+    test('is equal when constructed from different sources', () => {
+      expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams({ a: '1', b: '2' }))).toBe(true);
+      expect(deepEqual(new URLSearchParams('a=1'), new URL('https://foo.com/?a=1').searchParams)).toBe(true);
+    });
+
+    test('compares when nested', () => {
+      expect(deepEqual({ params: new URLSearchParams('a=1') }, { params: new URLSearchParams('a=1') })).toBe(true);
+      expect(deepEqual({ params: new URLSearchParams('a=1') }, { params: new URLSearchParams('a=2') })).toBe(false);
+    });
+
+    test('is used for the query string of a `URL` when customized', () => {
+      const alwaysEqual = createCustomEqual({
+        createCustomConfig: () => ({ areUrlSearchParamsEqual: () => true }),
+      });
+
+      expect(alwaysEqual(new URLSearchParams('a=1'), new URLSearchParams('a=2'))).toBe(true);
+      expect(alwaysEqual(new URL('https://foo.com/?a=1'), new URL('https://foo.com/?a=2'))).toBe(true);
+      // Overriding the query comparison must not mask a difference elsewhere in the URL.
+      expect(alwaysEqual(new URL('https://foo.com/x?a=1'), new URL('https://foo.com/y?a=2'))).toBe(false);
+    });
+  });
+
   describe('Error', () => {
     function createError<Value>(message: string, property?: Value) {
       const error = new Error(message) as Error & { property?: Value };
@@ -595,6 +663,51 @@ describe('correctness fixes', () => {
 
       expect(deepEqual(a, b)).toBe(true);
       expect(deepEqual(a, c)).toBe(false);
+    });
+
+    test('compares the `errors` of an `AggregateError`', () => {
+      function createAggregateError(errors: unknown[]) {
+        const error = new AggregateError(errors, 'boom');
+
+        // Stacks are location-dependent, so they are normalized to isolate what is being tested.
+        error.stack = 'STACK';
+
+        return error;
+      }
+
+      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1, 2]))).toBe(true);
+      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1, 3]))).toBe(false);
+      expect(deepEqual(createAggregateError([1, 2]), createAggregateError([1]))).toBe(false);
+      // `errors` is an own but non-enumerable property, so it is invisible to the object
+      // comparator the error comparator is composed with, and must be compared explicitly.
+      expect(strictDeepEqual(createAggregateError([1, 2]), createAggregateError([1, 3]))).toBe(false);
+    });
+
+    test('compares the `errors` of an `AggregateError` by value', () => {
+      function createAggregateError(errors: unknown[]) {
+        const error = new AggregateError(errors, 'boom');
+
+        error.stack = 'STACK';
+
+        return error;
+      }
+
+      expect(deepEqual(createAggregateError([{ code: 'E' }]), createAggregateError([{ code: 'E' }]))).toBe(true);
+      expect(deepEqual(createAggregateError([{ code: 'E' }]), createAggregateError([{ code: 'F' }]))).toBe(false);
+    });
+
+    test('handles self-referential `AggregateError` errors when circular', () => {
+      function createSelfReferential() {
+        const errors: unknown[] = [];
+        const error = new AggregateError(errors, 'boom');
+
+        error.stack = 'STACK';
+        errors.push(error);
+
+        return error;
+      }
+
+      expect(circularDeepEqual(createSelfReferential(), createSelfReferential())).toBe(true);
     });
 
     test('handles self-referential errors when circular', () => {

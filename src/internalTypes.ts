@@ -95,6 +95,11 @@ export interface ComparatorConfig<Meta> {
    */
   areTypedArraysEqual: EqualityComparator<Meta>;
   /**
+   * Whether the URL search params passed are equal in value. This is also used for the query
+   * string of a `URL`, so overriding it affects both.
+   */
+  areUrlSearchParamsEqual: EqualityComparator<Meta>;
+  /**
    * Whether the URLs passed are equal in value.
    */
   areUrlsEqual: EqualityComparator<Meta>;

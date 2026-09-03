@@ -7,13 +7,13 @@ The following types are handled out-of-the-box:
 
 - Plain objects (including `react` elements and `Arguments`)
 - Arrays
-- `ArrayBuffer` / `TypedArray` / `DataView` instances
+- `ArrayBuffer` / `SharedArrayBuffer` / `TypedArray` / `DataView` instances
 - `Date` objects
 - `RegExp` objects
 - `Map` / `Set` iterables
 - `Promise` objects and then-ables
-- `Error` objects, including subclasses and their own properties
-- `URL` objects
+- `Error` objects, including subclasses, their own properties, and the `errors` of an `AggregateError`
+- `URL` and `URLSearchParams` objects
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes
 
@@ -148,7 +148,7 @@ objects passed and returns a boolean representing the value equivalency of the o
 - All other items are based on referential equality (`a === b`)
 
 ```ts
-import { sameValueEqual } from 'fast-equals';
+import { sameValueZeroEqual } from 'fast-equals';
 
 const mainObject = { foo: NaN, bar: 'baz' };
 
@@ -156,9 +156,9 @@ const objectA = 'baz';
 const objectB = NaN;
 const objectC = { foo: NaN, bar: 'baz' };
 
-console.log(sameValueEqual(mainObject.bar, objectA)); // true
-console.log(sameValueEqual(mainObject.foo, objectB)); // true
-console.log(sameValueEqual(mainObject, objectC)); // false
+console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
+console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
+console.log(sameValueZeroEqual(mainObject, objectC)); // false
 ```
 
 ### strictEqual
@@ -359,6 +359,7 @@ interface ComparatorConfig<Meta> {
   areRegExpsEqual: EqualityComparator<Meta>;
   areSetsEqual: EqualityComparator<Meta>;
   areTypedArraysEqual: EqualityComparator<Meta>;
+  areUrlSearchParamsEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
   getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
 }
