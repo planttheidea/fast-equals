@@ -1,25 +1,35 @@
 # fast-equals CHANGELOG
 
-## Unreleased
+## 6.1.0
 
 ### Enhancements
 
-- Added `SharedArrayBuffer` support, compared by contents like `ArrayBuffer`.
-- Added order-independent `URLSearchParams` comparison, with repeated keys preserved.
-- Optimized `Map` and `Set` comparisons with key/value lookup before exhaustive scanning. `Set` comparisons are ~27x
-  faster and `Map` comparisons ~6x faster for 200 primitive entries.
-- Optimized large integer `TypedArray`, `ArrayBuffer`, and `DataView` comparisons by comparing underlying bytes in
-  8-byte chunks. A 64KB `Uint8Array` is ~9x faster and a 4KB buffer ~6x faster.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Added `SharedArrayBuffer` support, compared by contents
+  like `ArrayBuffer`.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Added order-independent `URLSearchParams` comparison,
+  with repeated keys preserved.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Optimized `Map` and `Set` comparisons with key/value
+  lookup before exhaustive scanning. `Set` comparisons are ~27x faster and `Map` comparisons ~6x faster for 200
+  primitive entries.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Optimized large integer `TypedArray`, `ArrayBuffer`,
+  and `DataView` comparisons by comparing underlying bytes in 8-byte chunks. A 64KB `Uint8Array` is ~9x faster and a 4KB
+  buffer ~6x faster.
 
 ### Bugfixes
 
-- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant.
-- Fixed `Error` comparisons ignoring own enumerable properties.
-- Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
-- Fixed boxed `BigInt` values to compare by value rather than identity.
-- Added comparison support for boxed `Symbol` values.
-- Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching `SameValueZero` semantics.
-- Updated `engines.node` to >=12.17.0, the first version supporting both ESM and CommonJS entry points via exports.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Fixed `URL` comparisons ignoring query strings. Query
+  parameter order remains insignificant.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Fixed `Error` comparisons ignoring own enumerable
+  properties.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Fixed `Error.cause` to compare by value and added
+  circular reference tracking for errors.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Fixed boxed `BigInt` values to compare by value rather
+  than identity.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Added comparison support for boxed `Symbol` values.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Fixed `TypedArray` comparisons to treat `NaN` as equal
+  to itself, matching `SameValueZero` semantics.
+- [#200](https://github.com/planttheidea/fast-equals/pull/200) - Updated `engines.node` to >=12.17.0, the first version
+  supporting both ESM and CommonJS entry points via exports.
 
 ## 6.0.2
 
