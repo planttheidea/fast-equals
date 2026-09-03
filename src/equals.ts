@@ -122,77 +122,17 @@ export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
  * Whether the `Map`s are equal in value.
  */
 export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<any>): boolean {
-  const size = a.size;
-
-  if (size !== b.size) {
-    return false;
-  }
-
-  if (!size) {
-    return true;
-  }
-
-  const matchedIndices = new Uint8Array(size);
-  const aIterable = a.entries();
-
-  let aResult: IteratorResult<[any, any]>;
-  let bResult: IteratorResult<[any, any]>;
-  let index = 0;
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  while ((aResult = aIterable.next())) {
-    if (aResult.done) {
-      break;
-    }
-
-    const bIterable = b.entries();
-
-    let hasMatch = 0;
-    let matchIndex = 0;
-
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    while ((bResult = bIterable.next())) {
-      if (bResult.done) {
-        break;
-      }
-
-      if (matchedIndices[matchIndex]) {
-        matchIndex++;
-        continue;
-      }
-
-      const aEntry = aResult.value;
-      const bEntry = bResult.value;
-
-      if (
-        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
-        && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
-      ) {
-        hasMatch = matchedIndices[matchIndex] = 1;
-        break;
-      }
-
-      matchIndex++;
-    }
-
-    if (!hasMatch) {
-      return false;
-    }
-
-    index++;
-  }
-
-  return true;
+  return compareMapEntries(a, b, state, false);
 }
 
 /**
  * Whether the `Map`s are equal in value, resolving entries by key lookup where possible.
  *
  * @note
- * `areMapsEqual` must scan all of `b` for every entry of `a` because entry order is not
- * significant, which is quadratic. `Map.prototype.has` resolves the common cases -- primitive keys,
- * and object keys held by shared reference -- in constant time instead, leaving only the entries it
- * cannot resolve to the exhaustive scan.
+ * Entry order is not significant, so matching otherwise requires scanning all of `b` for every
+ * entry of `a`. `Map.prototype.has` resolves the common cases -- primitive keys, and object keys
+ * held by shared reference -- in constant time instead, leaving only the entries it cannot resolve
+ * to the exhaustive scan.
  *
  * This is only installed when the default internal comparator is in use. The comparisons it skips
  * are ones that comparator provably resolves the same way: an identity key comparison always
@@ -202,72 +142,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
  * to be transitive, so it keeps the exhaustive scan.
  */
 export function areMapsEqualByLookup(a: Map<any, any>, b: Map<any, any>, state: State<any>): boolean {
-  const size = a.size;
-
-  if (size !== b.size) {
-    return false;
-  }
-
-  if (!size) {
-    return true;
-  }
-
-  let unmatchedA: Array<[any, any]> | undefined;
-  let claimedB: Set<any> | undefined;
-
-  for (const aEntry of a) {
-    const key = aEntry[0];
-
-    // `has` uses SameValueZero, which is the same result the comparator produces for the keys it
-    // resolves here, since it short-circuits on reference equality before any value comparison.
-    if (b.has(key) && state.equals(aEntry[1], b.get(key), key, key, a, b, state)) {
-      (claimedB ||= new Set()).add(key);
-    } else {
-      (unmatchedA ||= []).push(aEntry);
-    }
-  }
-
-  if (!unmatchedA) {
-    return true;
-  }
-
-  const unmatchedB: Array<[any, any]> = [];
-
-  for (const bEntry of b) {
-    if (!claimedB || !claimedB.has(bEntry[0])) {
-      unmatchedB.push(bEntry);
-    }
-  }
-
-  const matchedIndices = new Uint8Array(unmatchedB.length);
-
-  for (let index = 0; index < unmatchedA.length; index++) {
-    const aEntry = unmatchedA[index]!;
-
-    let hasMatch = 0;
-
-    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
-      if (matchedIndices[matchIndex]) {
-        continue;
-      }
-
-      const bEntry = unmatchedB[matchIndex]!;
-
-      if (
-        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
-        && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
-      ) {
-        hasMatch = matchedIndices[matchIndex] = 1;
-        break;
-      }
-    }
-
-    if (!hasMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return compareMapEntries(a, b, state, true);
 }
 
 /**
@@ -358,56 +233,7 @@ export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
  * Whether the `Set`s are equal in value.
  */
 export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boolean {
-  const size = a.size;
-
-  if (size !== b.size) {
-    return false;
-  }
-
-  if (!size) {
-    return true;
-  }
-
-  const matchedIndices = new Uint8Array(size);
-  const aIterable = a.values();
-
-  let aResult: IteratorResult<any>;
-  let bResult: IteratorResult<any>;
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  while ((aResult = aIterable.next())) {
-    if (aResult.done) {
-      break;
-    }
-
-    const bIterable = b.values();
-
-    let hasMatch = 0;
-    let matchIndex = 0;
-
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    while ((bResult = bIterable.next())) {
-      if (bResult.done) {
-        break;
-      }
-
-      if (
-        !matchedIndices[matchIndex]
-        && state.equals(aResult.value, bResult.value, aResult.value, bResult.value, a, b, state)
-      ) {
-        hasMatch = matchedIndices[matchIndex] = 1;
-        break;
-      }
-
-      matchIndex++;
-    }
-
-    if (!hasMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return compareSetValues(a, b, state, false);
 }
 
 /**
@@ -415,62 +241,11 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
  *
  * @note
  * See `areMapsEqualByLookup` for why this is only installed for the default internal comparator.
- * Because `Set` values are unique, each lookup hit claims exactly one entry of `b`, so the entries
+ * Because `Set` values are unique, each lookup hit claims exactly one entry of `b`, so the values
  * left for the exhaustive scan are precisely those each set does not share with the other.
  */
 export function areSetsEqualByLookup(a: Set<any>, b: Set<any>, state: State<any>): boolean {
-  const size = a.size;
-
-  if (size !== b.size) {
-    return false;
-  }
-
-  if (!size) {
-    return true;
-  }
-
-  let unmatchedA: any[] | undefined;
-
-  for (const aValue of a) {
-    if (!b.has(aValue)) {
-      (unmatchedA ||= []).push(aValue);
-    }
-  }
-
-  if (!unmatchedA) {
-    return true;
-  }
-
-  const unmatchedB: any[] = [];
-
-  for (const bValue of b) {
-    if (!a.has(bValue)) {
-      unmatchedB.push(bValue);
-    }
-  }
-
-  const matchedIndices = new Uint8Array(unmatchedB.length);
-
-  for (let index = 0; index < unmatchedA.length; index++) {
-    const aValue = unmatchedA[index];
-
-    let hasMatch = 0;
-
-    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
-      const bValue = unmatchedB[matchIndex];
-
-      if (!matchedIndices[matchIndex] && state.equals(aValue, bValue, aValue, bValue, a, b, state)) {
-        hasMatch = matchedIndices[matchIndex] = 1;
-        break;
-      }
-    }
-
-    if (!hasMatch) {
-      return false;
-    }
-  }
-
-  return true;
+  return compareSetValues(a, b, state, true);
 }
 
 /**
@@ -482,8 +257,6 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   if (b.length !== index || a.byteOffset !== b.byteOffset) {
     return false;
   }
-
-  const byteLength = a.byteLength;
 
   // Only float-backed views can hold `NaN`, and the additional check needed to treat it as equal
   // to itself measurably slows the loop, so integer views keep the plain comparison. This is
@@ -499,6 +272,11 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
 
     return true;
   }
+
+  const byteLength = a.byteLength;
+
+  // Leading elements already accounted for by the chunked comparison below.
+  let compared = 0;
 
   // Integer views hold no padding and no values with multiple representations, so comparing the
   // underlying bytes eight at a time is equivalent to comparing elements, and substantially faster
@@ -517,27 +295,12 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
       }
     }
 
-    // Whatever does not fill a whole word is compared as bytes.
-    const remainder = byteLength & 7;
-
-    if (remainder) {
-      const offset = a.byteOffset + (words << 3);
-      const bytesA = new Uint8Array(a.buffer, offset, remainder);
-      const bytesB = new Uint8Array(b.buffer, b.byteOffset + (words << 3), remainder);
-
-      let byteIndex = remainder;
-
-      while (byteIndex-- > 0) {
-        if (bytesA[byteIndex] !== bytesB[byteIndex]) {
-          return false;
-        }
-      }
-    }
-
-    return true;
+    // Every element size divides eight, so the bytes compared always cover whole elements, and
+    // whatever did not fill a word is left to the loop below rather than needing a pass of its own.
+    compared = (words << 3) / a.BYTES_PER_ELEMENT;
   }
 
-  while (index-- > 0) {
+  while (index-- > compared) {
     if (a[index] !== b[index]) {
       return false;
     }
@@ -556,33 +319,8 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  */
 export function areUrlSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
   // Identical serializations are equal under any ordering, and this is by far the common case, so
-  // it is worth avoiding the entry arrays entirely when it holds.
-  if (a.toString() === b.toString()) {
-    return true;
-  }
-
-  const entriesA = Array.from(a);
-  const entriesB = Array.from(b);
-
-  let index = entriesA.length;
-
-  if (entriesB.length !== index) {
-    return false;
-  }
-
-  entriesA.sort(compareEntries);
-  entriesB.sort(compareEntries);
-
-  while (index-- > 0) {
-    const entryA = entriesA[index]!;
-    const entryB = entriesB[index]!;
-
-    if (entryA[0] !== entryB[0] || entryA[1] !== entryB[1]) {
-      return false;
-    }
-  }
-
-  return true;
+  // it is worth checking before sorting anything.
+  return a.toString() === b.toString() || sortSearchParams(a) === sortSearchParams(b);
 }
 
 /**
@@ -612,19 +350,162 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
 }
 
 /**
- * Order search param entries by key, then by value, so that two sets of entries holding the same
- * pairs in different orders align for a positional comparison.
+ * Match the entries of two `Map`s, which are equal when every entry of `a` can be paired with a
+ * distinct entry of `b`. When `byLookup` is set, entries whose key is present in `b` by identity
+ * are paired directly, and only what remains is matched by the exhaustive scan.
  */
-function compareEntries(a: [string, string], b: [string, string]): number {
-  if (a[0] !== b[0]) {
-    return a[0] < b[0] ? -1 : 1;
+function compareMapEntries(a: Map<any, any>, b: Map<any, any>, state: State<any>, byLookup: boolean): boolean {
+  const size = a.size;
+
+  if (size !== b.size) {
+    return false;
   }
 
-  if (a[1] !== b[1]) {
-    return a[1] < b[1] ? -1 : 1;
+  if (!size) {
+    return true;
   }
 
-  return 0;
+  let unmatchedA: Array<[any, any]>;
+  let claimedB: Set<any> | undefined;
+
+  if (byLookup) {
+    const deferred: Array<[any, any]> = [];
+
+    for (const entry of a) {
+      const key = entry[0];
+
+      // `has` uses SameValueZero, which is the same result the comparator produces for the keys it
+      // resolves here, since it short-circuits on reference equality before any value comparison.
+      if (b.has(key) && state.equals(entry[1], b.get(key), key, key, a, b, state)) {
+        (claimedB ||= new Set()).add(key);
+      } else {
+        deferred.push(entry);
+      }
+    }
+
+    if (!deferred.length) {
+      return true;
+    }
+
+    unmatchedA = deferred;
+  } else {
+    unmatchedA = Array.from(a);
+  }
+
+  const unmatchedB: Array<[any, any]> = [];
+
+  for (const entry of b) {
+    if (!claimedB || !claimedB.has(entry[0])) {
+      unmatchedB.push(entry);
+    }
+  }
+
+  const matchedIndices = new Uint8Array(unmatchedB.length);
+
+  for (let index = 0; index < unmatchedA.length; index++) {
+    const aEntry = unmatchedA[index]!;
+
+    let hasMatch = 0;
+
+    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
+      if (matchedIndices[matchIndex]) {
+        continue;
+      }
+
+      const bEntry = unmatchedB[matchIndex]!;
+
+      if (
+        state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
+        && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
+      ) {
+        hasMatch = matchedIndices[matchIndex] = 1;
+        break;
+      }
+    }
+
+    if (!hasMatch) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Match the values of two `Set`s. See `compareMapEntries`, which this mirrors.
+ */
+function compareSetValues(a: Set<any>, b: Set<any>, state: State<any>, byLookup: boolean): boolean {
+  const size = a.size;
+
+  if (size !== b.size) {
+    return false;
+  }
+
+  if (!size) {
+    return true;
+  }
+
+  let unmatchedA: any[];
+
+  if (byLookup) {
+    const deferred: any[] = [];
+
+    for (const value of a) {
+      if (!b.has(value)) {
+        deferred.push(value);
+      }
+    }
+
+    if (!deferred.length) {
+      return true;
+    }
+
+    unmatchedA = deferred;
+  } else {
+    unmatchedA = Array.from(a);
+  }
+
+  const unmatchedB: any[] = [];
+
+  for (const value of b) {
+    if (!byLookup || !a.has(value)) {
+      unmatchedB.push(value);
+    }
+  }
+
+  const matchedIndices = new Uint8Array(unmatchedB.length);
+
+  for (let index = 0; index < unmatchedA.length; index++) {
+    const aValue = unmatchedA[index];
+
+    let hasMatch = 0;
+
+    for (let matchIndex = 0; matchIndex < unmatchedB.length; matchIndex++) {
+      const bValue = unmatchedB[matchIndex];
+
+      if (!matchedIndices[matchIndex] && state.equals(aValue, bValue, aValue, bValue, a, b, state)) {
+        hasMatch = matchedIndices[matchIndex] = 1;
+        break;
+      }
+    }
+
+    if (!hasMatch) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Serialize search params into a form that ignores their order. Encoding both halves of each pair
+ * keeps `=` and `&` out of either, so the joined result is unambiguous and two sets of params hold
+ * the same pairs, the same number of times, exactly when it matches.
+ */
+function sortSearchParams(params: URLSearchParams): string {
+  return Array.from(params, ([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))
+    .sort()
+    .join('&');
 }
 
 /**

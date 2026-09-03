@@ -1,7 +1,7 @@
 > fast-equals
 
 Perform [blazing fast](#benchmarks) equality comparisons between two objects, while also allowing for flexibility for
-various use-cases. It has no dependencies, and is ~2kB when minified and gzipped.
+various use-cases. It has no dependencies, and is ~2.6kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
