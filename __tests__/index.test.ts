@@ -768,6 +768,19 @@ describe('correctness fixes', () => {
       expect(deepEqual(new Set([Object(BigInt(1))]), new Set([Object(BigInt(2))]))).toBe(false);
     });
 
+    test('treats boxed `-0` and `0` as equal, matching SameValueZero', () => {
+      // `valueOf()` preserves the sign of the zero, so this is the one place a boxed number can
+      // observe the difference between SameValue and SameValueZero. It follows the primitive.
+      expect(deepEqual(new Number(-0), new Number(0))).toBe(true);
+      expect(deepEqual(-0, 0)).toBe(true);
+      expect(deepEqual({ value: new Number(-0) }, { value: new Number(0) })).toBe(true);
+    });
+
+    test('treats boxed `NaN` as equal to itself', () => {
+      expect(deepEqual(new Number(NaN), new Number(NaN))).toBe(true);
+      expect(deepEqual(new Number(NaN), new Number(1))).toBe(false);
+    });
+
     test('keeps primitive and boxed `BigInt` distinct', () => {
       // The primitive is handled by the `bigint` branch, the wrapper by the tag comparison, and
       // the two are never equal to one another because their `typeof` differs.
@@ -775,6 +788,19 @@ describe('correctness fixes', () => {
       expect(deepEqual(BigInt(1), BigInt(2))).toBe(false);
       expect(deepEqual(BigInt(1), Object(BigInt(1)))).toBe(false);
       expect(deepEqual(Object(BigInt(1)), BigInt(1))).toBe(false);
+    });
+  });
+
+  describe('Date', () => {
+    test('treats an invalid date as equal to itself', () => {
+      // `getTime()` is `NaN` for both, which SameValueZero treats as equal.
+      expect(deepEqual(new Date(NaN), new Date(NaN))).toBe(true);
+      expect(deepEqual(new Date(NaN), new Date(0))).toBe(false);
+    });
+
+    test('treats `-0` and `0` timestamps as equal', () => {
+      // `TimeClip` normalizes `-0` to `+0`, so the two can never actually differ in sign.
+      expect(deepEqual(new Date(-0), new Date(0))).toBe(true);
     });
   });
 

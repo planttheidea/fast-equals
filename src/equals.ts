@@ -96,7 +96,7 @@ export function areDataViewsEqual(a: DataView, b: DataView): boolean {
  * Whether the dates passed are equal in value.
  */
 export function areDatesEqual(a: Date, b: Date): boolean {
-  return sameValueEqual(a.getTime(), b.getTime());
+  return sameValueZeroEqual(a.getTime(), b.getTime());
 }
 
 /**
@@ -269,7 +269,7 @@ export function areObjectsEqualStrict(a: AnyObject, b: AnyObject, state: State<a
  * Whether the primitive wrappers passed are equal in value.
  */
 export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapper): boolean {
-  return sameValueEqual(a.valueOf(), b.valueOf());
+  return sameValueZeroEqual(a.valueOf(), b.valueOf());
 }
 
 /**

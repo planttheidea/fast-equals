@@ -35,6 +35,7 @@ If you are having any problems, want to request a new feature, or have any quest
 - [Usage](#usage)
 - [Available methods](#available-methods)
   - [deepEqual](#deepequal)
+    - [Comparing numbers](#comparing-numbers)
     - [Comparing `Map`s](#comparing-maps)
   - [shallowEqual](#shallowequal)
   - [sameValueEqual](#samevalueequal)
@@ -75,6 +76,27 @@ const objectB = { foo: { bar: 'baz' } };
 console.log(objectA === objectB); // false
 console.log(deepEqual(objectA, objectB)); // true
 ```
+
+#### Comparing numbers
+
+Numbers are compared on a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) basis, which
+means:
+
+- `NaN` is equal to `NaN`
+- `+0` and `-0` are equal
+
+```ts
+console.log(deepEqual(NaN, NaN)); // true
+console.log(deepEqual(0, -0)); // true
+```
+
+This applies consistently wherever a number is reached: directly, nested in an object or array, as a `TypedArray`
+element, as a boxed `new Number()`, and as the timestamp of a `Date`. It also matches the
+[`SameValueZero` semantics that `Map` and `Set` use for key equality](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality),
+so a number behaves the same as a collection key as it does anywhere else.
+
+_**NOTE**: The exported [`sameValueEqual`](#samevalueequal) method performs a true `SameValue` comparison, in which `+0`
+and `-0` are **not** equal. It is available as a standalone utility, but it is not what the deep comparison uses._
 
 #### Comparing `Map`s
 
@@ -499,17 +521,17 @@ Caveats that impact the benchmark (and accuracy of comparison):
   fully supported their comparison
 - `fast-deep-equal`, `react-fast-compare` and `nano-equal` throw on objects with `null` as prototype
   (`Object.create(null)`)
-- `assert.deepStrictEqual` does not support `NaN` or `SameValue` equality for dates
+- `assert.deepStrictEqual` does not support `NaN` or `SameValueZero` equality for dates
 - `deep-eql` does not support `SameValue` equality for zero equality (positive and negative zero are not equal)
 - `deep-equal` does not support `NaN` and does not strictly compare object type, or date / regexp values, nor uses
   `SameValue` equality for dates
-- `fast-deep-equal` does not support `NaN` or `SameValue` equality for dates
-- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValue`
+- `fast-deep-equal` does not support `NaN` or `SameValueZero` equality for dates
+- `nano-equal` does not strictly compare object property structure, array length, or object type, nor `SameValueZero`
   equality for dates
-- `react-fast-compare` does not support `NaN` or `SameValue` equality for dates, and does not compare `function`
+- `react-fast-compare` does not support `NaN` or `SameValueZero` equality for dates, and does not compare `function`
   equality
 - `shallow-equal-fuzzy` does not strictly compare object type or regexp values, nor `SameValue` equality for dates
-- `underscore.isEqual` does not support `SameValue` equality for primitives or dates
+- `underscore.isEqual` does not support `SameValueZero` equality for primitives or dates
 
 All of these have the potential of inflating the respective library's numbers in comparison to `fast-equals`, but it was
 the closest apples-to-apples comparison I could create of a reasonable sample size. It should be noted that `react`

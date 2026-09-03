@@ -14,7 +14,7 @@ import {
   areTypedArraysEqual,
   areUrlSearchParamsEqual,
   areUrlsEqual,
-  sameValueEqual,
+  sameValueZeroEqual,
   strictEqual,
 } from '../src/equals.js';
 import type { InternalEqualityComparator, State } from '../src/internalTypes.ts';
@@ -28,7 +28,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areErrorsEqual,
   areFunctionsEqual: strictEqual,
   areMapsEqual,
-  areNumbersEqual: sameValueEqual,
+  areNumbersEqual: sameValueZeroEqual,
   areObjectsEqual,
   arePrimitiveWrappersEqual,
   areRegExpsEqual,

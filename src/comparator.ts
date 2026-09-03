@@ -13,7 +13,7 @@ import {
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlSearchParamsEqual as areUrlSearchParamsEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
-  sameValueEqual,
+  sameValueZeroEqual,
   strictEqual,
 } from './equals.js';
 import type {
@@ -192,7 +192,7 @@ export function createEqualityComparatorConfig<Meta>({
       : combineComparators(areErrorsEqualDefault, areObjectsEqualDefault),
     areFunctionsEqual: strictEqual,
     areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
-    areNumbersEqual: sameValueEqual,
+    areNumbersEqual: sameValueZeroEqual,
     areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
     arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
