@@ -2,12 +2,16 @@
 
 ## 6.0.3
 
-- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant, with repeated keys
-  counted.
-- Fixed `Error` comparisons ignoring own enumerable properties.
-- Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
-- Fixed boxed `BigInt` values to compare by value rather than identity.
-- Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching SameValueZero semantics.
+- [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `URL` comparisons ignoring query strings. Query
+  parameter order remains insignificant, with repeated keys counted.
+- [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `Error` comparisons ignoring own enumerable
+  properties.
+- [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `Error.cause` to compare by value and added
+  circular reference tracking for errors.
+- [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed boxed `BigInt` values to compare by value rather
+  than identity.
+- [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `TypedArray` comparisons to treat `NaN` as equal
+  to itself, matching SameValueZero semantics.
 
 ## 6.0.2
 
