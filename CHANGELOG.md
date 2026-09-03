@@ -2,12 +2,12 @@
 
 ## 6.0.3
 
-- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant, with repeated keys counted.
+- Fixed `URL` comparisons ignoring query strings. Query parameter order remains insignificant, with repeated keys
+  counted.
 - Fixed `Error` comparisons ignoring own enumerable properties.
 - Fixed `Error.cause` to compare by value and added circular reference tracking for errors.
 - Fixed boxed `BigInt` values to compare by value rather than identity.
 - Fixed `TypedArray` comparisons to treat `NaN` as equal to itself, matching SameValueZero semantics.
-- Updated `engines.node` to `>=12.17.0`, the first version supporting both ESM and CommonJS entry points via `exports`.
 
 ## 6.0.2
 
