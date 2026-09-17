@@ -2,7 +2,7 @@
 
 ## 5.4.3
 
-- [#205](https://github.com/planttheidea/fast-equals/pull/204) - Use a more efficient comparison for pure objects
+- [#205](https://github.com/planttheidea/fast-equals/pull/205) - Use a more efficient comparison for pure objects
   (`Object.create(null)`).
 
 ## 5.4.2
