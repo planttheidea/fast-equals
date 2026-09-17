@@ -170,6 +170,11 @@ export function createEqualityComparator<Meta>({
       return areSetsEqual(a, b, state);
     }
 
+    if (constructor == null) {
+      // Objects with a prototype of `null` are plain objects.
+      return areObjectsEqual(a, b, state);
+    }
+
     // Since this is a custom object, capture the string tag to determing its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
     const tag = toString.call(a);
