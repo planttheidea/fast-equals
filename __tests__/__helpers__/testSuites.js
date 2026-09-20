@@ -370,6 +370,13 @@ export const testSuites = [
         value1: { foo: undefined },
         value2: { bar: undefined },
       },
+      {
+        deepEqual: false,
+        description: 'null-prototype empty objects do not equal regular empty objects',
+        shallowEqual: false,
+        value1: {},
+        value2: Object.create(null),
+      },
     ],
   },
 

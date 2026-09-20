@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 5.4.3
+
+- [#205](https://github.com/planttheidea/fast-equals/pull/205) - Use a more efficient comparison for pure objects
+  (`Object.create(null)`).
+
 ## 5.4.2
 
 - [#202](https://github.com/planttheidea/fast-equals/pull/202) - Fixed `URL` comparisons ignoring query strings. Query
