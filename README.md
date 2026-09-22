@@ -148,7 +148,7 @@ objects passed and returns a boolean representing the value equivalency of the o
 - All other items are based on referential equality (`a === b`)
 
 ```ts
-import { sameValueEqual } from 'fast-equals';
+import { sameValueZeroEqual } from 'fast-equals';
 
 const mainObject = { foo: NaN, bar: 'baz' };
 
@@ -156,9 +156,9 @@ const objectA = 'baz';
 const objectB = NaN;
 const objectC = { foo: NaN, bar: 'baz' };
 
-console.log(sameValueEqual(mainObject.bar, objectA)); // true
-console.log(sameValueEqual(mainObject.foo, objectB)); // true
-console.log(sameValueEqual(mainObject, objectC)); // false
+console.log(sameValueZeroEqual(mainObject.bar, objectA)); // true
+console.log(sameValueZeroEqual(mainObject.foo, objectB)); // true
+console.log(sameValueZeroEqual(mainObject, objectC)); // false
 ```
 
 ### strictEqual
@@ -180,9 +180,9 @@ const objectA = 'baz';
 const objectB = NaN;
 const objectC = { foo: NaN, bar: 'baz' };
 
-console.log(sameValueEqual(mainObject.bar, objectA)); // true
-console.log(sameValueEqual(mainObject.foo, objectB)); // false
-console.log(sameValueEqual(mainObject, objectC)); // false
+console.log(strictEqual(mainObject.bar, objectA)); // true
+console.log(strictEqual(mainObject.foo, objectB)); // false
+console.log(strictEqual(mainObject, objectC)); // false
 ```
 
 _**NOTE**: This is mainly a convenience function, such as needing a default functional equality comparator. Naturally,
@@ -262,8 +262,8 @@ const otherArray = ['foo'];
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(strictDeepEqual(array, otherArray)); // true;
-console.log(strictDeepEqual(array, ['foo'])); // false;
+console.log(strictShallowEqual(array, otherArray)); // true;
+console.log(strictShallowEqual(array, ['foo'])); // false;
 ```
 
 ### strictCircularDeepEqual
@@ -302,8 +302,8 @@ Object.defineProperty(second, 'bar', {
   value: 'baz',
 });
 
-console.log(circularDeepEqual(first, second)); // true
-console.log(circularDeepEqual(first, new Circular('foo'))); // false
+console.log(strictCircularDeepEqual(first, second)); // true
+console.log(strictCircularDeepEqual(first, new Circular('foo'))); // false
 ```
 
 ### strictCircularShallowEqual
@@ -321,13 +321,13 @@ const array = ['foo'];
 const otherArray = ['foo'];
 
 array.push(array);
-otherArray.push(otherArray);
+otherArray.push(array); // Shallow comparison requires the same nested reference.
 
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(circularShallowEqual(array, otherArray)); // true
-console.log(circularShallowEqual(array, ['foo', array])); // false
+console.log(strictCircularShallowEqual(array, otherArray)); // true
+console.log(strictCircularShallowEqual(array, ['foo', array])); // false
 ```
 
 ### createCustomEqual
