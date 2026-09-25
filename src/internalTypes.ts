@@ -139,6 +139,7 @@ export type TypedArray =
   | Uint8ClampedArray;
 
 export interface CustomEqualCreatorOptions<Meta> {
+  constructors?: boolean;
   /**
    * Whether circular references should be supported. It causes the
    * comparison to be slower, but for objects that have circular references

@@ -35,7 +35,10 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
-export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): EqualityComparator<Meta> {
+export function createEqualityComparator<Meta>(
+  config: ComparatorConfig<Meta>,
+  constructors = true,
+): EqualityComparator<Meta> {
   const supportedComparatorMap = createSupportedComparatorMap(config);
   const {
     areArraysEqual,
@@ -93,10 +96,18 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     // when reviewing comparable libraries in the wild this order
     // appears to be generally consistent.
 
-    // Constructors should match, otherwise there is potential for false positives
-    // between class and subclass or custom object and POJO.
     if (constructor !== b.constructor) {
-      return false;
+      if (constructors) {
+        return false;
+      }
+      const tag = toString.call(a);
+      if (tag !== toString.call(b)) {
+        return false;
+      }
+      const comparator =
+        supportedComparatorMap[tag]
+        || (getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, state, tag));
+      return comparator ? comparator(a, b, state) : false;
     }
 
     // Try to fast-path equality checks for other complex object types in the

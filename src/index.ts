@@ -90,10 +90,11 @@ export function createCustomEqual<Meta = undefined>(options: CustomEqualCreatorO
     createInternalComparator: createCustomInternalComparator,
     createState,
     strict = false,
+    constructors = true,
   } = options;
 
   const config = createEqualityComparatorConfig<Meta>(options);
-  const comparator = createEqualityComparator(config);
+  const comparator = createEqualityComparator(config, constructors);
   const equals = createCustomInternalComparator
     ? createCustomInternalComparator(comparator)
     : createInternalEqualityComparator(comparator);

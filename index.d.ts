@@ -104,6 +104,7 @@ type PrimitiveWrapper = Boolean | Number | String;
  */
 type TypedArray = BigInt64Array | BigUint64Array | Float32Array | Float64Array | Int8Array | Int16Array | Int32Array | Uint16Array | Uint32Array | Uint8Array | Uint8ClampedArray;
 interface CustomEqualCreatorOptions<Meta> {
+    constructors?: boolean;
     /**
      * Whether circular references should be supported. It causes the
      * comparison to be slower, but for objects that have circular references
