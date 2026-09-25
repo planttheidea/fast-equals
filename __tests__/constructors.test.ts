@@ -101,6 +101,25 @@ describe('constructors', () => {
     }
   });
 
+  test('allows custom config to override the constructor policy', () => {
+    const attrs = dictionary();
+    const equal = createCustomEqual({
+      createCustomConfig: (config) => {
+        expect(config.constructors).toBe(true);
+        return { constructors: false };
+      },
+    });
+    const checked = createCustomEqual({
+      constructors: false,
+      createCustomConfig: (config) => {
+        expect(config.constructors).toBe(false);
+        return { constructors: true };
+      },
+    });
+    expect(equal(attrs, { ...attrs })).toBe(true);
+    expect(checked(attrs, { ...attrs })).toBe(false);
+  });
+
   test('uses the configured object comparator for mismatched constructors', () => {
     const equal = createCustomEqual({
       constructors: false,

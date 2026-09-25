@@ -35,10 +35,7 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
-export function createEqualityComparator<Meta>(
-  config: ComparatorConfig<Meta>,
-  constructors = true,
-): EqualityComparator<Meta> {
+export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   const supportedComparatorMap = createSupportedComparatorMap(config);
   const {
     areArraysEqual,
@@ -50,6 +47,7 @@ export function createEqualityComparator<Meta>(
     areRegExpsEqual,
     areSetsEqual,
     getUnsupportedCustomComparator,
+    constructors = true,
   } = config;
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -96,70 +94,69 @@ export function createEqualityComparator<Meta>(
     // when reviewing comparable libraries in the wild this order
     // appears to be generally consistent.
 
-    if (constructor !== b.constructor) {
-      if (constructors) {
-        return false;
-      }
-      const tag = toString.call(a);
-      if (tag !== toString.call(b)) {
-        return false;
-      }
-      const comparator =
-        supportedComparatorMap[tag]
-        || (getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, state, tag));
-      return comparator ? comparator(a, b, state) : false;
-    }
+    const sameConstructor = constructor === b.constructor;
 
-    // Try to fast-path equality checks for other complex object types in the
-    // same realm to avoid capturing the string tag. Strict equality is used
-    // instead of `instanceof` because it is more performant for the common
-    // use-case. If someone is creating a subclass from a native class, it will be
-    // handled with the string tag comparison.
-
-    if (constructor === Object) {
-      return areObjectsEqual(a, b, state);
-    }
-
-    if (constructor === Array) {
-      return areArraysEqual(a, b, state);
-    }
-
-    if (constructor === Date) {
-      return areDatesEqual(a, b, state);
-    }
-
-    if (constructor === RegExp) {
-      return areRegExpsEqual(a, b, state);
-    }
-
-    if (constructor === Map) {
-      return areMapsEqual(a, b, state);
-    }
-
-    if (constructor === Set) {
-      return areSetsEqual(a, b, state);
-    }
-
-    if (constructor == null) {
-      // Objects with a prototype of `null` are plain objects.
-      return areObjectsEqual(a, b, state);
-    }
-
-    if (constructor === Promise) {
-      // Avoid tag checks for promise values, since we know if they are not referentially equal
-      // then they are not equal.
+    if (!sameConstructor && constructors) {
       return false;
     }
 
-    // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
-    // the string tag or doing an `instanceof` in edge cases.
-    if (Array.isArray(a)) {
-      return areArraysEqual(a, b, state);
+    if (sameConstructor) {
+      // Try to fast-path equality checks for other complex object types in the
+      // same realm to avoid capturing the string tag. Strict equality is used
+      // instead of `instanceof` because it is more performant for the common
+      // use-case. If someone is creating a subclass from a native class, it will be
+      // handled with the string tag comparison.
+
+      if (constructor === Object) {
+        return areObjectsEqual(a, b, state);
+      }
+
+      if (constructor === Array) {
+        return areArraysEqual(a, b, state);
+      }
+
+      if (constructor === Date) {
+        return areDatesEqual(a, b, state);
+      }
+
+      if (constructor === RegExp) {
+        return areRegExpsEqual(a, b, state);
+      }
+
+      if (constructor === Map) {
+        return areMapsEqual(a, b, state);
+      }
+
+      if (constructor === Set) {
+        return areSetsEqual(a, b, state);
+      }
+
+      if (constructor == null) {
+        // Objects with a prototype of `null` are plain objects.
+        return areObjectsEqual(a, b, state);
+      }
+
+      if (constructor === Promise) {
+        // Avoid tag checks for promise values, since we know if they are not referentially equal
+        // then they are not equal.
+        return false;
+      }
+
+      // `isArray()` works on subclasses and is cross-realm, so we can avoid capturing
+      // the string tag or doing an `instanceof` in edge cases.
+      if (Array.isArray(a)) {
+        return areArraysEqual(a, b, state);
+      }
     }
 
     // Since this is a custom object, capture the string tag to determining its type.
     // This is reasonably performant in modern environments like v8 and SpiderMonkey.
     const tag = toString.call(a);
+
+    if (!sameConstructor && tag !== toString.call(b)) {
+      return false;
+    }
+
     const supportedComparator = supportedComparatorMap[tag];
 
     if (supportedComparator) {
@@ -190,10 +187,12 @@ export function createEqualityComparator<Meta>(
  */
 export function createEqualityComparatorConfig<Meta>({
   circular,
+  constructors = true,
   createCustomConfig,
   strict,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
   let config = {
+    constructors,
     areArrayBuffersEqual,
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
     areDataViewsEqual,

@@ -36,6 +36,7 @@ export interface CircularState<Meta> extends State<Meta> {
 export type AnyObject = Record<number | string | symbol, any>;
 
 export interface ComparatorConfig<Meta> {
+  constructors?: boolean;
   /**
    * Whether the array buffers passed are equal in value. In strict mode, this includes
    * additional properties added to the array.

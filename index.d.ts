@@ -28,6 +28,7 @@ interface State<Meta> {
     readonly strict: boolean;
 }
 interface ComparatorConfig<Meta> {
+    constructors?: boolean;
     /**
      * Whether the array buffers passed are equal in value. In strict mode, this includes
      * additional properties added to the array.

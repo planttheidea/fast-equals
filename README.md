@@ -346,6 +346,7 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
+  constructors?: boolean;
   areArrayBuffersEqual: EqualityComparator<Meta>;
   areArraysEqual: EqualityComparator<Meta>;
   areDataViewsEqual: EqualityComparator<Meta>;
@@ -388,7 +389,8 @@ ordering of keys matters to equality._
 
 Defaults to `true`. Set to `false` to compare values with different constructors using their type-specific comparators,
 provided their `Object.prototype.toString` tags match. This applies at the root and to nested values, and can be
-combined with `circular`, `strict`, and custom comparators.
+combined with `circular`, `strict`, and custom comparators. The resolved setting is included in the configuration passed
+to `createCustomConfig`, which may override it.
 
 ```ts
 const equal = createCustomEqual({ constructors: false });
