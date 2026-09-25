@@ -346,6 +346,7 @@ interface Cache<Key extends object, Value> {
 }
 
 interface ComparatorConfig<Meta> {
+  constructors?: boolean;
   areArrayBuffersEqual: EqualityComparator<Meta>;
   areArraysEqual: EqualityComparator<Meta>;
   areDataViewsEqual: EqualityComparator<Meta>;
@@ -371,6 +372,7 @@ function createCustomEqual<Meta>(options: {
   ) => (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<Meta>) => boolean;
   createState?: () => { cache?: Cache; meta?: Meta };
   strict?: boolean;
+  constructors?: boolean;
 }): <A, B>(a: A, b: B) => boolean;
 ```
 
@@ -382,6 +384,27 @@ like assistance feel free to [file an issue](https://github.com/planttheidea/fas
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing
 equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where
 ordering of keys matters to equality._
+
+#### constructors
+
+Defaults to `true`. Set to `false` to compare values with different constructors using their type-specific comparators,
+provided their `Object.prototype.toString` tags match. This applies at the root and to nested values, and can be
+combined with `circular`, `strict`, and custom comparators. The resolved setting is included in the configuration passed
+to `createCustomConfig`, which may override it.
+
+```ts
+const equal = createCustomEqual({ constructors: false });
+const attrs = Object.assign(Object.create(null), { aspectRatio: 16 / 9 });
+
+equal(attrs, { ...attrs }); // true
+```
+
+This supports migrating from [`lodash.isEqual`](https://lodash.com/docs/4.17.15#isEqual) when comparing null-prototype
+dictionaries (such as ProseMirror attributes or `Object.groupBy` results) with ordinary objects. It does not provide
+complete lodash parity: disabling the check also permits distinct class constructors with matching type tags and equal
+properties, whereas lodash can distinguish those classes. Different type tags (such as a `Date` and an ordinary object)
+remain unequal. Own enumerable `constructor` properties are still compared as data. The default behavior of the exported
+equality functions is unchanged.
 
 #### getUnsupportedCustomComparator
 
