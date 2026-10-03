@@ -94,6 +94,12 @@ interface ComparatorConfig<Meta> {
      * Get a custom comparator based on the objects passed.
      */
     getUnsupportedCustomComparator: ((a: any, b: any, state: State<Meta>, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
+    /**
+     * Whether a null-prototype object (`Object.create(null)`) is unequal to an otherwise identical
+     * plain object. Defaults to `true`; when `false`, the two are compared as dictionaries.
+     * Constructor checks for all other types are unaffected.
+     */
+    strictNullPrototypeComparison?: boolean;
 }
 type EqualityComparator<Meta> = (a: any, b: any, state: State<Meta>) => boolean;
 type InternalEqualityComparator<Meta> = (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<Meta>) => boolean;
@@ -138,6 +144,12 @@ interface CustomEqualCreatorOptions<Meta> {
      * with equal shape of descriptors.
      */
     strict?: boolean;
+    /**
+     * Whether a null-prototype object (`Object.create(null)`) is unequal to an otherwise identical
+     * plain object. Defaults to `true`; when `false`, the two are compared as dictionaries.
+     * Constructor checks for all other types are unaffected.
+     */
+    strictNullPrototypeComparison?: boolean;
 }
 
 /**

@@ -361,6 +361,7 @@ interface ComparatorConfig<Meta> {
   areTypedArraysEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
   getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
+  strictNullPrototypeComparison?: boolean;
 }
 
 function createCustomEqual<Meta>(options: {
@@ -371,6 +372,7 @@ function createCustomEqual<Meta>(options: {
   ) => (a: any, b: any, indexOrKeyA: any, indexOrKeyB: any, parentA: any, parentB: any, state: State<Meta>) => boolean;
   createState?: () => { cache?: Cache; meta?: Meta };
   strict?: boolean;
+  strictNullPrototypeComparison?: boolean;
 }): <A, B>(a: A, b: B) => boolean;
 ```
 
@@ -382,6 +384,23 @@ like assistance feel free to [file an issue](https://github.com/planttheidea/fas
 _**NOTE**: `Map` implementations compare equality for both keys and value. When using a custom comparator and comparing
 equality of the keys, the iteration index is provided as both `indexOrKeyA` and `indexOrKeyB` to help use-cases where
 ordering of keys matters to equality._
+
+#### strictNullPrototypeComparison
+
+Defaults to `true`, which keeps a null-prototype object (`Object.create(null)`) unequal to an otherwise identical plain
+object. Set it to `false` to compare the two as dictionaries, for values such as
+[ProseMirror node attributes](https://prosemirror.net/docs/ref/#model.Node.attrs) or `Object.groupBy` results.
+
+```ts
+const equal = createCustomEqual({ strictNullPrototypeComparison: false });
+const attrs = Object.assign(Object.create(null), { aspectRatio: 16 / 9 });
+
+equal(attrs, { ...attrs }); // true
+```
+
+This is the only exception to the constructor check: a null-prototype object remains unequal to arrays, `Map`s, dates,
+and other built-ins, and distinct class constructors remain unequal to each other. It applies to nested values and can
+be combined with `circular`, `strict`, and custom comparators.
 
 #### getUnsupportedCustomComparator
 

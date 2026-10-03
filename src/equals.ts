@@ -1,4 +1,11 @@
-import type { AnyObject, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
+import type {
+  AnyObject,
+  ComparatorConfig,
+  EqualityComparator,
+  PrimitiveWrapper,
+  State,
+  TypedArray,
+} from './internalTypes.js';
 import { getStrictProperties, hasOwn } from './utils.js';
 
 const PREACT_VNODE = '__v';
@@ -10,6 +17,7 @@ const REACT_OWNER = '_owner';
 const HAS_FLOAT_16_ARRAY = typeof Float16Array !== 'undefined';
 
 const { getOwnPropertyDescriptor, keys } = Object;
+const { toString } = Object.prototype;
 
 /**
  * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
@@ -318,6 +326,43 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
   }
 
   return true;
+}
+
+/**
+ * Whether the custom objects are equal in value, based on their string tag. Capturing the tag
+ * is reasonably performant in modern environments like v8 and SpiderMonkey. This is kept out of
+ * the main comparator so that it stays within the engine's bytecode budget for inlining.
+ */
+export function areTaggedObjectsEqual(
+  a: any,
+  b: any,
+  state: State<any>,
+  supportedComparatorMap: Record<string, EqualityComparator<any>>,
+  getUnsupportedCustomComparator: ComparatorConfig<any>['getUnsupportedCustomComparator'],
+): boolean {
+  const tag = toString.call(a);
+  const supportedComparator = supportedComparatorMap[tag];
+
+  if (supportedComparator) {
+    return supportedComparator(a, b, state);
+  }
+
+  const unsupportedCustomComparator =
+    getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, state, tag);
+
+  if (unsupportedCustomComparator) {
+    return unsupportedCustomComparator(a, b, state);
+  }
+
+  // If not matching any tags that require a specific type of comparison, then we hard-code false because
+  // the only thing remaining is strict equality, which has already been compared. This is for a few reasons:
+  //   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
+  //     comparison that can be made.
+  //   - For types that can be introspected but do not have an objective definition of what
+  //     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
+  // In all cases, these decisions should be reevaluated based on changes to the language and
+  // common development practices.
+  return false;
 }
 
 /**

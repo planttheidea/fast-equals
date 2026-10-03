@@ -1,7 +1,9 @@
 import type { AnyObject, Cache, CircularState, EqualityComparator, State } from './internalTypes.js';
 
 const { getOwnPropertyNames, getOwnPropertySymbols } = Object;
-const { hasOwnProperty } = Object.prototype;
+const { hasOwnProperty, toString } = Object.prototype;
+
+const OBJECT_TAG = '[object Object]';
 
 /**
  * Combine two comparators into a single comparators.
@@ -64,3 +66,23 @@ export function getStrictProperties(object: AnyObject): Array<string | symbol> {
 export const hasOwn =
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   Object.hasOwn || ((object: AnyObject, property: number | string | symbol) => hasOwnProperty.call(object, property));
+
+/**
+ * Whether a null-prototype object is being compared with a plain object. Only one side can be
+ * null-prototype when the constructors differ. The other side must be a plain object by
+ * constructor, or by tag when it comes from another realm.
+ */
+export function isNullPrototypeComparable(a: any, b: any): boolean {
+  const aConstructor = a.constructor;
+  const bConstructor = b.constructor;
+
+  if (aConstructor == null) {
+    return bConstructor === Object || toString.call(b) === OBJECT_TAG;
+  }
+
+  if (bConstructor == null) {
+    return aConstructor === Object || toString.call(a) === OBJECT_TAG;
+  }
+
+  return false;
+}
