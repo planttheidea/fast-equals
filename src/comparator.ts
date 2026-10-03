@@ -51,19 +51,19 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
   } = config;
 
   /**
-   * Whether the custom objects are equal in value, based on their string tag. Capturing the tag
-   * is reasonably performant in modern environments like v8 and SpiderMonkey. This is kept out of
-   * the main comparator so that it stays within the engine's bytecode budget for inlining.
-   *
-   * If not matching any tags that require a specific type of comparison, then we hard-code false
-   * because the only thing remaining is strict equality, which has already been compared. This is
-   * for a few reasons:
+   * Whether the custom objects are equal in value, based on their string tag. If not matching any tags
+   * that require a specific type of comparison, then we hard-code false because the only thing remaining
+   * is strict equality, which has already been compared. This is for a few reasons:
    *   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
    *     comparison that can be made.
    *   - For types that can be introspected but do not have an objective definition of what
    *     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
    * In all cases, these decisions should be reevaluated based on changes to the language and
    * common development practices.
+   *
+   * Capturing the tag is reasonably performant in modern environments like v8 and SpiderMonkey. This is
+   * kept out of the main comparator so that it stays within the engine's bytecode budget for inlining.
+   * See [#207](https://github.com/planttheidea/fast-equals/pull/207) for more details.
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
