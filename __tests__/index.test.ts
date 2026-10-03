@@ -1,3 +1,4 @@
+import { runInNewContext } from 'node:vm';
 import { describe, expect, test } from 'vitest';
 import {
   circularDeepEqual,
@@ -761,5 +762,155 @@ describe('sameValueZeroEqual', () => {
         ).toBe(false);
       });
     }
+  });
+});
+
+describe('strictNullPrototypeComparison', () => {
+  interface Attrs {
+    aspectRatio: number;
+    dynamicContent: boolean;
+    self?: object;
+  }
+
+  const dictionary = (): Attrs => {
+    const attrs: Attrs = { aspectRatio: 16 / 9, dynamicContent: false };
+
+    Object.setPrototypeOf(attrs, null);
+
+    return attrs;
+  };
+
+  test('is strict by default', () => {
+    const attrs = dictionary();
+
+    expect(deepEqual(attrs, { ...attrs })).toBe(false);
+    expect(createCustomEqual()(attrs, { ...attrs })).toBe(false);
+    expect(createCustomEqual({ strictNullPrototypeComparison: true })(attrs, { ...attrs })).toBe(false);
+  });
+
+  test.each([false, true])('compares dictionaries with plain objects with circular=%s', (circular) => {
+    const equal = createCustomEqual({ circular, strictNullPrototypeComparison: false });
+    const attrs = dictionary();
+    const pairs: Array<[unknown, unknown, boolean]> = [
+      [attrs, { ...attrs }, true],
+      [{ ...attrs }, attrs, true],
+      [{ attrs }, { attrs: { ...attrs } }, true],
+      [[attrs], [{ ...attrs }], true],
+      [new Map([['attrs', attrs]]), new Map([['attrs', { ...attrs }]]), true],
+      [new Set([attrs]), new Set([{ ...attrs }]), true],
+      [Object.create(null), {}, true],
+      [{}, Object.create(null), true],
+      [attrs, { ...attrs, aspectRatio: 2 }, false],
+      [attrs, { aspectRatio: attrs.aspectRatio }, false],
+      [attrs, { ...attrs, extra: undefined }, false],
+    ];
+
+    for (const [a, b, expected] of pairs) {
+      expect(equal(a, b)).toBe(expected);
+    }
+  });
+
+  test('supports mixed-prototype cycles and detects changed values', () => {
+    const equal = createCustomEqual({ circular: true, strictNullPrototypeComparison: false });
+    const a = dictionary();
+    const b = { ...a };
+
+    a.self = a;
+    b.self = b;
+
+    expect(equal(a, b)).toBe(true);
+    expect(equal(b, a)).toBe(true);
+
+    b.aspectRatio = 2;
+
+    expect(equal(a, b)).toBe(false);
+  });
+
+  test('retains descriptor checks in strict mode', () => {
+    const equal = createCustomEqual({ strict: true, strictNullPrototypeComparison: false });
+    const a = dictionary();
+    const b = { ...a };
+
+    expect(equal(a, b)).toBe(true);
+
+    Object.defineProperty(b, 'aspectRatio', { writable: false });
+
+    expect(equal(a, b)).toBe(false);
+  });
+
+  test('still compares own constructor properties as data', () => {
+    const equal = createCustomEqual({ strictNullPrototypeComparison: false });
+
+    expect(equal(Object.assign(Object.create(null), { constructor: 1 }), { constructor: 1 })).toBe(true);
+    expect(equal(Object.assign(Object.create(null), { constructor: 1 }), { constructor: 2 })).toBe(false);
+  });
+
+  test('compares with plain objects from another realm', () => {
+    const equal = createCustomEqual({ strictNullPrototypeComparison: false });
+    const foreign = runInNewContext('({ aspectRatio: 16 / 9, dynamicContent: false })');
+
+    expect(equal(dictionary(), foreign)).toBe(true);
+    expect(equal(foreign, dictionary())).toBe(true);
+  });
+
+  test('keeps constructor checks for everything else', () => {
+    class A {
+      value = 1;
+    }
+    class B {
+      value = 1;
+    }
+
+    const equal = createCustomEqual({ strictNullPrototypeComparison: false });
+
+    expect(equal(new A(), new B())).toBe(false);
+    expect(equal(new A(), { value: 1 })).toBe(false);
+    expect(equal({ value: 1 }, new A())).toBe(false);
+    expect(equal(new Date(1), {})).toBe(false);
+    expect(equal([], {})).toBe(false);
+  });
+
+  test('rejects incompatible types for null-prototype objects in either argument order', () => {
+    const equal = createCustomEqual({ strictNullPrototypeComparison: false });
+    const empty = Object.create(null);
+    const others = [[], new Map(), new Set(), new Date(0), /a/, new Uint8Array(0), Promise.resolve(), Math.max];
+
+    for (const other of others) {
+      expect(equal(empty, other)).toBe(false);
+      expect(equal(other, empty)).toBe(false);
+    }
+  });
+
+  test('allows custom config to override the setting', () => {
+    const attrs = dictionary();
+    const loosened = createCustomEqual({
+      createCustomConfig: (config) => {
+        expect(config.strictNullPrototypeComparison).toBe(true);
+
+        return { strictNullPrototypeComparison: false };
+      },
+    });
+    const tightened = createCustomEqual({
+      createCustomConfig: (config) => {
+        expect(config.strictNullPrototypeComparison).toBe(false);
+
+        return { strictNullPrototypeComparison: true };
+      },
+      strictNullPrototypeComparison: false,
+    });
+
+    expect(loosened(attrs, { ...attrs })).toBe(true);
+    expect(tightened(attrs, { ...attrs })).toBe(false);
+  });
+
+  test('uses the configured object comparator', () => {
+    const equal = createCustomEqual({
+      createCustomConfig: () => ({ areObjectsEqual: (a, b) => a.id === b.id }),
+      strictNullPrototypeComparison: false,
+    });
+    const a = Object.assign(Object.create(null), { id: 1, label: 'before' });
+
+    expect(equal(a, { id: 1, label: 'after' })).toBe(true);
+    expect(equal(a, { id: 2, label: 'before' })).toBe(false);
   });
 });

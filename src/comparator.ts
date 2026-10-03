@@ -10,6 +10,7 @@ import {
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
+  areTaggedObjectsEqual,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
   sameValueEqual,
@@ -22,9 +23,7 @@ import type {
   InternalEqualityComparator,
   State,
 } from './internalTypes.js';
-import { combineComparators, createIsCircular } from './utils.js';
-
-const toString = Object.prototype.toString;
+import { combineComparators, createIsCircular, isNullPrototypeComparable } from './utils.js';
 
 interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOptions<Meta>>, 'circular' | 'strict'> {
   comparator: EqualityComparator<Meta>;
@@ -47,6 +46,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     areRegExpsEqual,
     areSetsEqual,
     getUnsupportedCustomComparator,
+    strictNullPrototypeComparison,
   } = config;
   /**
    * compare the value of the two objects and return true if they are equivalent in values
@@ -96,7 +96,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     // Constructors should match, otherwise there is potential for false positives
     // between class and subclass or custom object and POJO.
     if (constructor !== b.constructor) {
-      return false;
+      return strictNullPrototypeComparison ? false : isNullPrototypeComparable(a, b) && areObjectsEqual(a, b, state);
     }
 
     // Try to fast-path equality checks for other complex object types in the
@@ -146,31 +146,8 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
       return areArraysEqual(a, b, state);
     }
 
-    // Since this is a custom object, capture the string tag to determining its type.
-    // This is reasonably performant in modern environments like v8 and SpiderMonkey.
-    const tag = toString.call(a);
-    const supportedComparator = supportedComparatorMap[tag];
-
-    if (supportedComparator) {
-      return supportedComparator(a, b, state);
-    }
-
-    const unsupportedCustomComparator =
-      getUnsupportedCustomComparator && getUnsupportedCustomComparator(a, b, state, tag);
-
-    if (unsupportedCustomComparator) {
-      return unsupportedCustomComparator(a, b, state);
-    }
-
-    // If not matching any tags that require a specific type of comparison, then we hard-code false because
-    // the only thing remaining is strict equality, which has already been compared. This is for a few reasons:
-    //   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
-    //     comparison that can be made.
-    //   - For types that can be introspected but do not have an objective definition of what
-    //     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
-    // In all cases, these decisions should be reevaluated based on changes to the language and
-    // common development practices.
-    return false;
+    // Since this is a custom object, use the string tag to determine its type.
+    return areTaggedObjectsEqual(a, b, state, supportedComparatorMap, getUnsupportedCustomComparator);
   };
 }
 
@@ -181,6 +158,7 @@ export function createEqualityComparatorConfig<Meta>({
   circular,
   createCustomConfig,
   strict,
+  strictNullPrototypeComparison = true,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
   let config = {
     areArrayBuffersEqual,
@@ -206,6 +184,7 @@ export function createEqualityComparatorConfig<Meta>({
       : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
     getUnsupportedCustomComparator: undefined,
+    strictNullPrototypeComparison,
   };
 
   if (createCustomConfig) {
