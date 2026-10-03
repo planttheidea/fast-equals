@@ -1,5 +1,12 @@
 # fast-equals CHANGELOG
 
+## 6.1.0
+
+- [#207](https://github.com/planttheidea/fast-equals/pull/207) - Add `strictNullPrototypeComparison` configuration
+  option (thanks [@erictheswift](https://github.com/erictheswift))
+- [#208](https://github.com/planttheidea/fast-equals/pull/208) - Skip the `getUnsupportedCustomComparator` check for
+  tag-based comparisons when no getter is configured.
+
 ## 6.0.4
 
 - [#204](https://github.com/planttheidea/fast-equals/pull/204) - Use a more efficient comparison for pure objects

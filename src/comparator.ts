@@ -10,7 +10,6 @@ import {
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
-  areTaggedObjectsEqual,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areUrlsEqual as areUrlsEqualDefault,
   sameValueEqual,
@@ -31,6 +30,8 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
   equals: InternalEqualityComparator<Meta>;
 }
 
+const { toString } = Object.prototype;
+
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
@@ -48,6 +49,41 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     getUnsupportedCustomComparator,
     strictNullPrototypeComparison,
   } = config;
+
+  /**
+   * Whether the custom objects are equal in value, based on their string tag. If not matching any tags
+   * that require a specific type of comparison, then we hard-code false because the only thing remaining
+   * is strict equality, which has already been compared. This is for a few reasons:
+   *   - Certain types that cannot be introspected (e.g., `WeakMap`). For these types, this is the only
+   *     comparison that can be made.
+   *   - For types that can be introspected but do not have an objective definition of what
+   *     equality is (`Error`, etc.), the subjective decision is to be conservative and strictly compare.
+   * In all cases, these decisions should be reevaluated based on changes to the language and
+   * common development practices.
+   *
+   * Capturing the tag is reasonably performant in modern environments like v8 and SpiderMonkey. This is
+   * kept out of the main comparator so that it stays within the engine's bytecode budget for inlining.
+   * See [#207](https://github.com/planttheidea/fast-equals/pull/207) for more details.
+   */
+  const areTaggedObjectsEqual = getUnsupportedCustomComparator
+    ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
+        const tag = toString.call(a);
+        const supportedComparator = supportedComparatorMap[tag];
+
+        if (supportedComparator) {
+          return supportedComparator(a, b, state);
+        }
+
+        const unsupportedCustomComparator = getUnsupportedCustomComparator(a, b, state, tag);
+
+        return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
+      }
+    : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
+        const supportedComparator = supportedComparatorMap[toString.call(a)];
+
+        return supportedComparator ? supportedComparator(a, b, state) : false;
+      };
+
   /**
    * compare the value of the two objects and return true if they are equivalent in values
    */
@@ -147,7 +183,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
     }
 
     // Since this is a custom object, use the string tag to determine its type.
-    return areTaggedObjectsEqual(a, b, state, supportedComparatorMap, getUnsupportedCustomComparator);
+    return areTaggedObjectsEqual(a, b, state);
   };
 }
 

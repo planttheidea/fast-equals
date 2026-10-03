@@ -1,7 +1,7 @@
 > fast-equals
 
 Perform [blazing fast](#benchmarks) equality comparisons between two objects, while also allowing for flexibility for
-various use-cases. It has no dependencies, and is ~2.3kB when minified and gzipped.
+various use-cases. It has no dependencies, and is ~2.46kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -17,8 +17,8 @@ The following types are handled out-of-the-box:
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes
 
-Methods are available for deep, shallow, [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue),
-[`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero), or
+Methods are available for deep, shallow, [`SameValue`](https://262.ecma-international.org/7.0/#sec-samevalue),
+[`SameValueZero`](https://262.ecma-international.org/7.0/#sec-samevaluezero), or
 [strict equality](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) comparison. In addition, you
 can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition,
 or both. You can also customize any specific type comparison based on your application's use-cases.
@@ -47,6 +47,7 @@ If you are having any problems, want to request a new feature, or have any quest
   - [strictCircularDeepEqual](#strictcirculardeepequal)
   - [strictCircularShallowEqual](#strictcircularshallowequal)
   - [createCustomEqual](#createcustomequal)
+    - [strictNullPrototypeComparison](#strictnullprototypecomparison)
     - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
     - [Recipes](#recipes)
 - [Benchmarks](#benchmarks)
@@ -79,7 +80,7 @@ console.log(deepEqual(objectA, objectB)); // true
 #### Comparing `Map`s
 
 `Map` objects support complex keys (objects, Arrays, etc.), however
-[the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality).
+[the spec for key lookups in `Map` are based on `SameValueZero`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality).
 If the spec were followed for comparison, the following would always be `false`:
 
 ```ts
@@ -113,8 +114,8 @@ console.log(shallowEqual(objectA, objectC)); // false
 
 ### sameValueEqual
 
-Performs a [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue) comparison on the two objects passed
-and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+Performs a [`SameValue`](https://262.ecma-international.org/7.0/#sec-samevalue) comparison on the two objects passed and
+returns a boolean representing the value equivalency of the objects. In simple terms, this means:
 
 - `+0` and `-0` are not equal
 - `NaN` is equal to `NaN`
@@ -140,8 +141,8 @@ _**NOTE**: In environments that support
 
 ### sameValueZeroEqual
 
-Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two
-objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+Performs a [`SameValueZero`](https://262.ecma-international.org/7.0/#sec-samevaluezero) comparison on the two objects
+passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
 
 - `+0` and `-0` are equal
 - `NaN` is equal to `NaN`
@@ -213,7 +214,7 @@ Just as with `deepEqual`, [both keys and values are compared for deep equality](
 
 ### circularShallowEqual
 
-Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only
+Performs the same comparison as `shallowEqual` but supports circular objects. It is slower than `shallowEqual`, so only
 use if you know circular objects are present.
 
 ```ts
@@ -227,7 +228,7 @@ console.log(circularShallowEqual(array, [array])); // false
 
 ### strictDeepEqual
 
-Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking symbol properties
 - Checking non-enumerable properties in object comparisons
@@ -242,13 +243,13 @@ const otherArray = [{ foo: 'bar' }];
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(strictDeepEqual(array, otherArray)); // true;
-console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false;
+console.log(strictDeepEqual(array, otherArray)); // true
+console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false
 ```
 
 ### strictShallowEqual
 
-Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
@@ -262,13 +263,13 @@ const otherArray = ['foo'];
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(strictShallowEqual(array, otherArray)); // true;
-console.log(strictShallowEqual(array, ['foo'])); // false;
+console.log(strictShallowEqual(array, otherArray)); // true
+console.log(strictShallowEqual(array, ['foo'])); // false
 ```
 
 ### strictCircularDeepEqual
 
-Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking `Symbol` properties on the object
 - Checking non-enumerable properties in object comparisons
@@ -308,8 +309,7 @@ console.log(strictCircularDeepEqual(first, new Circular('foo'))); // false
 
 ### strictCircularShallowEqual
 
-Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. In this
-includes:
+Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
@@ -360,7 +360,8 @@ interface ComparatorConfig<Meta> {
   areSetsEqual: EqualityComparator<Meta>;
   areTypedArraysEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
-  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
+  getUnsupportedCustomComparator:
+    (<Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
   strictNullPrototypeComparison?: boolean;
 }
 
@@ -404,9 +405,10 @@ be combined with `circular`, `strict`, and custom comparators.
 
 #### getUnsupportedCustomComparator
 
-If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to
-support via the `getUnsupportedCustomComparator` option. See [this recipe]('./recipes/special-objects.md) for an
-example.
+If you want to compare objects whose tag is not handled out-of-the-box (such as a custom `Symbol.toStringTag` or a
+`WeakMap`), you can provide a `getUnsupportedCustomComparator` method. It receives both values, the comparison state,
+and the tag, and returns the comparator to use for them. Returning `undefined` treats the values as unequal. See
+[this recipe](./recipes/special-objects.md) for an example.
 
 #### Recipes
 
@@ -415,16 +417,15 @@ to the problem you are solving, they can offer guidance of how to structure your
 
 - [Legacy environment support for `RegExp` comparators](./recipes/legacy-regexp-support.md)
 - [Explicit property check](./recipes/explicit-property-check.md)
-- [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
+- [Using `meta` in comparison](./recipes/using-meta-in-comparison.md)
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
-- [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 - [Legacy environment support for circular equal comparators](./recipes/legacy-circular-equal-support.md)
 - [Custom comparator support](./recipes/special-objects.md)
 
 ## Benchmarks
 
 All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version
-`24.11.1`, and are based on averages of running comparisons based deep equality on the following object types:
+`24.15.0`, and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -440,74 +441,74 @@ Testing mixed objects equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 1478330.935014 │
+│ fast-equals (passed)                   │ 1522774.1567   │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 1246644.004889 │
+│ react-fast-compare (passed)            │ 1285289.880042 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 1223991.602206 │
+│ fast-deep-equal (passed)               │ 1285105.414715 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (passed)           │ 1192746.28367  │
+│ shallow-equal-fuzzy (passed)           │ 1248325.039481 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (failed)                    │ 917825.058845  │
+│ nano-equal (failed)                    │ 962152.688616  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 734269.031473  │
+│ fast-equals (circular) (passed)        │ 800100.693495  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 702632.334945  │
+│ dequal/lite (passed)                   │ 778011.650869  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 676206.685725  │
+│ dequal (passed)                        │ 770187.208947  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 413859.810046  │
+│ underscore.isEqual (passed)            │ 449433.41171   │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 384573.330742  │
+│ assert.deepStrictEqual (passed)        │ 442249.829162  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 333634.454044  │
+│ es-toolkit (passed)                    │ 355943.82757   │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 285124.652706  │
+│ fast-equals (strict) (passed)          │ 307931.96677   │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 272221.340481  │
+│ lodash.isEqual (passed)                │ 294660.269815  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 236878.960045  │
+│ fast-equals (strict circular) (passed) │ 252760.794458  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 154390.610864  │
+│ deep-eql (passed)                      │ 166131.383227  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 905.343563     │
+│ deep-equal (passed)                    │ 970.944208     │
 └────────────────────────────────────────┴────────────────┘
 
 Testing mixed objects not equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 4962887.909706 │
+│ fast-equals (passed)                   │ 5122472.769802 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 3362453.019363 │
+│ fast-deep-equal (passed)               │ 3520297.242957 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 3359178.728738 │
+│ fast-equals (circular) (passed)        │ 3485912.9348   │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 3240226.145634 │
+│ react-fast-compare (passed)            │ 3414203.488651 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 2895230.420069 │
+│ fast-equals (strict) (passed)          │ 3038182.032793 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 2178891.848559 │
+│ fast-equals (strict circular) (passed) │ 2344879.08551  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 1271343.172786 │
+│ dequal/lite (passed)                   │ 1340883.333611 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 1249090.305916 │
+│ dequal (passed)                        │ 1311832.728093 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (failed)           │ 1197792.018762 │
+│ shallow-equal-fuzzy (failed)           │ 1249967.301358 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (passed)                    │ 1041772.816799 │
+│ nano-equal (passed)                    │ 1096529.56672  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 642874.802948  │
+│ underscore.isEqual (passed)            │ 660524.165237  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 360803.14264   │
+│ lodash.isEqual (passed)                │ 385500.174796  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 353678.240503  │
+│ es-toolkit (passed)                    │ 365617.977684  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 177224.890296  │
+│ deep-eql (passed)                      │ 186388.440331  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 19507.749026   │
+│ assert.deepStrictEqual (passed)        │ 21060.162935   │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 3559.100155    │
+│ deep-equal (passed)                    │ 3819.218852    │
 └────────────────────────────────────────┴────────────────┘
 ```
 
