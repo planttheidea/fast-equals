@@ -17,8 +17,8 @@ The following types are handled out-of-the-box:
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes
 
-Methods are available for deep, shallow, [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue),
-[`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero), or
+Methods are available for deep, shallow, [`SameValue`](https://262.ecma-international.org/7.0/#sec-samevalue),
+[`SameValueZero`](https://262.ecma-international.org/7.0/#sec-samevaluezero), or
 [strict equality](https://262.ecma-international.org/7.0/#sec-strict-equality-comparison) comparison. In addition, you
 can opt into support for circular objects, or performing a "strict" comparison with unconventional property definition,
 or both. You can also customize any specific type comparison based on your application's use-cases.
@@ -47,6 +47,7 @@ If you are having any problems, want to request a new feature, or have any quest
   - [strictCircularDeepEqual](#strictcirculardeepequal)
   - [strictCircularShallowEqual](#strictcircularshallowequal)
   - [createCustomEqual](#createcustomequal)
+    - [strictNullPrototypeComparison](#strictnullprototypecomparison)
     - [getUnsupportedCustomComparator](#getunsupportedcustomcomparator)
     - [Recipes](#recipes)
 - [Benchmarks](#benchmarks)
@@ -79,7 +80,7 @@ console.log(deepEqual(objectA, objectB)); // true
 #### Comparing `Map`s
 
 `Map` objects support complex keys (objects, Arrays, etc.), however
-[the spec for key lookups in `Map` are based on `SameZeroValue`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality).
+[the spec for key lookups in `Map` are based on `SameValueZero`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#key_equality).
 If the spec were followed for comparison, the following would always be `false`:
 
 ```ts
@@ -113,8 +114,8 @@ console.log(shallowEqual(objectA, objectC)); // false
 
 ### sameValueEqual
 
-Performs a [`SameValue`](http://ecma-international.org/ecma-262/7.0/#sec-samevalue) comparison on the two objects passed
-and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+Performs a [`SameValue`](https://262.ecma-international.org/7.0/#sec-samevalue) comparison on the two objects passed and
+returns a boolean representing the value equivalency of the objects. In simple terms, this means:
 
 - `+0` and `-0` are not equal
 - `NaN` is equal to `NaN`
@@ -140,8 +141,8 @@ _**NOTE**: In environments that support
 
 ### sameValueZeroEqual
 
-Performs a [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero) comparison on the two
-objects passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
+Performs a [`SameValueZero`](https://262.ecma-international.org/7.0/#sec-samevaluezero) comparison on the two objects
+passed and returns a boolean representing the value equivalency of the objects. In simple terms, this means:
 
 - `+0` and `-0` are equal
 - `NaN` is equal to `NaN`
@@ -213,7 +214,7 @@ Just as with `deepEqual`, [both keys and values are compared for deep equality](
 
 ### circularShallowEqual
 
-Performs the same comparison as `shallowequal` but supports circular objects. It is slower than `shallowEqual`, so only
+Performs the same comparison as `shallowEqual` but supports circular objects. It is slower than `shallowEqual`, so only
 use if you know circular objects are present.
 
 ```ts
@@ -227,7 +228,7 @@ console.log(circularShallowEqual(array, [array])); // false
 
 ### strictDeepEqual
 
-Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `deepEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking symbol properties
 - Checking non-enumerable properties in object comparisons
@@ -242,13 +243,13 @@ const otherArray = [{ foo: 'bar' }];
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(strictDeepEqual(array, otherArray)); // true;
-console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false;
+console.log(strictDeepEqual(array, otherArray)); // true
+console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false
 ```
 
 ### strictShallowEqual
 
-Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
@@ -262,13 +263,13 @@ const otherArray = ['foo'];
 array.bar = 'baz';
 otherArray.bar = 'baz';
 
-console.log(strictShallowEqual(array, otherArray)); // true;
-console.log(strictShallowEqual(array, ['foo'])); // false;
+console.log(strictShallowEqual(array, otherArray)); // true
+console.log(strictShallowEqual(array, ['foo'])); // false
 ```
 
 ### strictCircularDeepEqual
 
-Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. In this includes:
+Performs the same comparison as `circularDeepEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking `Symbol` properties on the object
 - Checking non-enumerable properties in object comparisons
@@ -308,8 +309,7 @@ console.log(strictCircularDeepEqual(first, new Circular('foo'))); // false
 
 ### strictCircularShallowEqual
 
-Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. In this
-includes:
+Performs the same comparison as `circularShallowEqual` but performs a strict comparison of the objects. This includes:
 
 - Checking non-enumerable properties in object comparisons
 - Checking full descriptor of properties on the object to match
@@ -360,7 +360,8 @@ interface ComparatorConfig<Meta> {
   areSetsEqual: EqualityComparator<Meta>;
   areTypedArraysEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
-  getUnsupportedCustomComparator: <Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta>;
+  getUnsupportedCustomComparator:
+    (<Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
   strictNullPrototypeComparison?: boolean;
 }
 
@@ -404,9 +405,10 @@ be combined with `circular`, `strict`, and custom comparators.
 
 #### getUnsupportedCustomComparator
 
-If you want to compare objects that have a custom `@@toStringTag`, you can provide a map of the custom tags you want to
-support via the `getUnsupportedCustomComparator` option. See [this recipe]('./recipes/special-objects.md) for an
-example.
+If you want to compare objects whose tag is not handled out-of-the-box (such as a custom `Symbol.toStringTag` or a
+`WeakMap`), you can provide a `getUnsupportedCustomComparator` method. It receives both values, the comparison state,
+and the tag, and returns the comparator to use for them. Returning `undefined` treats the values as unequal. See
+[this recipe](./recipes/special-objects.md) for an example.
 
 #### Recipes
 
@@ -415,9 +417,8 @@ to the problem you are solving, they can offer guidance of how to structure your
 
 - [Legacy environment support for `RegExp` comparators](./recipes/legacy-regexp-support.md)
 - [Explicit property check](./recipes/explicit-property-check.md)
-- [Using `meta` in comparison](./recipes//using-meta-in-comparison.md)
+- [Using `meta` in comparison](./recipes/using-meta-in-comparison.md)
 - [Comparing non-standard properties](./recipes/non-standard-properties.md)
-- [Strict property descriptor comparison](./recipes/strict-property-descriptor-check.md)
 - [Legacy environment support for circular equal comparators](./recipes/legacy-circular-equal-support.md)
 - [Custom comparator support](./recipes/special-objects.md)
 
