@@ -5,11 +5,12 @@ const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
-// `Float16Array` is recent enough that it cannot be referenced unguarded, and capturing its
-// availability once keeps that detail out of the comparison itself.
-const HAS_FLOAT_16_ARRAY = typeof Float16Array !== 'undefined';
-
 const { getOwnPropertyDescriptor, keys } = Object;
+
+/**
+ * Identify the element type of TypedArrays across realms and subclasses.
+ */
+const getTypedArrayTag = getOwnPropertyDescriptor(Object.getPrototypeOf(Int8Array.prototype), Symbol.toStringTag)!.get!;
 
 /**
  * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
@@ -333,7 +334,9 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   // Only float-backed views can hold `NaN`, and the additional check needed to treat it as equal
   // to itself measurably slows the loop, so integer views keep the plain comparison. This is
   // hoisted out of the loop so the cost is paid once per call rather than once per element.
-  if (a instanceof Float64Array || a instanceof Float32Array || (HAS_FLOAT_16_ARRAY && a instanceof Float16Array)) {
+  const tag = getTypedArrayTag.call(a);
+
+  if (tag === 'Float64Array' || tag === 'Float32Array' || tag === 'Float16Array') {
     while (index-- > 0) {
       // `NaN` is the only value not equal to itself, and it is treated as equal here to match
       // the SameValueZero semantics used for every other numeric comparison in the library.
