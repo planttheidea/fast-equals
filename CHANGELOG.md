@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 6.1.1
+
+- [#210](https://github.com/planttheidea/fast-equals/pull/210) - Fix support for cross-realm float array handling
+  (thanks [@pravlav-25](https://github.com/pralav-25))
+
 ## 6.1.0
 
 - [#207](https://github.com/planttheidea/fast-equals/pull/207) - Add `strictNullPrototypeComparison` configuration
