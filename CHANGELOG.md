@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 5.4.4
+
+- [#212](https://github.com/planttheidea/fast-equals/pull/212) - Backport fix from
+  [#210](https://github.com/planttheidea/fast-equals/pull/210) for cross-realm float array handling.
+
 ## 5.4.3
 
 - [#205](https://github.com/planttheidea/fast-equals/pull/205) - Use a more efficient comparison for pure objects

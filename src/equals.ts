@@ -10,6 +10,7 @@ const { getOwnPropertyDescriptor, keys } = Object;
 /**
  * Identify the element type of TypedArrays across realms and subclasses.
  */
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const getTypedArrayTag = getOwnPropertyDescriptor(Object.getPrototypeOf(Int8Array.prototype), Symbol.toStringTag)!.get!;
 
 /**
