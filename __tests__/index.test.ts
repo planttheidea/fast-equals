@@ -684,6 +684,55 @@ describe('correctness fixes', () => {
   });
 });
 
+describe.each([
+  { name: 'deepEqual', equal: deepEqual },
+  { name: 'shallowEqual', equal: shallowEqual },
+  { name: 'circularDeepEqual', equal: circularDeepEqual },
+  { name: 'circularShallowEqual', equal: circularShallowEqual },
+  { name: 'strictDeepEqual', equal: strictDeepEqual },
+  { name: 'strictShallowEqual', equal: strictShallowEqual },
+  { name: 'strictCircularDeepEqual', equal: strictCircularDeepEqual },
+  { name: 'strictCircularShallowEqual', equal: strictCircularShallowEqual },
+])('$name floating TypedArrays across realms', ({ equal }) => {
+  test.each(
+    [Float32Array, Float64Array, ...(typeof Float16Array === 'undefined' ? [] : [Float16Array])].map((Constructor) => ({
+      name: Constructor.name,
+      Constructor,
+    })),
+  )('compares $name values consistently within each realm', ({ name, Constructor }) => {
+    const localA = new Constructor([NaN, 1]);
+    const localB = new Constructor([NaN, 1]);
+    const localNumber = new Constructor([2, 1]);
+    const [foreignA, foreignB, foreignNumber] = runInNewContext(`[
+      new ${name}([NaN, 1]),
+      new ${name}([NaN, 1]),
+      new ${name}([2, 1]),
+    ]`) as [Float64Array, Float64Array, Float64Array];
+
+    expect(equal(localA, localB)).toBe(true);
+    expect(equal(foreignA, foreignB)).toBe(true);
+    expect(equal(localA, localNumber)).toBe(false);
+    expect(equal(localNumber, localA)).toBe(false);
+    expect(equal(foreignA, foreignNumber)).toBe(false);
+    expect(equal(foreignNumber, foreignA)).toBe(false);
+
+    // Different realms have different constructors, which remain unequal.
+    expect(equal(localA, foreignA)).toBe(false);
+    expect(equal(foreignA, localA)).toBe(false);
+  });
+
+  test('compares floating TypedArray subclasses from another realm', () => {
+    const [a, b, number] = runInNewContext(`
+      class CustomFloatArray extends Float64Array {}
+      [new CustomFloatArray([NaN]), new CustomFloatArray([NaN]), new CustomFloatArray([1])];
+    `) as [Float64Array, Float64Array, Float64Array];
+
+    expect(equal(a, b)).toBe(true);
+    expect(equal(a, number)).toBe(false);
+    expect(equal(number, a)).toBe(false);
+  });
+});
+
 describe('sameValueEqual', () => {
   Object.keys(primitiveValues).forEach((key) => {
     test(`has ${key} be equal by SameValue`, () => {
