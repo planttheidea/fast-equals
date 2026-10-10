@@ -111,6 +111,7 @@ export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
     && a.message === b.message
     && a.stack === b.stack
     && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
+    && state.equals((a as AggregateError).errors, (b as AggregateError).errors, 'errors', 'errors', a, b, state)
   );
 }
 

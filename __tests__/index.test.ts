@@ -547,6 +547,30 @@ describe('correctness fixes', () => {
   });
 
   describe('Error', () => {
+    test('compares AggregateError contents', () => {
+      const [a, b, c] = [[{ code: 'A' }], [{ code: 'A' }], [{ code: 'B' }]].map(
+        (errors) => new AggregateError(errors, 'failure'),
+      );
+
+      expect(a!.stack).toBe(b!.stack);
+      expect(deepEqual(a, b)).toBe(true);
+      expect(deepEqual(a, c)).toBe(false);
+      expect(shallowEqual(a, b)).toBe(false);
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, c)).toBe(false);
+    });
+
+    test('compares circular AggregateError contents', () => {
+      const [a, b] = [0, 1].map(() => new AggregateError([], 'failure'));
+      a!.errors.push(a);
+      b!.errors.push(b);
+
+      expect(circularDeepEqual(a, b)).toBe(true);
+      expect(strictCircularDeepEqual(a, b)).toBe(true);
+      b!.errors.push('different');
+      expect(circularDeepEqual(a, b)).toBe(false);
+    });
+
     function createError<Value>(message: string, property?: Value) {
       const error = new Error(message) as Error & { property?: Value };
 
