@@ -5,7 +5,15 @@ const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
+/**
+ * Above this many keys, out-of-position keys are checked with `propertyIsEnumerable` rather than by
+ * scanning the other object's keys. Measured in V8: scanning wins up to 50 keys and loses from 100.
+ */
+const MAX_SCANNED_PROPERTIES = 64;
+
 const { getOwnPropertyDescriptor, keys } = Object;
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const { propertyIsEnumerable } = Object.prototype;
 
 /**
  * Identify the element type of TypedArrays across realms and subclasses.
@@ -61,13 +69,77 @@ export function areDatesEqual(a: Date, b: Date): boolean {
 
 /**
  * Whether the errors passed are equal in value.
+ *
+ * @note
+ * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
+ * explicitly. `cause` and `errors` are compared by value rather than by reference, matching how
+ * every other nested value in the comparison is treated. They are compared exactly once, regardless
+ * of whether they were assigned (enumerable) or set by the constructor (non-enumerable). Other own
+ * enumerable properties (which custom `Error` subclasses commonly add) are compared afterward.
+ *
+ * The own property comparison is inlined rather than extracted, which measured faster in V8 when
+ * recursing through `cause`. Keep the bytecode under V8's 460-byte TurboFan inlining limit (383 bytes
+ * at time of writing; check with `node --print-bytecode --print-bytecode-filter=areErrorsEqual`), or
+ * this stops being inlined into its callers.
  */
 export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
+  if (a.name !== b.name || a.message !== b.message || a.stack !== b.stack) {
+    return false;
+  }
+
+  const causeA = a.cause;
+  const causeB = b.cause;
+
+  if (causeA !== causeB && !state.equals(causeA, causeB, 'cause', 'cause', a, b, state)) {
+    return false;
+  }
+
+  const errorsA = (a as AggregateError).errors;
+  const errorsB = (b as AggregateError).errors;
+
+  if (errorsA !== errorsB && !state.equals(errorsA, errorsB, 'errors', 'errors', a, b, state)) {
+    return false;
+  }
+
+  const propertiesA = keys(a);
+  const propertiesB = keys(b);
+
+  let index = propertiesA.length;
+
+  // Constructed errors rarely have enumerable own properties.
+  if (!index && !propertiesB.length) {
+    return true;
+  }
+
+  let compared = 0;
+  let property: string;
+
+  while (index-- > 0) {
+    property = propertiesA[index]!;
+
+    // Already compared above regardless of enumerability, so we can ignore them.
+    if (property === 'cause' || property === 'errors') {
+      continue;
+    }
+
+    // `propertyIsEnumerable` rather than `hasOwn`, so that a non-enumerable own property on `b` cannot
+    // stand in for an enumerable one. Keys in the same position are trivially enumerable on `b`.
+    if (
+      (property !== propertiesB[index] && !propertyIsEnumerable.call(b, property))
+      || !state.equals((a as Dictionary)[property], (b as Dictionary)[property], property, property, a, b, state)
+    ) {
+      return false;
+    }
+
+    ++compared;
+  }
+
+  // Every compared key is enumerable on `b`, so any of `b`'s keys left over must be `cause` / `errors`.
+  const remaining = propertiesB.length - compared;
+
   return (
-    a.name === b.name
-    && a.message === b.message
-    && a.stack === b.stack
-    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
+    !remaining
+    || remaining === (propertyIsEnumerable.call(b, 'cause') ? 1 : 0) + (propertyIsEnumerable.call(b, 'errors') ? 1 : 0)
   );
 }
 
@@ -76,6 +148,18 @@ export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
  */
 export function areFunctionsEqual(a: (...args: any[]) => any, b: (...args: any[]) => any): boolean {
   return a === b;
+}
+
+/**
+ * Whether the errors passed are equal in value.
+ *
+ * @note
+ * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
+ * explicitly. `cause` and `errors` are own properties, so `areObjectsEqualStrict` compares them along
+ * with every other own property; they are not compared explicitly to avoid comparing them twice.
+ */
+export function areErrorsEqualStrict(a: Error, b: Error, state: State<any>): boolean {
+  return a.name === b.name && a.message === b.message && a.stack === b.stack && areObjectsEqualStrict(a, b, state);
 }
 
 /**
@@ -155,19 +239,39 @@ export const areNumbersEqual = sameValueZeroEqual;
  */
 export function areObjectsEqual(a: Dictionary, b: Dictionary, state: State<any>): boolean {
   const properties = keys(a);
+  const propertiesB = keys(b);
 
   let index = properties.length;
 
-  if (keys(b).length !== index) {
+  if (propertiesB.length !== index) {
     return false;
   }
+
+  const isScannable = index <= MAX_SCANNED_PROPERTIES;
+
+  let property: string;
 
   // Decrementing `while` showed faster results than either incrementing or
   // decrementing `for` loop and than an incrementing `while` loop. Declarative
   // methods like `some` / `every` were not used to avoid incurring the garbage
   // cost of anonymous callbacks.
   while (index-- > 0) {
-    if (!isPropertyEqual(a, b, state, properties[index]!)) {
+    property = properties[index]!;
+
+    if (isReactProperty(a, b, property)) {
+      continue;
+    }
+
+    // Objects built the same way list their keys in the same order, in which case the key is
+    // already known to be an own enumerable property of `b` and the lookup can be skipped.
+    // Otherwise, `propertiesB` is exactly `b`'s own enumerable keys. Scanning it is faster than
+    // `propertyIsEnumerable` for smaller objects, but it is linear per key, so larger objects
+    // (where reordering would make it quadratic) use the lookup instead.
+    if (
+      (property !== propertiesB[index]
+        && !(isScannable ? propertiesB.includes(property) : propertyIsEnumerable.call(b, property)))
+      || !state.equals(a[property], b[property], property, property, a, b, state)
+    ) {
       return false;
     }
   }
@@ -198,7 +302,10 @@ export function areObjectsEqualStrict(a: Dictionary, b: Dictionary, state: State
   while (index-- > 0) {
     property = properties[index]!;
 
-    if (!isPropertyEqual(a, b, state, property)) {
+    if (
+      !isReactProperty(a, b, property)
+      && (!hasOwn(b, property) || !state.equals(a[property], b[property], property, property, a, b, state))
+    ) {
       return false;
     }
 
@@ -377,13 +484,8 @@ function sortSearchParams(serialized: string): string {
   return serialized.split('&').sort().join('&');
 }
 
-function isPropertyEqual(a: Dictionary, b: Dictionary, state: State<any>, property: string | symbol) {
-  if (
-    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
-    && (a.$$typeof || b.$$typeof)
-  ) {
-    return true;
-  }
-
-  return hasOwn(b, property) && state.equals(a[property], b[property], property, property, a, b, state);
+function isReactProperty(a: Dictionary, b: Dictionary, property: string | symbol): boolean {
+  return (
+    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE) && !!(a.$$typeof || b.$$typeof)
+  );
 }

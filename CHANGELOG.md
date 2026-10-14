@@ -1,5 +1,12 @@
 # fast-equals CHANGELOG
 
+## 5.4.5
+
+- [#219](https://github.com/planttheidea/fast-equals/pull/219) - Backport fixes from
+  [#214](https://github.com/planttheidea/fast-equals/pull/214),
+  [#217](https://github.com/planttheidea/fast-equals/pull/217) and
+  [#218](https://github.com/planttheidea/fast-equals/pull/218) for `Error` and object comparison correctness.
+
 ## 5.4.4
 
 - [#212](https://github.com/planttheidea/fast-equals/pull/212) - Backport fix from
