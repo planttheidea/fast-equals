@@ -6,6 +6,7 @@
   checked (thanks [@feritcemkahraman](https://github.com/feritcemkahraman))
 - [#217](https://github.com/planttheidea/fast-equals/pull/217) - Fixed `Error` comparisons to compare `cause` / `errors`
   once and symmetrically, regardless of enumerability.
+- Fixed asymmetric object comparisons when a property was enumerable on one side but non-enumerable on the other.
 
 ## 6.2.0
 

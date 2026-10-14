@@ -510,8 +510,10 @@ function isObjectPropertyEqual(
     return true;
   }
 
+  // `propertyIsEnumerable` rather than `hasOwn`, so that a non-enumerable own property on `b` cannot
+  // stand in for an enumerable one and leave one of `b`'s enumerable properties unchecked.
   return (
-    (isKnownPropertyOfB || hasOwn(b, property))
+    (isKnownPropertyOfB || propertyIsEnumerable.call(b, property))
     && state.equals(a[property], b[property], property, property, a, b, state)
   );
 }

@@ -823,6 +823,32 @@ describe('correctness fixes', () => {
     });
   });
 
+  describe('object enumerability', () => {
+    const withHidden = <Value extends object>(object: Value, property: string, value: unknown) =>
+      Object.defineProperty(object, property, { configurable: true, enumerable: false, value });
+
+    test('compares objects with the same keys in a different order', () => {
+      expect(deepEqual({ a: 1, b: 2, c: 3 }, { c: 3, b: 2, a: 1 })).toBe(true);
+      expect(deepEqual({ a: 1, b: 2, c: 3 }, { c: 3, b: 2, a: 4 })).toBe(false);
+    });
+
+    test('does not let a non-enumerable property stand in for an enumerable one', () => {
+      const enumerable = { x: 1 };
+      const hidden = withHidden({ y: 2 }, 'x', 1);
+
+      expect(deepEqual(enumerable, hidden)).toBe(false);
+      expect(deepEqual(hidden, enumerable)).toBe(false);
+    });
+
+    test('does not let a non-enumerable property stand in for an enumerable one when keys are reordered', () => {
+      const enumerable = { x: 1, y: 2 };
+      const hidden = withHidden({ y: 2, z: 3 }, 'x', 1);
+
+      expect(deepEqual(enumerable, hidden)).toBe(false);
+      expect(deepEqual(hidden, enumerable)).toBe(false);
+    });
+  });
+
   describe('primitive wrappers', () => {
     test('compares boxed `BigInt` values', () => {
       expect(deepEqual(Object(BigInt(1)), Object(BigInt(1)))).toBe(true);
