@@ -893,6 +893,69 @@ describe('correctness fixes', () => {
     test('treats `-0` and `0` as equal, matching SameValueZero', () => {
       expect(deepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
     });
+
+    describe('strict', () => {
+      const withHidden = <Value extends object>(object: Value, property: string, value: unknown) =>
+        Object.defineProperty(object, property, { configurable: true, enumerable: false, value, writable: true });
+
+      test.each([
+        { name: 'strictDeepEqual', equal: strictDeepEqual },
+        { name: 'strictCircularDeepEqual', equal: strictCircularDeepEqual },
+      ])('compares own properties after the elements with $name', ({ equal }) => {
+        const symbol = Symbol('tag');
+        const withMeta = (meta: string) => Object.assign(new Uint8Array([1, 2]), { meta });
+        const withSymbol = (value: number) => Object.assign(new Uint8Array([1, 2]), { [symbol]: value });
+
+        expect(equal(withMeta('a'), withMeta('a'))).toBe(true);
+        expect(equal(withMeta('a'), withMeta('b'))).toBe(false);
+        expect(equal(withMeta('a'), new Uint8Array([1, 2]))).toBe(false);
+        expect(equal(new Uint8Array([1, 2]), withMeta('a'))).toBe(false);
+        expect(equal(Object.assign(new Uint8Array([1]), { x: 1 }), Object.assign(new Uint8Array([1]), { y: 1 }))).toBe(
+          false,
+        );
+
+        expect(equal(withSymbol(1), withSymbol(1))).toBe(true);
+        expect(equal(withSymbol(1), withSymbol(2))).toBe(false);
+
+        expect(equal(withMeta('a'), withHidden(new Uint8Array([1, 2]), 'meta', 'a'))).toBe(false);
+      });
+
+      test('compares elements and offsets as in loose mode', () => {
+        const buffer = new ArrayBuffer(32);
+
+        new Float64Array(buffer).set([9, 1, 2, 9]);
+
+        expect(strictDeepEqual(new Float64Array([1, 2, 3]), new Float64Array([1, 2, 4]))).toBe(false);
+        expect(strictDeepEqual(new Float64Array([1, 2]), new Float64Array([1, 2, 3]))).toBe(false);
+        expect(strictDeepEqual(new Float64Array([NaN]), new Float64Array([NaN]))).toBe(true);
+        expect(strictDeepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
+        expect(strictDeepEqual(new Float64Array(buffer, 8, 2), new Float64Array([1, 2]))).toBe(false);
+      });
+
+      test('does not compare elements again as own properties', () => {
+        let calls = 0;
+
+        const isEqual = createCustomEqual({
+          createInternalComparator: (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+            ++calls;
+
+            return compare(a, b, state);
+          },
+          strict: true,
+        });
+
+        expect(isEqual(new Uint8Array(100).fill(7), new Uint8Array(100).fill(7))).toBe(true);
+        expect(calls).toBe(0);
+
+        expect(
+          isEqual(
+            Object.assign(new Uint8Array(100).fill(7), { meta: 'a' }),
+            Object.assign(new Uint8Array(100).fill(7), { meta: 'a' }),
+          ),
+        ).toBe(true);
+        expect(calls).toBe(1);
+      });
+    });
   });
 });
 

@@ -12,6 +12,7 @@ import {
   areRegExpsEqual as areRegExpsEqualDefault,
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
+  areTypedArraysEqualStrict as areTypedArraysEqualStrictDefault,
   areUrlsEqual as areUrlsEqualDefault,
   sameValueEqual,
   strictEqual,
@@ -216,9 +217,7 @@ export function createEqualityComparatorConfig<Meta>({
     arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
     areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
-    areTypedArraysEqual: strict
-      ? combineComparators(areTypedArraysEqualDefault, areObjectsEqualStrictDefault)
-      : areTypedArraysEqualDefault,
+    areTypedArraysEqual: strict ? areTypedArraysEqualStrictDefault : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
     getUnsupportedCustomComparator: undefined,
     strictNullPrototypeComparison,

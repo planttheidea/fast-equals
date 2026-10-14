@@ -1,9 +1,11 @@
 import type { AnyObject, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
-import { getStrictProperties, hasOwn } from './utils.js';
-
-const PREACT_VNODE = '__v';
-const PREACT_OWNER = '__o';
-const REACT_OWNER = '_owner';
+import {
+  areStrictPropertiesEqual,
+  getStrictProperties,
+  getTypedArrayTag,
+  isReactProperty,
+  sortSearchParams,
+} from './utils.js';
 
 /**
  * Above this many keys, out-of-position keys are checked with `propertyIsEnumerable` rather than by
@@ -11,13 +13,8 @@ const REACT_OWNER = '_owner';
  */
 const MAX_SCANNED_PROPERTIES = 64;
 
-const { getOwnPropertyDescriptor, keys } = Object;
+const { keys } = Object;
 const { propertyIsEnumerable } = Object.prototype;
-
-/**
- * Identify the element type of TypedArrays across realms and subclasses.
- */
-const getTypedArrayTag = getOwnPropertyDescriptor(Object.getPrototypeOf(Int8Array.prototype), Symbol.toStringTag)!.get!;
 
 /**
  * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
@@ -308,46 +305,7 @@ export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): 
 export function areObjectsEqualStrict(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const properties = getStrictProperties(a);
 
-  let index = properties.length;
-
-  if (getStrictProperties(b).length !== index) {
-    return false;
-  }
-
-  let property: string | symbol;
-  let descriptorA: ReturnType<typeof getOwnPropertyDescriptor>;
-  let descriptorB: ReturnType<typeof getOwnPropertyDescriptor>;
-
-  // Decrementing `while` showed faster results than either incrementing or
-  // decrementing `for` loop and than an incrementing `while` loop. Declarative
-  // methods like `some` / `every` were not used to avoid incurring the garbage
-  // cost of anonymous callbacks.
-  while (index-- > 0) {
-    property = properties[index]!;
-
-    if (
-      !isReactProperty(a, b, property)
-      && (!hasOwn(b, property) || !state.equals(a[property], b[property], property, property, a, b, state))
-    ) {
-      return false;
-    }
-
-    descriptorA = getOwnPropertyDescriptor(a, property);
-    descriptorB = getOwnPropertyDescriptor(b, property);
-
-    if (
-      (descriptorA || descriptorB)
-      && (!descriptorA
-        || !descriptorB
-        || descriptorA.configurable !== descriptorB.configurable
-        || descriptorA.enumerable !== descriptorB.enumerable
-        || descriptorA.writable !== descriptorB.writable)
-    ) {
-      return false;
-    }
-  }
-
-  return true;
+  return getStrictProperties(b).length === properties.length && areStrictPropertiesEqual(a, b, state, properties, 0);
 }
 
 /**
@@ -362,6 +320,23 @@ export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapp
  */
 export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
   return a.source === b.source && a.flags === b.flags;
+}
+
+/**
+ * Whether the search params passed are equal in value.
+ *
+ * @note
+ * Order is not significant, matching how the other unordered collections in the library are
+ * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
+ * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
+ */
+function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+  const serializedA = a.toString();
+  const serializedB = b.toString();
+
+  // Identical serializations are equal under any ordering, and this is by far the common case, so
+  // it is worth checking before sorting anything.
+  return serializedA === serializedB || sortSearchParams(serializedA) === sortSearchParams(serializedB);
 }
 
 /**
@@ -457,6 +432,26 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
 }
 
 /**
+ * Whether the TypedArray instances are equal in value with strict property checking.
+ *
+ * @note
+ * Indexed elements are also own properties, listed first and in order, with descriptors fixed by the
+ * spec. They are compared once by `areTypedArraysEqual`, so only the own properties after them
+ * (including symbols) are compared with strict property checking.
+ */
+export function areTypedArraysEqualStrict(a: TypedArray, b: TypedArray, state: State<any>): boolean {
+  if (!areTypedArraysEqual(a, b)) {
+    return false;
+  }
+
+  const properties = getStrictProperties(a);
+
+  return (
+    getStrictProperties(b).length === properties.length && areStrictPropertiesEqual(a, b, state, properties, a.length)
+  );
+}
+
+/**
  * Whether the URL instances are equal in value.
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
@@ -475,40 +470,5 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
     && a.pathname === b.pathname
     && a.hash === b.hash
     && areSearchParamsEqual(a.searchParams, b.searchParams)
-  );
-}
-
-/**
- * Whether the search params passed are equal in value.
- *
- * @note
- * Order is not significant, matching how the other unordered collections in the library are
- * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
- * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
- */
-function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
-  const serializedA = a.toString();
-  const serializedB = b.toString();
-
-  // Identical serializations are equal under any ordering, and this is by far the common case, so
-  // it is worth checking before sorting anything.
-  return serializedA === serializedB || sortSearchParams(serializedA) === sortSearchParams(serializedB);
-}
-
-/**
- * Reorder a serialized query string so that params holding the same pairs compare as equal
- * regardless of the order they appear in.
- *
- * @note
- * The serializer percent-encodes `&` and `=` wherever they appear inside a name or a value, so
- * splitting on `&` recovers exactly the pairs and nothing else.
- */
-function sortSearchParams(serialized: string): string {
-  return serialized.split('&').sort().join('&');
-}
-
-function isReactProperty(a: AnyObject, b: AnyObject, property: string | symbol): boolean {
-  return (
-    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE) && !!(a.$$typeof || b.$$typeof)
   );
 }
