@@ -1,5 +1,10 @@
 # fast-equals CHANGELOG
 
+## 6.2.0
+
+- [#216](https://github.com/planttheidea/fast-equals/pull/216) - Check own properties on `Date` objects when using
+  `strict` mode ([thanks @xiehuanyi](https://github.com/xiehuanyi))
+
 ## 6.1.1
 
 - [#210](https://github.com/planttheidea/fast-equals/pull/210) - Fix support for cross-realm float array handling
