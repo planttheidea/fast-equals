@@ -5,6 +5,12 @@ const PREACT_VNODE = '__v';
 const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
+/**
+ * Above this many keys, out-of-position keys are checked with `propertyIsEnumerable` rather than by
+ * scanning the other object's keys. Measured in V8: scanning wins up to 50 keys and loses from 100.
+ */
+const MAX_SCANNED_PROPERTIES = 64;
+
 const { getOwnPropertyDescriptor, keys } = Object;
 const { propertyIsEnumerable } = Object.prototype;
 
@@ -256,19 +262,39 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
  */
 export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const properties = keys(a);
+  const propertiesB = keys(b);
 
   let index = properties.length;
 
-  if (keys(b).length !== index) {
+  if (propertiesB.length !== index) {
     return false;
   }
+
+  const isScannable = index <= MAX_SCANNED_PROPERTIES;
+
+  let property: string;
 
   // Decrementing `while` showed faster results than either incrementing or
   // decrementing `for` loop and than an incrementing `while` loop. Declarative
   // methods like `some` / `every` were not used to avoid incurring the garbage
   // cost of anonymous callbacks.
   while (index-- > 0) {
-    if (!isPropertyEqual(a, b, state, properties[index]!)) {
+    property = properties[index]!;
+
+    if (isReactProperty(a, b, property)) {
+      continue;
+    }
+
+    // Objects built the same way list their keys in the same order, in which case the key is
+    // already known to be an own enumerable property of `b` and the lookup can be skipped.
+    // Otherwise, `propertiesB` is exactly `b`'s own enumerable keys. Scanning it is faster than
+    // `propertyIsEnumerable` for smaller objects, but it is linear per key, so larger objects
+    // (where reordering would make it quadratic) use the lookup instead.
+    if (
+      (property !== propertiesB[index]
+        && !(isScannable ? propertiesB.includes(property) : propertyIsEnumerable.call(b, property)))
+      || !state.equals(a[property], b[property], property, property, a, b, state)
+    ) {
       return false;
     }
   }
@@ -299,7 +325,10 @@ export function areObjectsEqualStrict(a: AnyObject, b: AnyObject, state: State<a
   while (index-- > 0) {
     property = properties[index]!;
 
-    if (!isPropertyEqual(a, b, state, property)) {
+    if (
+      !isReactProperty(a, b, property)
+      && (!hasOwn(b, property) || !state.equals(a[property], b[property], property, property, a, b, state))
+    ) {
       return false;
     }
 
@@ -478,13 +507,8 @@ function sortSearchParams(serialized: string): string {
   return serialized.split('&').sort().join('&');
 }
 
-function isPropertyEqual(a: AnyObject, b: AnyObject, state: State<any>, property: string | symbol) {
-  if (
-    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
-    && (a.$$typeof || b.$$typeof)
-  ) {
-    return true;
-  }
-
-  return hasOwn(b, property) && state.equals(a[property], b[property], property, property, a, b, state);
+function isReactProperty(a: AnyObject, b: AnyObject, property: string | symbol): boolean {
+  return (
+    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE) && !!(a.$$typeof || b.$$typeof)
+  );
 }
