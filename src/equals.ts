@@ -146,7 +146,7 @@ export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
   while (index-- > 0) {
     property = propertiesA[index]!;
 
-    // Already compared above, regardless of enumerability.
+    // Already compared above regardless of enumerability, so we can ignore them.
     if (property === 'cause' || property === 'errors') {
       continue;
     }
