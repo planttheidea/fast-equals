@@ -10,6 +10,8 @@
   enumerable on one side but non-enumerable on the other.
 - [#220](https://github.com/planttheidea/fast-equals/pull/220) - Use `Array` instead of `Uint8Array` to track matched
   `Map` / `Set` entries, which is faster for typical sizes.
+- [#221](https://github.com/planttheidea/fast-equals/pull/221) - Avoid comparing `TypedArray` elements twice in `strict`
+  mode.
 
 ## 6.2.0
 
