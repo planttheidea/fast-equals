@@ -8,6 +8,8 @@
   once and symmetrically, regardless of enumerability.
 - [#218](https://github.com/planttheidea/fast-equals/pull/218) - Fixed asymmetric object comparisons when a property was
   enumerable on one side but non-enumerable on the other.
+- [#220](https://github.com/planttheidea/fast-equals/pull/220) - Use `Array` instead of `Uint8Array` to track matched
+  `Map` / `Set` entries, which is faster for typical sizes.
 
 ## 6.2.0
 
