@@ -200,7 +200,9 @@ export function createEqualityComparatorConfig<Meta>({
     areArrayBuffersEqual,
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
     areDataViewsEqual,
-    areDatesEqual: areDatesEqualDefault,
+    areDatesEqual: strict
+      ? combineComparators(areDatesEqualDefault, areObjectsEqualStrictDefault)
+      : areDatesEqualDefault,
     // `Error` subclasses routinely carry their own enumerable properties (`status`, `code`, ...),
     // which the error comparator alone does not see, so it is composed with the object comparator.
     // `name` / `message` / `stack` are own but not enumerable, which is why errors need a
@@ -229,6 +231,7 @@ export function createEqualityComparatorConfig<Meta>({
 
   if (circular) {
     const areArraysEqual = createIsCircular(config.areArraysEqual);
+    const areDatesEqual = strict ? createIsCircular(config.areDatesEqual) : config.areDatesEqual;
     // Errors are included because comparing `cause` and own properties by value means an error
     // that references itself would otherwise recurse without bound.
     const areErrorsEqual = createIsCircular(config.areErrorsEqual);
@@ -238,6 +241,7 @@ export function createEqualityComparatorConfig<Meta>({
 
     config = Object.assign({}, config, {
       areArraysEqual,
+      areDatesEqual,
       areErrorsEqual,
       areMapsEqual,
       areObjectsEqual,

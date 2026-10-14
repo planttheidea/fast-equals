@@ -501,6 +501,65 @@ describe('strict', () => {
 });
 
 describe('correctness fixes', () => {
+  describe('Date own properties', () => {
+    test('compares own metadata in strict mode while retaining timestamp comparison', () => {
+      const first = Object.assign(new Date(0), { metadata: { value: 1 } });
+      const equal = Object.assign(new Date(0), { metadata: { value: 1 } });
+      const different = Object.assign(new Date(0), { metadata: { value: 2 } });
+      const later = Object.assign(new Date(1), { metadata: { value: 1 } });
+
+      expect(deepEqual(first, different)).toBe(true);
+      expect(strictDeepEqual(first, equal)).toBe(true);
+      expect(strictDeepEqual(first, different)).toBe(false);
+      expect(strictDeepEqual(first, later)).toBe(false);
+    });
+
+    test('compares symbol, non-enumerable and descriptor differences in strict mode', () => {
+      const symbol = Symbol('metadata');
+      const withSymbol = (value: number) => Object.assign(new Date(0), { [symbol]: value });
+      const withHidden = (value: number) => Object.defineProperty(new Date(0), 'metadata', { value });
+      const withDescriptor = (writable: boolean) =>
+        Object.defineProperty(new Date(0), 'metadata', { value: 1, writable });
+
+      expect(strictDeepEqual(withSymbol(1), withSymbol(2))).toBe(false);
+      expect(strictDeepEqual(withHidden(1), withHidden(2))).toBe(false);
+      expect(strictDeepEqual(withDescriptor(true), withDescriptor(false))).toBe(false);
+    });
+
+    test('uses reference equality for metadata in shallow strict modes', () => {
+      const metadata = { value: 1 };
+      const first = Object.assign(new Date(0), { metadata });
+      const shared = Object.assign(new Date(0), { metadata });
+      const separate = Object.assign(new Date(0), { metadata: { value: 1 } });
+
+      for (const equal of [strictShallowEqual, strictCircularShallowEqual]) {
+        expect(equal(first, shared)).toBe(true);
+        expect(equal(first, separate)).toBe(false);
+      }
+    });
+
+    test('handles circular Date metadata in strict circular mode', () => {
+      type CircularDate = Date & { metadata: { value: number }; self?: CircularDate };
+      const createDate = (value: number): CircularDate => {
+        const date: CircularDate = Object.assign(new Date(0), { metadata: { value } });
+        date.self = date;
+        return date;
+      };
+
+      expect(strictCircularDeepEqual(createDate(1), createDate(1))).toBe(true);
+      expect(strictCircularDeepEqual(createDate(1), createDate(2))).toBe(false);
+    });
+
+    test('preserves an explicitly configured Date comparator in strict mode', () => {
+      const equal = createCustomEqual({
+        strict: true,
+        createCustomConfig: () => ({ areDatesEqual: () => true }),
+      });
+
+      expect(equal(new Date(0), new Date(1))).toBe(true);
+    });
+  });
+
   describe('URL', () => {
     test('compares the query string', () => {
       expect(deepEqual(new URL('https://foo.com/?a=1'), new URL('https://foo.com/?a=2'))).toBe(false);

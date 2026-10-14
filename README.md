@@ -235,6 +235,7 @@ Performs the same comparison as `deepEqual` but performs a strict comparison of 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
+- Checking own properties on `Date` objects
 
 ```ts
 const array = [{ foo: 'bar' }];
@@ -255,6 +256,7 @@ Performs the same comparison as `shallowEqual` but performs a strict comparison 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
+- Checking own properties on `Date` objects
 
 ```ts
 const array = ['foo'];
@@ -276,6 +278,7 @@ Performs the same comparison as `circularDeepEqual` but performs a strict compar
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
+- Checking own properties on `Date` objects
 
 ```ts
 function Circular(value) {
@@ -315,6 +318,7 @@ Performs the same comparison as `circularShallowEqual` but performs a strict com
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
+- Checking own properties on `Date` objects
 
 ```ts
 const array = ['foo'];
