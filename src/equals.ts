@@ -6,6 +6,7 @@ const PREACT_OWNER = '__o';
 const REACT_OWNER = '_owner';
 
 const { getOwnPropertyDescriptor, keys } = Object;
+const { propertyIsEnumerable } = Object.prototype;
 
 /**
  * Identify the element type of TypedArrays across realms and subclasses.
@@ -100,19 +101,87 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  *
  * @note
  * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
- * explicitly. `cause` is compared by value rather than by reference, matching how every other
- * nested value in the comparison is treated. Own enumerable properties (which custom `Error`
- * subclasses commonly add) are compared by composing this with the object comparator in the
- * comparator config, so that the strict and circular variants apply to them as well.
+ * explicitly. `cause` and `errors` are compared by value rather than by reference, matching how
+ * every other nested value in the comparison is treated. They are compared exactly once, regardless
+ * of whether they were assigned (enumerable) or set by the constructor (non-enumerable). Other own
+ * enumerable properties (which custom `Error` subclasses commonly add) are compared afterward.
+ *
+ * The own property comparison is inlined rather than extracted, which measured faster in V8 when
+ * recursing through `cause`. Keep the bytecode under V8's 460-byte TurboFan inlining limit (383 bytes
+ * at time of writing; check with `node --print-bytecode --print-bytecode-filter=areErrorsEqual`), or
+ * this stops being inlined into its callers.
  */
 export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
+  if (a.name !== b.name || a.message !== b.message || a.stack !== b.stack) {
+    return false;
+  }
+
+  const causeA = a.cause;
+  const causeB = b.cause;
+
+  if (causeA !== causeB && !state.equals(causeA, causeB, 'cause', 'cause', a, b, state)) {
+    return false;
+  }
+
+  const errorsA = (a as AggregateError).errors;
+  const errorsB = (b as AggregateError).errors;
+
+  if (errorsA !== errorsB && !state.equals(errorsA, errorsB, 'errors', 'errors', a, b, state)) {
+    return false;
+  }
+
+  const propertiesA = keys(a);
+  const propertiesB = keys(b);
+
+  let index = propertiesA.length;
+
+  // Constructed errors rarely have enumerable own properties.
+  if (!index && !propertiesB.length) {
+    return true;
+  }
+
+  let compared = 0;
+  let property: string;
+
+  while (index-- > 0) {
+    property = propertiesA[index]!;
+
+    // Already compared above regardless of enumerability, so we can ignore them.
+    if (property === 'cause' || property === 'errors') {
+      continue;
+    }
+
+    // `propertyIsEnumerable` rather than `hasOwn`, so that a non-enumerable own property on `b` cannot
+    // stand in for an enumerable one. Keys in the same position are trivially enumerable on `b`.
+    if (
+      (property !== propertiesB[index] && !propertyIsEnumerable.call(b, property))
+      || !state.equals((a as AnyObject)[property], (b as AnyObject)[property], property, property, a, b, state)
+    ) {
+      return false;
+    }
+
+    ++compared;
+  }
+
+  // Every compared key is enumerable on `b`, so any of `b`'s keys left over must be `cause` / `errors`.
+  const remaining = propertiesB.length - compared;
+
   return (
-    a.name === b.name
-    && a.message === b.message
-    && a.stack === b.stack
-    && state.equals(a.cause, b.cause, 'cause', 'cause', a, b, state)
-    && state.equals((a as AggregateError).errors, (b as AggregateError).errors, 'errors', 'errors', a, b, state)
+    !remaining
+    || remaining === (propertyIsEnumerable.call(b, 'cause') ? 1 : 0) + (propertyIsEnumerable.call(b, 'errors') ? 1 : 0)
   );
+}
+
+/**
+ * Whether the errors passed are equal in value.
+ *
+ * @note
+ * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
+ * explicitly. `cause` and `errors` are own properties, so `areObjectsEqualStrict` compares them along
+ * with every other own property; they are not compared explicitly to avoid comparing them twice.
+ */
+export function areErrorsEqualStrict(a: Error, b: Error, state: State<any>): boolean {
+  return a.name === b.name && a.message === b.message && a.stack === b.stack && areObjectsEqualStrict(a, b, state);
 }
 
 /**
