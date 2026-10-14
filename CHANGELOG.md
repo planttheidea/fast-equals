@@ -4,7 +4,8 @@
 
 - [#214](https://github.com/planttheidea/fast-equals/pull/214) - Ensure `AggregateError` instance `.errors` property is
   checked (thanks [@feritcemkahraman](https://github.com/feritcemkahraman))
-- Fixed `Error` comparisons to compare `cause` / `errors` once and symmetrically, regardless of enumerability.
+- [#217](https://github.com/planttheidea/fast-equals/pull/217) - Fixed `Error` comparisons to compare `cause` / `errors`
+  once and symmetrically, regardless of enumerability.
 
 ## 6.2.0
 
