@@ -102,9 +102,15 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * @note
  * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
  * explicitly. `cause` and `errors` are compared by value rather than by reference, matching how
- * every other nested value in the comparison is treated. Own enumerable properties (which custom
- * `Error` subclasses commonly add) are compared by composing this with the object comparator in
- * the comparator config, so that the strict and circular variants apply to them as well.
+ * every other nested value in the comparison is treated. They are compared exactly once, regardless
+ * of whether they were assigned (enumerable) or set by the constructor (non-enumerable). Other own
+ * enumerable properties (which custom `Error` subclasses commonly add) are compared afterward.
+ *
+ * @note
+ * The own property comparison is inlined rather than extracted, which measured faster in V8 when
+ * recursing through `cause`. Keep the bytecode under V8's 460-byte TurboFan inlining limit (383 bytes
+ * at time of writing; check with `node --print-bytecode --print-bytecode-filter=areErrorsEqual`), or
+ * this stops being inlined into its callers.
  */
 export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
   if (a.name !== b.name || a.message !== b.message || a.stack !== b.stack) {
@@ -125,15 +131,6 @@ export function areErrorsEqual(a: Error, b: Error, state: State<any>): boolean {
     return false;
   }
 
-  return areErrorPropertiesEqual(a, b, state);
-}
-
-/**
- * Whether the own enumerable properties of the errors are equal, excluding `cause` and `errors`. Those
- * are compared by value separately, regardless of whether they were assigned (enumerable) or set by
- * the constructor (non-enumerable), so they are compared exactly once.
- */
-function areErrorPropertiesEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const propertiesA = keys(a);
   const propertiesB = keys(b);
 
@@ -150,7 +147,7 @@ function areErrorPropertiesEqual(a: AnyObject, b: AnyObject, state: State<any>):
   while (index-- > 0) {
     property = propertiesA[index]!;
 
-    // Compared separately in `areErrorsEqual`, regardless of enumerability.
+    // Already compared above, regardless of enumerability.
     if (property === 'cause' || property === 'errors') {
       continue;
     }
@@ -159,7 +156,7 @@ function areErrorPropertiesEqual(a: AnyObject, b: AnyObject, state: State<any>):
     // stand in for an enumerable one. Keys in the same position are trivially enumerable on `b`.
     if (
       (property !== propertiesB[index] && !propertyIsEnumerable.call(b, property))
-      || !state.equals(a[property], b[property], property, property, a, b, state)
+      || !state.equals((a as AnyObject)[property], (b as AnyObject)[property], property, property, a, b, state)
     ) {
       return false;
     }
@@ -181,8 +178,8 @@ function areErrorPropertiesEqual(a: AnyObject, b: AnyObject, state: State<any>):
  *
  * @note
  * `name`, `message` and `stack` are own properties but are not enumerable, so they are compared
- * explicitly. `cause` and `errors` are compared separately by the `areObjectsEqualStrict` comparator,
- * so they are left out to avoid the cost of comparing them twice.
+ * explicitly. `cause` and `errors` are own properties, so `areObjectsEqualStrict` compares them along
+ * with every other own property; they are not compared explicitly to avoid comparing them twice.
  */
 export function areErrorsEqualStrict(a: Error, b: Error, state: State<any>): boolean {
   return a.name === b.name && a.message === b.message && a.stack === b.stack && areObjectsEqualStrict(a, b, state);

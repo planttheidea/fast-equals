@@ -204,10 +204,10 @@ export function createEqualityComparatorConfig<Meta>({
     areDatesEqual: strict
       ? combineComparators(areDatesEqualDefault, areObjectsEqualStrictDefault)
       : areDatesEqualDefault,
-    // `Error` subclasses routinely carry their own enumerable properties (`status`, `code`, ...),
-    // which the error comparator alone does not see, so it is composed with the object comparator.
-    // `name` / `message` / `stack` are own but not enumerable, which is why errors need a
-    // comparator of their own rather than being treated as plain objects in the first place.
+    // `name` / `message` / `stack` / `cause` / `errors` are not enumerable (unless assigned), which is why
+    // errors need a comparator of their own rather than being treated as plain objects. Each variant also
+    // compares the own properties that `Error` subclasses routinely carry (`status`, `code`, ...):
+    // enumerable ones in loose mode, and all of them (via `areObjectsEqualStrict`) in strict mode.
     areErrorsEqual: strict ? areErrorsEqualStrictDefault : areErrorsEqualDefault,
     areFunctionsEqual: strictEqual,
     areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,

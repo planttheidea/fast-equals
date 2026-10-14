@@ -1,5 +1,11 @@
 # fast-equals CHANGELOG
 
+## 6.2.1
+
+- [#214](https://github.com/planttheidea/fast-equals/pull/214) - Ensure `AggregateError` instance `.errors` property is
+  checked (thanks [@feritcemkahraman](https://github.com/feritcemkahraman))
+- Fixed `Error` comparisons to compare `cause` / `errors` once and symmetrically, regardless of enumerability.
+
 ## 6.2.0
 
 - [#216](https://github.com/planttheidea/fast-equals/pull/216) - Check own properties on `Date` objects when using
@@ -33,7 +39,7 @@
 - [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed boxed `BigInt` values to compare by value rather
   than identity.
 - [#201](https://github.com/planttheidea/fast-equals/pull/201) - Fixed `TypedArray` comparisons to treat `NaN` as equal
-  to itself, matching SameValueZero semantics.## 5.4.2
+  to itself, matching SameValueZero semantics.
 
 ## 5.4.2
 
