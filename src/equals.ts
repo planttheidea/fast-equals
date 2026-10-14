@@ -256,19 +256,26 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
  */
 export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
   const properties = keys(a);
+  const propertiesB = keys(b);
 
   let index = properties.length;
 
-  if (keys(b).length !== index) {
+  if (propertiesB.length !== index) {
     return false;
   }
+
+  let property: string;
 
   // Decrementing `while` showed faster results than either incrementing or
   // decrementing `for` loop and than an incrementing `while` loop. Declarative
   // methods like `some` / `every` were not used to avoid incurring the garbage
   // cost of anonymous callbacks.
   while (index-- > 0) {
-    if (!isPropertyEqual(a, b, state, properties[index]!)) {
+    property = properties[index]!;
+
+    // Objects built the same way list their keys in the same order, in which case the key is
+    // already known to be an own enumerable property of `b` and the lookup can be skipped.
+    if (!isObjectPropertyEqual(a, b, state, property, property === propertiesB[index])) {
       return false;
     }
   }
@@ -487,4 +494,24 @@ function isPropertyEqual(a: AnyObject, b: AnyObject, state: State<any>, property
   }
 
   return hasOwn(b, property) && state.equals(a[property], b[property], property, property, a, b, state);
+}
+
+function isObjectPropertyEqual(
+  a: AnyObject,
+  b: AnyObject,
+  state: State<any>,
+  property: string,
+  isKnownPropertyOfB: boolean,
+) {
+  if (
+    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
+    && (a.$$typeof || b.$$typeof)
+  ) {
+    return true;
+  }
+
+  return (
+    (isKnownPropertyOfB || hasOwn(b, property))
+    && state.equals(a[property], b[property], property, property, a, b, state)
+  );
 }
