@@ -106,7 +106,6 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * of whether they were assigned (enumerable) or set by the constructor (non-enumerable). Other own
  * enumerable properties (which custom `Error` subclasses commonly add) are compared afterward.
  *
- * @note
  * The own property comparison is inlined rather than extracted, which measured faster in V8 when
  * recursing through `cause`. Keep the bytecode under V8's 460-byte TurboFan inlining limit (383 bytes
  * at time of writing; check with `node --print-bytecode --print-bytecode-filter=areErrorsEqual`), or
