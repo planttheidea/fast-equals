@@ -204,7 +204,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
     return true;
   }
 
-  const matchedIndices = new Uint8Array(size);
+  const matchedIndices = new Array<true | undefined>(size);
   const aIterable = a.entries();
 
   let aResult: IteratorResult<[any, any]>;
@@ -219,7 +219,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 
     const bIterable = b.entries();
 
-    let hasMatch = 0;
+    let hasMatch = false;
     let matchIndex = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -240,7 +240,7 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
         state.equals(aEntry[0], bEntry[0], index, matchIndex, a, b, state)
         && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a, b, state)
       ) {
-        hasMatch = matchedIndices[matchIndex] = 1;
+        hasMatch = matchedIndices[matchIndex] = true;
         break;
       }
 
@@ -378,7 +378,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
     return true;
   }
 
-  const matchedIndices = new Uint8Array(size);
+  const matchedIndices = new Array<true | undefined>(size);
   const aIterable = a.values();
 
   let aResult: IteratorResult<any>;
@@ -392,7 +392,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
 
     const bIterable = b.values();
 
-    let hasMatch = 0;
+    let hasMatch = false;
     let matchIndex = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -405,7 +405,7 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
         !matchedIndices[matchIndex]
         && state.equals(aResult.value, bResult.value, aResult.value, bResult.value, a, b, state)
       ) {
-        hasMatch = matchedIndices[matchIndex] = 1;
+        hasMatch = matchedIndices[matchIndex] = true;
         break;
       }
 
