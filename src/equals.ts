@@ -273,9 +273,16 @@ export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): 
   while (index-- > 0) {
     property = properties[index]!;
 
+    if (isReactProperty(a, b, property)) {
+      continue;
+    }
+
     // Objects built the same way list their keys in the same order, in which case the key is
     // already known to be an own enumerable property of `b` and the lookup can be skipped.
-    if (!isObjectPropertyEqual(a, b, state, property, property === propertiesB[index])) {
+    if (
+      (property !== propertiesB[index] && !propertyIsEnumerable.call(b, property))
+      || !state.equals(a[property], b[property], property, property, a, b, state)
+    ) {
       return false;
     }
   }
@@ -306,7 +313,10 @@ export function areObjectsEqualStrict(a: AnyObject, b: AnyObject, state: State<a
   while (index-- > 0) {
     property = properties[index]!;
 
-    if (!isPropertyEqual(a, b, state, property)) {
+    if (
+      !isReactProperty(a, b, property)
+      && (!hasOwn(b, property) || !state.equals(a[property], b[property], property, property, a, b, state))
+    ) {
       return false;
     }
 
@@ -485,35 +495,8 @@ function sortSearchParams(serialized: string): string {
   return serialized.split('&').sort().join('&');
 }
 
-function isPropertyEqual(a: AnyObject, b: AnyObject, state: State<any>, property: string | symbol) {
-  if (
-    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
-    && (a.$$typeof || b.$$typeof)
-  ) {
-    return true;
-  }
-
-  return hasOwn(b, property) && state.equals(a[property], b[property], property, property, a, b, state);
-}
-
-function isObjectPropertyEqual(
-  a: AnyObject,
-  b: AnyObject,
-  state: State<any>,
-  property: string,
-  isKnownPropertyOfB: boolean,
-) {
-  if (
-    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE)
-    && (a.$$typeof || b.$$typeof)
-  ) {
-    return true;
-  }
-
-  // `propertyIsEnumerable` rather than `hasOwn`, so that a non-enumerable own property on `b` cannot
-  // stand in for an enumerable one and leave one of `b`'s enumerable properties unchecked.
+function isReactProperty(a: AnyObject, b: AnyObject, property: string | symbol): boolean {
   return (
-    (isKnownPropertyOfB || propertyIsEnumerable.call(b, property))
-    && state.equals(a[property], b[property], property, property, a, b, state)
+    (property === REACT_OWNER || property === PREACT_OWNER || property === PREACT_VNODE) && !!(a.$$typeof || b.$$typeof)
   );
 }
