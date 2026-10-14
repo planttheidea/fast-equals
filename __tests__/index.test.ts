@@ -718,6 +718,109 @@ describe('correctness fixes', () => {
 
       expect(strictDeepEqual(withDescriptor(true), withDescriptor(false))).toBe(false);
     });
+
+    test('compares `cause` by value regardless of whether it was assigned or constructed', () => {
+      const assigned = createError('boom');
+      const constructed = new Error('boom', { cause: { code: 'E' } });
+      const different = new Error('boom', { cause: { code: 'F' } });
+
+      assigned.cause = { code: 'E' };
+      constructed.stack = different.stack = 'STACK';
+
+      expect(deepEqual(assigned, constructed)).toBe(true);
+      expect(deepEqual(constructed, assigned)).toBe(true);
+      expect(deepEqual(assigned, different)).toBe(false);
+      expect(deepEqual(different, assigned)).toBe(false);
+
+      // The descriptors differ, which strict mode considers.
+      expect(strictDeepEqual(assigned, constructed)).toBe(false);
+    });
+
+    test('treats an own `cause` of `undefined` as equal to a missing `cause`', () => {
+      const withUndefined = new Error('boom', { cause: undefined });
+
+      withUndefined.stack = 'STACK';
+
+      expect(deepEqual(withUndefined, createError('boom'))).toBe(true);
+      expect(deepEqual(createError('boom'), withUndefined)).toBe(true);
+    });
+
+    test('compares enumerable `errors` on non-aggregate errors', () => {
+      const withErrors = (errors: string[]) => Object.assign(createError('boom'), { errors });
+
+      expect(deepEqual(withErrors(['a']), withErrors(['a']))).toBe(true);
+      expect(deepEqual(withErrors(['a']), withErrors(['b']))).toBe(false);
+      expect(deepEqual(withErrors(['a']), createError('boom'))).toBe(false);
+      expect(deepEqual(createError('boom'), withErrors(['a']))).toBe(false);
+    });
+
+    test('detects enumerable properties present on only one side', () => {
+      expect(deepEqual(createError('boom', 404), createError('boom'))).toBe(false);
+      expect(deepEqual(createError('boom'), createError('boom', 404))).toBe(false);
+    });
+
+    test('does not let a non-enumerable property stand in for an enumerable one', () => {
+      const enumerable = createError('boom', 404);
+      const hidden = Object.assign(
+        Object.defineProperty(createError('boom'), 'property', { configurable: true, enumerable: false, value: 404 }),
+        { other: true },
+      );
+
+      expect(deepEqual(enumerable, hidden)).toBe(false);
+      expect(deepEqual(hidden, enumerable)).toBe(false);
+
+      const assigned = createError('boom');
+      const constructed = Object.assign(new Error('boom', { cause: { code: 'E' } }), { other: true });
+
+      assigned.cause = { code: 'E' };
+      constructed.stack = 'STACK';
+
+      expect(deepEqual(assigned, constructed)).toBe(false);
+      expect(deepEqual(constructed, assigned)).toBe(false);
+    });
+
+    describe('compares nested `cause` and `errors` once per level', () => {
+      const DEPTH = 12;
+
+      function createChain(wrap: (error: Error) => Error) {
+        let error = createError('leaf');
+
+        for (let index = 0; index < DEPTH; ++index) {
+          error = wrap(error);
+          error.stack = 'STACK';
+        }
+
+        return error;
+      }
+
+      const chains = {
+        'assigned `cause`': (cause: Error) => Object.assign(new Error('boom'), { cause }),
+        'constructed `cause`': (cause: Error) => new Error('boom', { cause }),
+        'enumerable `errors`': (error: Error) => Object.assign(new Error('boom'), { errors: [error] }),
+        AggregateError: (error: Error) => new AggregateError([error], 'boom'),
+      };
+
+      for (const strict of [false, true]) {
+        for (const [name, wrap] of Object.entries(chains)) {
+          test(`${name}${strict ? ' (strict)' : ''}`, () => {
+            let calls = 0;
+
+            const isEqual = createCustomEqual({
+              createInternalComparator: (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+                ++calls;
+
+                return compare(a, b, state);
+              },
+              strict,
+            });
+
+            expect(isEqual(createChain(wrap), createChain(wrap))).toBe(true);
+            // Comparing a value more than once per level grows with `2 ** DEPTH` (4096).
+            expect(calls).toBeLessThan(DEPTH * 10);
+          });
+        }
+      }
+    });
   });
 
   describe('primitive wrappers', () => {
