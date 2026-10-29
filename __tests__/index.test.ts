@@ -955,6 +955,25 @@ describe('correctness fixes', () => {
         ).toBe(true);
         expect(calls).toBe(1);
       });
+
+      test('handles circular own properties in strict circular mode', () => {
+        type CircularArray = Uint8Array & { meta: number; self?: CircularArray };
+        const createArray = (meta: number): CircularArray => {
+          const array: CircularArray = Object.assign(new Uint8Array([1, 2]), { meta });
+          array.self = array;
+          return array;
+        };
+        const createPair = (meta: number) => {
+          const first: Float64Array & { peer?: unknown } = new Float64Array([1]);
+          first.peer = Object.assign(new Int8Array([1]), { peer: first, meta });
+          return first;
+        };
+
+        expect(strictCircularDeepEqual(createArray(1), createArray(1))).toBe(true);
+        expect(strictCircularDeepEqual(createArray(1), createArray(2))).toBe(false);
+        expect(strictCircularDeepEqual(createPair(1), createPair(1))).toBe(true);
+        expect(strictCircularDeepEqual(createPair(1), createPair(2))).toBe(false);
+      });
     });
   });
 });

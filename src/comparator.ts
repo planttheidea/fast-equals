@@ -236,6 +236,7 @@ export function createEqualityComparatorConfig<Meta>({
     const areMapsEqual = createIsCircular(config.areMapsEqual);
     const areObjectsEqual = createIsCircular(config.areObjectsEqual);
     const areSetsEqual = createIsCircular(config.areSetsEqual);
+    const areTypedArraysEqual = strict ? createIsCircular(config.areTypedArraysEqual) : config.areTypedArraysEqual;
 
     config = Object.assign({}, config, {
       areArraysEqual,
@@ -244,6 +245,7 @@ export function createEqualityComparatorConfig<Meta>({
       areMapsEqual,
       areObjectsEqual,
       areSetsEqual,
+      areTypedArraysEqual,
     });
   }
 
