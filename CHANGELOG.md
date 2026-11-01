@@ -1,5 +1,12 @@
 # fast-equals CHANGELOG
 
+## 6.2.2
+
+- [#223](https://github.com/planttheidea/fast-equals/pull/223) - Fixed a stack overflow in `strictCircularDeepEqual`
+  when a `TypedArray` has own properties that reference itself (thanks [@youdie006](https://github.com/youdie006))
+- [#224](https://github.com/planttheidea/fast-equals/pull/224) - Added test coverage for differently shaped circular
+  `TypedArray` own properties in `strict` circular mode.
+
 ## 6.2.1
 
 - [#214](https://github.com/planttheidea/fast-equals/pull/214) - Ensure `AggregateError` instance `.errors` property is

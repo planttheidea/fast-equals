@@ -974,6 +974,26 @@ describe('correctness fixes', () => {
         expect(strictCircularDeepEqual(createPair(1), createPair(1))).toBe(true);
         expect(strictCircularDeepEqual(createPair(1), createPair(2))).toBe(false);
       });
+
+      test('distinguishes circular own property shapes in strict circular mode', () => {
+        type LinkedArray = Uint8Array & { next?: LinkedArray };
+        const createSelfCycle = (): LinkedArray => {
+          const array: LinkedArray = new Uint8Array([1]);
+          array.next = array;
+          return array;
+        };
+        const createTwoHopCycle = (): LinkedArray => {
+          const first: LinkedArray = new Uint8Array([1]);
+          const second: LinkedArray = new Uint8Array([1]);
+          first.next = second;
+          second.next = first;
+          return first;
+        };
+
+        expect(strictCircularDeepEqual(createTwoHopCycle(), createTwoHopCycle())).toBe(true);
+        expect(strictCircularDeepEqual(createSelfCycle(), createTwoHopCycle())).toBe(false);
+        expect(strictCircularDeepEqual(createTwoHopCycle(), createSelfCycle())).toBe(false);
+      });
     });
   });
 });
