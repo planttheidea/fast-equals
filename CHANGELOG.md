@@ -1,5 +1,9 @@
 # fast-equals CHANGELOG
 
+## Unreleased
+
+- Compare own properties on primitive wrappers in strict modes, including circular metadata.
+
 ## 6.2.2
 
 - [#223](https://github.com/planttheidea/fast-equals/pull/223) - Fixed a stack overflow in `strictCircularDeepEqual`

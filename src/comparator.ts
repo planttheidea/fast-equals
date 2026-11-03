@@ -214,7 +214,9 @@ export function createEqualityComparatorConfig<Meta>({
     areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
     areNumbersEqual: sameValueEqual,
     areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
-    arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
+    arePrimitiveWrappersEqual: strict
+      ? combineComparators(arePrimitiveWrappersEqualDefault, areObjectsEqualStrictDefault)
+      : arePrimitiveWrappersEqualDefault,
     areRegExpsEqual: areRegExpsEqualDefault,
     areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
     areTypedArraysEqual: strict ? areTypedArraysEqualStrictDefault : areTypedArraysEqualDefault,
@@ -235,6 +237,9 @@ export function createEqualityComparatorConfig<Meta>({
     const areErrorsEqual = createIsCircular(config.areErrorsEqual);
     const areMapsEqual = createIsCircular(config.areMapsEqual);
     const areObjectsEqual = createIsCircular(config.areObjectsEqual);
+    const arePrimitiveWrappersEqual = strict
+      ? createIsCircular(config.arePrimitiveWrappersEqual)
+      : config.arePrimitiveWrappersEqual;
     const areSetsEqual = createIsCircular(config.areSetsEqual);
     const areTypedArraysEqual = strict ? createIsCircular(config.areTypedArraysEqual) : config.areTypedArraysEqual;
 
@@ -244,6 +249,7 @@ export function createEqualityComparatorConfig<Meta>({
       areErrorsEqual,
       areMapsEqual,
       areObjectsEqual,
+      arePrimitiveWrappersEqual,
       areSetsEqual,
       areTypedArraysEqual,
     });
