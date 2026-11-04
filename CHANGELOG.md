@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Compare own properties on primitive wrappers in strict modes, including circular metadata.
+- Compare own properties on primitive wrappers and `RegExp` objects in strict modes, including `lastIndex` and circular
+  metadata. Avoid comparing native boxed strings' character indices twice.
 
 ## 6.2.2
 

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   circularDeepEqual,
   circularShallowEqual,
+  createCustomEqual,
   deepEqual,
   shallowEqual,
   strictCircularDeepEqual,
@@ -97,4 +98,68 @@ describe.each(wrappers)('$name own properties', ({ create }) => {
       expect(compare(left, right)).toBe(true);
     }
   });
+});
+
+describe.each(strictComparators)('$name String index handling', ({ compare }) => {
+  test('keeps checking character properties when valueOf returns an unrelated value', () => {
+    for (const value of ['same', 0, true]) {
+      const valueOf = () => value;
+      const left = Object.assign(wrap('ab'), { valueOf });
+      const equal = Object.assign(wrap('ab'), { valueOf });
+      const different = Object.assign(wrap('ac'), { valueOf });
+
+      expect(compare(left, equal)).toBe(true);
+      expect(compare(left, different)).toBe(false);
+      expect(compare(different, left)).toBe(false);
+    }
+  });
+
+  test('does not skip Number metadata when a custom valueOf returns a string', () => {
+    const valueOf = () => 'long';
+    const left = Object.assign(wrap(1), { meta: 1, valueOf });
+    const different = Object.assign(wrap(1), { meta: 2, valueOf });
+
+    expect(compare(left, different)).toBe(false);
+    expect(compare(different, left)).toBe(false);
+  });
+
+  test('invokes a custom valueOf directly even when it has its own call property', () => {
+    const valueOf = Object.assign(() => 'same', {
+      call: () => {
+        throw new Error('The custom call property must not be invoked');
+      },
+    });
+    const left = Object.assign(wrap('ab'), { valueOf });
+    const equal = Object.assign(wrap('ab'), { valueOf });
+    const different = Object.assign(wrap('ac'), { valueOf });
+
+    expect(compare(left, equal)).toBe(true);
+    expect(compare(left, different)).toBe(false);
+  });
+
+  test('still compares numeric own properties outside the character indices', () => {
+    for (const key of ['2', '01']) {
+      const left = Object.assign(wrap('ab'), { [key]: 1 });
+      const equal = Object.assign(wrap('ab'), { [key]: 1 });
+      const different = Object.assign(wrap('ab'), { [key]: 2 });
+
+      expect(compare(left, equal)).toBe(true);
+      expect(compare(left, different)).toBe(false);
+      expect(compare(different, left)).toBe(false);
+    }
+  });
+});
+
+test('does not compare immutable String characters twice through the internal comparator', () => {
+  const visited: unknown[] = [];
+  const compare = createCustomEqual({
+    strict: true,
+    createInternalComparator: (compare) => (a, b, keyA, _keyB, _parentA, _parentB, state) => {
+      visited.push(keyA);
+      return compare(a, b, state);
+    },
+  });
+
+  expect(compare(wrap('a😀'), wrap('a😀'))).toBe(true);
+  expect(visited).toEqual(['length']);
 });

@@ -14,7 +14,9 @@ import {
 const MAX_SCANNED_PROPERTIES = 64;
 
 const { keys } = Object;
+const { call: callFunction } = Function.prototype;
 const { propertyIsEnumerable } = Object.prototype;
+const { valueOf: stringValueOf } = String.prototype;
 
 /**
  * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
@@ -316,10 +318,44 @@ export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapp
 }
 
 /**
+ * Whether the primitive wrappers passed are equal in value with strict property checking.
+ *
+ * @note
+ * A String's immutable character indices are already compared by its primitive value. Only skip
+ * them when both wrappers use the native String `valueOf`: an overridden method can hide
+ * different characters, or return a string from a different kind of wrapper. Custom and
+ * cross-realm methods retain the full property comparison.
+ */
+export function arePrimitiveWrappersEqualStrict(a: PrimitiveWrapper, b: PrimitiveWrapper, state: State<any>): boolean {
+  const valueOfA = a.valueOf;
+  const value = callFunction.call(valueOfA, a);
+  const valueOfB = b.valueOf;
+
+  if (!sameValueEqual(value, callFunction.call(valueOfB, b))) {
+    return false;
+  }
+
+  const start =
+    typeof value === 'string' && valueOfA === stringValueOf && valueOfB === stringValueOf ? value.length : 0;
+  const properties = getStrictProperties(a);
+
+  return (
+    getStrictProperties(b).length === properties.length && areStrictPropertiesEqual(a, b, state, properties, start)
+  );
+}
+
+/**
  * Whether the regexps passed are equal in value.
  */
 export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
   return a.source === b.source && a.flags === b.flags;
+}
+
+/**
+ * Whether the regexps passed are equal in value with strict property checking.
+ */
+export function areRegExpsEqualStrict(a: RegExp, b: RegExp, state: State<any>): boolean {
+  return areRegExpsEqual(a, b) && areObjectsEqualStrict(a, b, state);
 }
 
 /**
