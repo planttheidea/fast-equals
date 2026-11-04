@@ -9,7 +9,9 @@ import {
   areObjectsEqual as areObjectsEqualDefault,
   areObjectsEqualStrict as areObjectsEqualStrictDefault,
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
+  arePrimitiveWrappersEqualStrict as arePrimitiveWrappersEqualStrictDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
+  areRegExpsEqualStrict as areRegExpsEqualStrictDefault,
   areSetsEqual as areSetsEqualDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areTypedArraysEqualStrict as areTypedArraysEqualStrictDefault,
@@ -214,8 +216,8 @@ export function createEqualityComparatorConfig<Meta>({
     areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
     areNumbersEqual: sameValueEqual,
     areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
-    arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
-    areRegExpsEqual: areRegExpsEqualDefault,
+    arePrimitiveWrappersEqual: strict ? arePrimitiveWrappersEqualStrictDefault : arePrimitiveWrappersEqualDefault,
+    areRegExpsEqual: strict ? areRegExpsEqualStrictDefault : areRegExpsEqualDefault,
     areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
     areTypedArraysEqual: strict ? areTypedArraysEqualStrictDefault : areTypedArraysEqualDefault,
     areUrlsEqual: areUrlsEqualDefault,
@@ -235,6 +237,10 @@ export function createEqualityComparatorConfig<Meta>({
     const areErrorsEqual = createIsCircular(config.areErrorsEqual);
     const areMapsEqual = createIsCircular(config.areMapsEqual);
     const areObjectsEqual = createIsCircular(config.areObjectsEqual);
+    const arePrimitiveWrappersEqual = strict
+      ? createIsCircular(config.arePrimitiveWrappersEqual)
+      : config.arePrimitiveWrappersEqual;
+    const areRegExpsEqual = strict ? createIsCircular(config.areRegExpsEqual) : config.areRegExpsEqual;
     const areSetsEqual = createIsCircular(config.areSetsEqual);
     const areTypedArraysEqual = strict ? createIsCircular(config.areTypedArraysEqual) : config.areTypedArraysEqual;
 
@@ -244,6 +250,8 @@ export function createEqualityComparatorConfig<Meta>({
       areErrorsEqual,
       areMapsEqual,
       areObjectsEqual,
+      arePrimitiveWrappersEqual,
+      areRegExpsEqual,
       areSetsEqual,
       areTypedArraysEqual,
     });

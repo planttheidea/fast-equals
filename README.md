@@ -236,6 +236,12 @@ Performs the same comparison as `deepEqual` but performs a strict comparison of 
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
 - Checking own properties on `Date` objects
+- Checking own properties on primitive wrappers
+- Checking own properties on `RegExp` objects, including `lastIndex`
+
+Strict comparisons still check property descriptors and metadata on boxed strings, but skip comparing native strings'
+immutable character indices a second time. Strings with custom or cross-realm `valueOf` methods retain the full property
+comparison.
 
 ```ts
 const array = [{ foo: 'bar' }];
@@ -257,6 +263,8 @@ Performs the same comparison as `shallowEqual` but performs a strict comparison 
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
 - Checking own properties on `Date` objects
+- Checking own properties on primitive wrappers
+- Checking own properties on `RegExp` objects, including `lastIndex`
 
 ```ts
 const array = ['foo'];
@@ -279,6 +287,8 @@ Performs the same comparison as `circularDeepEqual` but performs a strict compar
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
 - Checking own properties on `Date` objects
+- Checking own properties on primitive wrappers
+- Checking own properties on `RegExp` objects, including `lastIndex`
 
 ```ts
 function Circular(value) {
@@ -319,6 +329,8 @@ Performs the same comparison as `circularShallowEqual` but performs a strict com
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
 - Checking own properties on `Date` objects
+- Checking own properties on primitive wrappers
+- Checking own properties on `RegExp` objects, including `lastIndex`
 
 ```ts
 const array = ['foo'];
