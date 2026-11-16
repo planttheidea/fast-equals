@@ -401,7 +401,11 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
   let index = a.length;
 
-  if (b.length !== index || a.byteOffset !== b.byteOffset) {
+  // `byteOffset` is where the view starts in its buffer, not part of its value: two views holding
+  // the same elements are equal wherever they sit, the same as `DataView` and `ArrayBuffer`
+  // comparisons. Node.js `Buffer`s are views into a shared pool at varying offsets, so checking it
+  // would make equal `Buffer`s compare unequal.
+  if (b.length !== index) {
     return false;
   }
 

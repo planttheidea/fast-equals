@@ -911,11 +911,25 @@ export const testSuites = [
         value2: new Uint8ClampedArray([21, 31]),
       },
       {
-        deepEqual: false,
-        description: 'not equal Uint8Array objects (different byteOffset',
-        shallowEqual: false,
+        deepEqual: true,
+        description: 'equal Uint8Array objects (different byteOffset)',
+        shallowEqual: true,
         value1: new Uint8Array(new ArrayBuffer(8), 0, 2),
         value2: new Uint8Array(new ArrayBuffer(8), 1, 2),
+      },
+      {
+        deepEqual: true,
+        description: 'equal Uint8Array objects (subarray and new array)',
+        shallowEqual: true,
+        value1: new Uint8Array([0, 21, 31]).subarray(1),
+        value2: new Uint8Array([21, 31]),
+      },
+      {
+        deepEqual: false,
+        description: 'not equal Uint8Array objects (different byteOffset and value)',
+        shallowEqual: false,
+        value1: new Uint8Array([0, 21, 31]).subarray(1),
+        value2: new Uint8Array([21, 32]),
       },
       {
         deepEqual: true,
