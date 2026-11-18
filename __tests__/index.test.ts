@@ -894,6 +894,25 @@ describe('correctness fixes', () => {
       expect(deepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
     });
 
+    test('compares elements wherever the views start in their buffers', () => {
+      // Small Node.js `Buffer`s are slices of one shared pool, so each starts at a different offset.
+      const a = Buffer.from('abc');
+      const b = Buffer.from('abc');
+
+      expect(a.byteOffset).not.toBe(b.byteOffset);
+      expect(deepEqual(a, b)).toBe(true);
+      expect(strictDeepEqual(a, b)).toBe(true);
+      expect(deepEqual({ data: a }, { data: b })).toBe(true);
+      expect(deepEqual(a, Buffer.from('abd'))).toBe(false);
+
+      const buffer = new ArrayBuffer(8);
+
+      new Uint8Array(buffer).set([1, 2], 4);
+
+      expect(deepEqual(new DataView(buffer, 4, 2), new DataView(new Uint8Array([1, 2]).buffer))).toBe(true);
+      expect(deepEqual(new DataView(buffer, 4, 2), new DataView(new Uint8Array([1, 3]).buffer))).toBe(false);
+    });
+
     describe('strict', () => {
       const withHidden = <Value extends object>(object: Value, property: string, value: unknown) =>
         Object.defineProperty(object, property, { configurable: true, enumerable: false, value, writable: true });
@@ -920,7 +939,7 @@ describe('correctness fixes', () => {
         expect(equal(withMeta('a'), withHidden(new Uint8Array([1, 2]), 'meta', 'a'))).toBe(false);
       });
 
-      test('compares elements and offsets as in loose mode', () => {
+      test('compares elements but not offsets as in loose mode', () => {
         const buffer = new ArrayBuffer(32);
 
         new Float64Array(buffer).set([9, 1, 2, 9]);
@@ -929,7 +948,8 @@ describe('correctness fixes', () => {
         expect(strictDeepEqual(new Float64Array([1, 2]), new Float64Array([1, 2, 3]))).toBe(false);
         expect(strictDeepEqual(new Float64Array([NaN]), new Float64Array([NaN]))).toBe(true);
         expect(strictDeepEqual(new Float64Array([-0]), new Float64Array([0]))).toBe(true);
-        expect(strictDeepEqual(new Float64Array(buffer, 8, 2), new Float64Array([1, 2]))).toBe(false);
+        expect(strictDeepEqual(new Float64Array(buffer, 8, 2), new Float64Array([1, 2]))).toBe(true);
+        expect(strictDeepEqual(new Float64Array(buffer, 8, 2), new Float64Array([1, 3]))).toBe(false);
       });
 
       test('does not compare elements again as own properties', () => {
