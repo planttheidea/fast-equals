@@ -1,5 +1,24 @@
 # fast-equals CHANGELOG
 
+## 6.3.0
+
+- [#227](https://github.com/planttheidea/fast-equals/pull/227) - Fixed false negatives when comparing `TypedArray` and
+  `DataView` objects whose elements are equal but start at different positions in their buffers (`byteOffset`), which
+  was not part of their value. Notably, this caused equal Node.js `Buffer`s to be unequal, since they are slices of a
+  shared pool. Comparisons of such views that previously returned `false` now return `true`. (thanks
+  [@bardrop](https://github.com/bardrop))
+- [#228](https://github.com/planttheidea/fast-equals/pull/228) - Fixed false positives in `strict` mode for objects that
+  hold their value internally, whose own properties were not all compared. Own properties are now compared on every such
+  type rather than one type at a time: `RegExp` (including `lastIndex`), `URL`, primitive wrappers, `ArrayBuffer` and
+  `DataView` objects join `Date`, `Map`, `Set` and `TypedArray` objects. Own properties that reference the object are
+  supported in `strict` circular mode. (thanks [@mayankdhingra02](https://github.com/mayankdhingra02) for raising this
+  in [#225](https://github.com/planttheidea/fast-equals/pull/225))
+- [#228](https://github.com/planttheidea/fast-equals/pull/228) - Only track circular references for these objects when
+  they have own properties beyond their intrinsic ones, which makes `strict` circular comparisons of `Date` and
+  `TypedArray` objects faster.
+- [#228](https://github.com/planttheidea/fast-equals/pull/228) - Avoid comparing the characters (or `length`) of
+  `String` wrappers twice in `strict` mode.
+
 ## 6.2.2
 
 - [#223](https://github.com/planttheidea/fast-equals/pull/223) - Fixed a stack overflow in `strictCircularDeepEqual`

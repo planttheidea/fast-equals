@@ -1,5 +1,5 @@
 import { runInNewContext } from 'node:vm';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import {
   circularDeepEqual,
   circularShallowEqual,
@@ -13,6 +13,7 @@ import {
   strictDeepEqual,
   strictShallowEqual,
 } from '../src/index.js';
+import type { AnyObject } from '../src/internalTypes.js';
 import { alternativeValues, mainValues, primitiveValues } from './__helpers__/dataTypes.js';
 import { testSuites } from './__helpers__/testSuites.js';
 
@@ -1015,6 +1016,240 @@ describe('correctness fixes', () => {
         expect(strictCircularDeepEqual(createTwoHopCycle(), createSelfCycle())).toBe(false);
       });
     });
+  });
+});
+
+describe('strict own properties on value types', () => {
+  type Factory = () => AnyObject;
+
+  const strictModes = [
+    { name: 'strictDeepEqual', equal: strictDeepEqual },
+    { name: 'strictCircularDeepEqual', equal: strictCircularDeepEqual },
+  ];
+
+  // Each factory creates a new value equal to every other value it creates.
+  const factories: Array<{ name: string; create: Factory }> = [
+    { name: 'ArrayBuffer', create: () => new Uint8Array([1, 2]).buffer },
+    { name: 'BigInt wrapper', create: () => Object(BigInt(1)) as AnyObject },
+    { name: 'Boolean wrapper', create: () => new Boolean(true) },
+    { name: 'DataView', create: () => new DataView(new Uint8Array([1, 2]).buffer) },
+    { name: 'Date', create: () => new Date(0) },
+    { name: 'Map', create: () => new Map([['a', 1]]) },
+    { name: 'Number wrapper', create: () => new Number(1) },
+    { name: 'RegExp', create: () => /a+b/gi },
+    { name: 'Set', create: () => new Set([1]) },
+    { name: 'String wrapper', create: () => new String('abc') },
+    { name: 'TypedArray', create: () => new Uint8Array([1, 2]) },
+    { name: 'URL', create: () => new URL('https://example.com/path?a=1') },
+  ];
+
+  describe.each(factories)('$name', ({ create }) => {
+    const withMeta = (meta: unknown) => Object.assign(create(), { meta });
+
+    test.each(strictModes)('compares own properties with $name', ({ equal }) => {
+      const symbol = Symbol('tag');
+      const withSymbol = (value: number) => Object.assign(create(), { [symbol]: value });
+      const withHidden = (value: unknown) =>
+        Object.defineProperty(create(), 'meta', { configurable: true, enumerable: false, value, writable: true });
+
+      expect(equal(create(), create())).toBe(true);
+      expect(equal(withMeta({ value: 1 }), withMeta({ value: 1 }))).toBe(true);
+      expect(equal(withMeta({ value: 1 }), withMeta({ value: 2 }))).toBe(false);
+      expect(equal(withMeta('a'), create())).toBe(false);
+      expect(equal(create(), withMeta('a'))).toBe(false);
+      expect(equal(Object.assign(create(), { x: 1 }), Object.assign(create(), { y: 1 }))).toBe(false);
+      expect(equal(withSymbol(1), withSymbol(1))).toBe(true);
+      expect(equal(withSymbol(1), withSymbol(2))).toBe(false);
+      expect(equal(withMeta('a'), withHidden('a'))).toBe(false);
+      expect(equal(withHidden('a'), withHidden('a'))).toBe(true);
+    });
+
+    test.each([
+      { name: 'deepEqual', equal: deepEqual },
+      { name: 'circularDeepEqual', equal: circularDeepEqual },
+    ])('ignores own properties with $name', ({ equal }) => {
+      // Loose mode only compares own properties of containers, and is unchanged here.
+      if (create() instanceof Map || create() instanceof Set) {
+        return;
+      }
+
+      expect(equal(withMeta('a'), withMeta('b'))).toBe(true);
+    });
+
+    test('handles own properties referencing the value in strict circular mode', () => {
+      type Linked = AnyObject & { meta: number; next?: Linked };
+      const createSelfCycle = (meta: number): Linked => {
+        const value: Linked = Object.assign(create(), { meta });
+        value.next = value;
+        return value;
+      };
+      const createTwoHopCycle = (meta: number): Linked => {
+        const first: Linked = Object.assign(create(), { meta });
+        const second: Linked = Object.assign(create(), { meta });
+        first.next = second;
+        second.next = first;
+        return first;
+      };
+      const createIndirectCycle = (meta: number) => {
+        const value: AnyObject = create();
+        value.owner = { meta, value };
+        return value;
+      };
+
+      expect(strictCircularDeepEqual(createSelfCycle(1), createSelfCycle(1))).toBe(true);
+      expect(strictCircularDeepEqual(createSelfCycle(1), createSelfCycle(2))).toBe(false);
+      expect(strictCircularDeepEqual(createTwoHopCycle(1), createTwoHopCycle(1))).toBe(true);
+      expect(strictCircularDeepEqual(createTwoHopCycle(1), createTwoHopCycle(2))).toBe(false);
+      expect(strictCircularDeepEqual(createSelfCycle(1), createTwoHopCycle(1))).toBe(false);
+      expect(strictCircularDeepEqual(createTwoHopCycle(1), createSelfCycle(1))).toBe(false);
+      expect(strictCircularDeepEqual(createIndirectCycle(1), createIndirectCycle(1))).toBe(true);
+      expect(strictCircularDeepEqual(createIndirectCycle(1), createIndirectCycle(2))).toBe(false);
+    });
+
+    test('preserves an explicitly configured comparator in strict mode', () => {
+      const value = create();
+      const key = (
+        {
+          '[object ArrayBuffer]': 'areArrayBuffersEqual',
+          '[object BigInt]': 'arePrimitiveWrappersEqual',
+          '[object Boolean]': 'arePrimitiveWrappersEqual',
+          '[object DataView]': 'areDataViewsEqual',
+          '[object Date]': 'areDatesEqual',
+          '[object Map]': 'areMapsEqual',
+          '[object Number]': 'arePrimitiveWrappersEqual',
+          '[object RegExp]': 'areRegExpsEqual',
+          '[object Set]': 'areSetsEqual',
+          '[object String]': 'arePrimitiveWrappersEqual',
+          '[object Uint8Array]': 'areTypedArraysEqual',
+          '[object URL]': 'areUrlsEqual',
+        } as const
+      )[Object.prototype.toString.call(value) as '[object Date]'];
+      const equal = createCustomEqual({ createCustomConfig: () => ({ [key]: () => true }), strict: true });
+
+      expect(equal(Object.assign(create(), { meta: 1 }), Object.assign(create(), { meta: 2 }))).toBe(true);
+    });
+  });
+
+  describe('String wrapper', () => {
+    test('compares the wrapped value', () => {
+      expect(strictDeepEqual(new String('abc'), new String('abd'))).toBe(false);
+      expect(strictDeepEqual(new String('abc'), new String('abcd'))).toBe(false);
+      expect(strictDeepEqual(new String(''), new String(''))).toBe(true);
+    });
+
+    test('does not compare characters again as own properties', () => {
+      let calls = 0;
+
+      const isEqual = createCustomEqual({
+        createInternalComparator: (compare) => (a, b, _keyA, _keyB, _parentA, _parentB, state) => {
+          ++calls;
+
+          return compare(a, b, state);
+        },
+        strict: true,
+      });
+
+      expect(isEqual(new String('x'.repeat(100)), new String('x'.repeat(100)))).toBe(true);
+      // Nor `length`, which follows the characters and is implied by them.
+      expect(calls).toBe(0);
+
+      expect(
+        isEqual(
+          Object.assign(new String('x'.repeat(100)), { meta: 'a' }),
+          Object.assign(new String('x'.repeat(100)), { meta: 'a' }),
+        ),
+      ).toBe(true);
+      // `length` and `meta`, since there are own properties beyond the intrinsic ones.
+      expect(calls).toBe(2);
+    });
+
+    test('compares index properties added after the characters', () => {
+      const withIndex = (value: string) => Object.assign(new String('ab'), { 5: value });
+
+      expect(strictDeepEqual(withIndex('x'), withIndex('x'))).toBe(true);
+      expect(strictDeepEqual(withIndex('x'), withIndex('y'))).toBe(false);
+    });
+
+    test('compares characters when `valueOf` is overridden', () => {
+      const valueOf = () => 'zzz';
+      const withValueOf = (value: string) => Object.assign(new String(value), { valueOf });
+
+      expect(strictDeepEqual(withValueOf('abc'), withValueOf('abc'))).toBe(true);
+      expect(strictDeepEqual(withValueOf('abc'), withValueOf('abd'))).toBe(false);
+
+      class Constant extends String {
+        override valueOf() {
+          return 'zzz';
+        }
+      }
+
+      expect(strictDeepEqual(new Constant('abc'), new Constant('abc'))).toBe(true);
+      expect(strictDeepEqual(new Constant('abc'), new Constant('abd'))).toBe(false);
+    });
+
+    test('compares String wrappers from another realm', () => {
+      const ForeignString = runInNewContext('String') as StringConstructor;
+      const foreign = (value: string) => new ForeignString(value);
+
+      expect(strictDeepEqual(foreign('abc'), foreign('abc'))).toBe(true);
+      expect(strictDeepEqual(foreign('abc'), foreign('abd'))).toBe(false);
+      expect(
+        strictDeepEqual(Object.assign(foreign('abc'), { meta: 1 }), Object.assign(foreign('abc'), { meta: 2 })),
+      ).toBe(false);
+    });
+  });
+
+  describe('RegExp', () => {
+    test('compares `lastIndex`, which is an own property', () => {
+      const withLastIndex = (lastIndex: number) => Object.assign(/a/g, { lastIndex });
+
+      expect(strictDeepEqual(withLastIndex(1), withLastIndex(1))).toBe(true);
+      expect(strictDeepEqual(withLastIndex(0), withLastIndex(1))).toBe(false);
+      expect(deepEqual(withLastIndex(0), withLastIndex(1))).toBe(true);
+    });
+
+    test('compares `lastIndex` by value when it is not a number', () => {
+      const withLastIndex = (lastIndex: unknown) => Object.assign(/a/g, { lastIndex });
+
+      expect(strictDeepEqual(withLastIndex({ value: 1 }), withLastIndex({ value: 1 }))).toBe(true);
+      expect(strictDeepEqual(withLastIndex({ value: 1 }), withLastIndex({ value: 2 }))).toBe(false);
+    });
+
+    test('compares the descriptor of `lastIndex`', () => {
+      expect(strictDeepEqual(Object.freeze(/a/), /a/)).toBe(false);
+      expect(strictDeepEqual(Object.freeze(/a/), Object.freeze(/a/))).toBe(true);
+    });
+
+    test('compares index properties, which are listed before `lastIndex`', () => {
+      const withIndex = (value: string) => Object.assign(/a/, { 0: value });
+
+      expect(strictDeepEqual(withIndex('x'), withIndex('x'))).toBe(true);
+      expect(strictDeepEqual(withIndex('x'), withIndex('y'))).toBe(false);
+    });
+  });
+
+  test('compares own properties without `Reflect`', async () => {
+    vi.resetModules();
+    vi.stubGlobal('Reflect', undefined);
+
+    try {
+      const { strictCircularDeepEqual: equal } = await import('../src/index.js');
+      const symbol = Symbol('tag');
+      const create = (value: number) => {
+        const date: AnyObject = Object.assign(new Date(0), { meta: value, [symbol]: value });
+        date.self = date;
+        return date;
+      };
+
+      expect(equal(create(1), create(1))).toBe(true);
+      expect(equal(create(1), create(2))).toBe(false);
+      expect(equal(Object.assign(new String('ab'), { meta: 1 }), Object.assign(new String('ab'), { meta: 1 }))).toBe(
+        true,
+      );
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
   });
 });
 

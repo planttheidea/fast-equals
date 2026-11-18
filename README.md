@@ -1,7 +1,7 @@
 > fast-equals
 
 Perform [blazing fast](#benchmarks) equality comparisons between two objects, while also allowing for flexibility for
-various use-cases. It has no dependencies, and is ~2.65kB when minified and gzipped.
+various use-cases. It has no dependencies, and is ~2.90kB when minified and gzipped.
 
 The following types are handled out-of-the-box:
 
@@ -235,7 +235,8 @@ Performs the same comparison as `deepEqual` but performs a strict comparison of 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on `Date` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
+  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = [{ foo: 'bar' }];
@@ -248,6 +249,16 @@ console.log(strictDeepEqual(array, otherArray)); // true
 console.log(strictDeepEqual(array, [{ foo: 'bar' }])); // false
 ```
 
+_**NOTE**: Any object can have properties assigned to it, including objects whose value is held internally
+(`date.foo = 'bar'`), so strict comparisons check those own properties in addition to the value itself. Properties that
+are part of the value (the elements of a `TypedArray`, the characters of a `String` wrapper) are not compared twice, but
+listing an object's own properties still has a cost. It is most noticeable for:_
+
+- _`RegExp` objects, which always have an own `lastIndex` property, so their own properties are always listed and
+  compared_
+- _`String` wrappers, whose characters are each an own property, so listing their own properties grows with the length
+  of the string_
+
 ### strictShallowEqual
 
 Performs the same comparison as `shallowEqual` but performs a strict comparison of the objects. This includes:
@@ -256,7 +267,8 @@ Performs the same comparison as `shallowEqual` but performs a strict comparison 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on `Date` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
+  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = ['foo'];
@@ -278,7 +290,8 @@ Performs the same comparison as `circularDeepEqual` but performs a strict compar
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on `Date` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
+  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 function Circular(value) {
@@ -318,7 +331,8 @@ Performs the same comparison as `circularShallowEqual` but performs a strict com
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on `Date` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
+  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = ['foo'];
@@ -428,8 +442,8 @@ to the problem you are solving, they can offer guidance of how to structure your
 
 ## Benchmarks
 
-All benchmarks were performed on an i9-11900H Ubuntu Linux 24.04 laptop with 64GB of memory using NodeJS version
-`24.15.0`, and are based on averages of running comparisons based deep equality on the following object types:
+All benchmarks were performed on an i9-11900H Manjaro Linux laptop with 64GB of memory using NodeJS version `26.13.0`,
+and are based on averages of running comparisons based deep equality on the following object types:
 
 - Primitives (`String`, `Number`, `null`, `undefined`)
 - `Function`
@@ -445,74 +459,74 @@ Testing mixed objects equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 1763109.81851  │
+│ fast-equals (passed)                   │ 1731598.023836 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 1297247.799465 │
+│ fast-deep-equal (passed)               │ 1309307.899547 │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 1271146.258704 │
+│ react-fast-compare (passed)            │ 1292046.683991 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (passed)           │ 1235115.693854 │
+│ shallow-equal-fuzzy (passed)           │ 1226265.458405 │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (failed)                    │ 964815.367752  │
+│ nano-equal (failed)                    │ 963157.128972  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 834232.686567  │
+│ fast-equals (circular) (passed)        │ 909479.445346  │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 759417.072806  │
+│ dequal/lite (passed)                   │ 778122.31992   │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 751901.517376  │
+│ dequal (passed)                        │ 760245.363659  │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 447789.934941  │
+│ underscore.isEqual (passed)            │ 445304.799867  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 433256.455121  │
+│ assert.deepStrictEqual (passed)        │ 438737.156408  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 343382.909087  │
+│ es-toolkit (passed)                    │ 382792.590707  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 294211.792998  │
+│ lodash.isEqual (passed)                │ 290229.549964  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 290477.460766  │
+│ fast-equals (strict) (passed)          │ 279185.538603  │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 232110.748904  │
+│ fast-equals (strict circular) (passed) │ 238470.634046  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 161408.4511    │
+│ deep-eql (passed)                      │ 172670.983717  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 951.279346     │
+│ deep-equal (passed)                    │ 1357.008406    │
 └────────────────────────────────────────┴────────────────┘
 
 Testing mixed objects not equal...
 ┌────────────────────────────────────────┬────────────────┐
 │ Name                                   │ Ops / sec      │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (passed)                   │ 5402008.064431 │
+│ fast-equals (passed)                   │ 5076106.125712 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (circular) (passed)        │ 3687783.563818 │
+│ fast-equals (circular) (passed)        │ 3544911.437592 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-deep-equal (passed)               │ 3479884.479164 │
+│ fast-deep-equal (passed)               │ 3433830.73191  │
 ├────────────────────────────────────────┼────────────────┤
-│ react-fast-compare (passed)            │ 3356141.586592 │
+│ react-fast-compare (passed)            │ 3246695.251508 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict) (passed)          │ 2927133.435788 │
+│ fast-equals (strict) (passed)          │ 1584702.069444 │
 ├────────────────────────────────────────┼────────────────┤
-│ fast-equals (strict circular) (passed) │ 1566187.833636 │
+│ dequal/lite (passed)                   │ 1393178.232807 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal/lite (passed)                   │ 1316031.262808 │
+│ dequal (passed)                        │ 1370661.947753 │
 ├────────────────────────────────────────┼────────────────┤
-│ dequal (passed)                        │ 1298255.762153 │
+│ fast-equals (strict circular) (passed) │ 1336500.602356 │
 ├────────────────────────────────────────┼────────────────┤
-│ shallow-equal-fuzzy (failed)           │ 1219217.578795 │
+│ shallow-equal-fuzzy (failed)           │ 1219389.24268  │
 ├────────────────────────────────────────┼────────────────┤
-│ nano-equal (passed)                    │ 1074115.593615 │
+│ nano-equal (passed)                    │ 1088061.461684 │
 ├────────────────────────────────────────┼────────────────┤
-│ underscore.isEqual (passed)            │ 659016.868085  │
+│ underscore.isEqual (passed)            │ 661655.436986  │
 ├────────────────────────────────────────┼────────────────┤
-│ lodash.isEqual (passed)                │ 374944.853605  │
+│ es-toolkit (passed)                    │ 401295.827671  │
 ├────────────────────────────────────────┼────────────────┤
-│ es-toolkit (passed)                    │ 355882.255615  │
+│ lodash.isEqual (passed)                │ 377347.276362  │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-eql (passed)                      │ 182235.73069   │
+│ deep-eql (passed)                      │ 199704.751472  │
 ├────────────────────────────────────────┼────────────────┤
-│ assert.deepStrictEqual (passed)        │ 20975.582116   │
+│ assert.deepStrictEqual (passed)        │ 25504.609914   │
 ├────────────────────────────────────────┼────────────────┤
-│ deep-equal (passed)                    │ 3760.574487    │
+│ deep-equal (passed)                    │ 5996.790087    │
 └────────────────────────────────────────┴────────────────┘
 ```
 

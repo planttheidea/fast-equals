@@ -38,7 +38,7 @@ export type AnyObject = Record<number | string | symbol, any>;
 export interface ComparatorConfig<Meta> {
   /**
    * Whether the array buffers passed are equal in value. In strict mode, this includes
-   * additional properties added to the array.
+   * additional properties added to the array buffer.
    */
   areArrayBuffersEqual: EqualityComparator<Meta>;
   /**
@@ -47,7 +47,8 @@ export interface ComparatorConfig<Meta> {
    */
   areArraysEqual: EqualityComparator<Meta>;
   /**
-   * Whether the data views passed are equal in value.
+   * Whether the data views passed are equal in value. In strict mode, this includes
+   * additional properties added to the data view.
    */
   areDataViewsEqual: EqualityComparator<Meta>;
   /**
@@ -78,11 +79,13 @@ export interface ComparatorConfig<Meta> {
    */
   areObjectsEqual: EqualityComparator<Meta>;
   /**
-   * Whether the primitive wrappers passed are equal in value.
+   * Whether the primitive wrappers passed are equal in value. In strict mode, this includes
+   * additional properties added to the wrapper.
    */
   arePrimitiveWrappersEqual: EqualityComparator<Meta>;
   /**
-   * Whether the regexps passed are equal in value.
+   * Whether the regexps passed are equal in value. In strict mode, this includes `lastIndex`
+   * and additional properties added to the regexp.
    */
   areRegExpsEqual: EqualityComparator<Meta>;
   /**
@@ -96,7 +99,8 @@ export interface ComparatorConfig<Meta> {
    */
   areTypedArraysEqual: EqualityComparator<Meta>;
   /**
-   * Whether the URLs passed are equal in value.
+   * Whether the URLs passed are equal in value. In strict mode, this includes
+   * additional properties added to the URL.
    */
   areUrlsEqual: EqualityComparator<Meta>;
   /**

@@ -54,12 +54,59 @@ export function areStrictPropertiesEqual(
 }
 
 /**
- * Combine two comparators into a single comparators.
+ * Whether the own properties of objects whose value is compared by other means (`Date`, `RegExp`,
+ * TypedArrays, primitive wrappers, etc.) are equal with strict property checking. Own properties
+ * before `start` are intrinsic to the type and already covered by the value comparison, so only the
+ * ones after them are compared. When `intrinsic` properties have been compared by the caller but are
+ * not guaranteed to be listed first (`RegExp`'s `lastIndex`), objects with only those return early,
+ * and otherwise every property from `start` is compared.
+ *
+ * @note
+ * These objects rarely have own properties beyond their intrinsic ones, so that case returns before
+ * any circular tracking is done. When they do, the properties can reference the object itself, so
+ * the pair is tracked in the cache (when present) here rather than by wrapping the comparator with
+ * `createIsCircular`. This keeps the cost of tracking off the common case.
  */
-export function combineComparators<Meta>(comparatorA: EqualityComparator<Meta>, comparatorB: EqualityComparator<Meta>) {
-  return function isEqual<A, B>(a: A, b: B, state: State<Meta>) {
-    return comparatorA(a, b, state) && comparatorB(a, b, state);
-  };
+export function areOwnPropertiesEqualStrict(
+  a: AnyObject,
+  b: AnyObject,
+  state: State<any>,
+  start: number,
+  intrinsic: number,
+): boolean {
+  const properties = getOwnKeys(a);
+  const length = properties.length;
+
+  if (getOwnKeys(b).length !== length) {
+    return false;
+  }
+
+  if (length === intrinsic) {
+    return true;
+  }
+
+  const cache = state.cache;
+
+  if (!cache) {
+    return areStrictPropertiesEqual(a, b, state, properties, start);
+  }
+
+  const cachedA = cache.get(a);
+  const cachedB = cache.get(b);
+
+  if (cachedA && cachedB) {
+    return cachedA === b && cachedB === a;
+  }
+
+  cache.set(a, b);
+  cache.set(b, a);
+
+  const result = areStrictPropertiesEqual(a, b, state, properties, start);
+
+  cache.delete(a);
+  cache.delete(b);
+
+  return result;
 }
 
 /**
@@ -115,6 +162,15 @@ export const getTypedArrayTag = getOwnPropertyDescriptor(
   Object.getPrototypeOf(Int8Array.prototype),
   Symbol.toStringTag,
 )!.get!;
+
+/**
+ * Get all own properties of the object, both strings and symbols, in the same order as
+ * `getStrictProperties`. `Reflect.ownKeys` is used when available because it is faster for objects
+ * like `Date` / `RegExp` / TypedArrays in V8. It is slower for plain objects without symbols, which
+ * is why `getStrictProperties` is still used directly for those.
+ */
+const getOwnKeys: (object: AnyObject) => Array<string | symbol> =
+  (typeof Reflect !== 'undefined' && Reflect.ownKeys) || getStrictProperties;
 
 /**
  * Whether the object contains the property passed as an own property.

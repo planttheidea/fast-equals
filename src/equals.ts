@@ -1,5 +1,6 @@
 import type { AnyObject, PrimitiveWrapper, State, TypedArray } from './internalTypes.js';
 import {
+  areOwnPropertiesEqualStrict,
   areStrictPropertiesEqual,
   getStrictProperties,
   getTypedArrayTag,
@@ -13,8 +14,9 @@ import {
  */
 const MAX_SCANNED_PROPERTIES = 64;
 
-const { keys } = Object;
+const { getOwnPropertyDescriptor, keys } = Object;
 const { propertyIsEnumerable } = Object.prototype;
+const { valueOf: stringValueOf } = String.prototype;
 
 /**
  * Whether the values passed are equal based on a [SameValue](https://262.ecma-international.org/7.0/#sec-samevalue) basis.
@@ -61,6 +63,13 @@ export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
 }
 
 /**
+ * Whether the array buffers are equal in value with strict property checking.
+ */
+export function areArrayBuffersEqualStrict(a: ArrayBuffer, b: ArrayBuffer, state: State<any>): boolean {
+  return areArrayBuffersEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
+}
+
+/**
  * Whether the arrays are equal in value.
  */
 export function areArraysEqual(a: any[], b: any[], state: State<any>) {
@@ -93,10 +102,24 @@ export function areDataViewsEqual(a: DataView, b: DataView): boolean {
 }
 
 /**
+ * Whether the dataviews are equal in value with strict property checking.
+ */
+export function areDataViewsEqualStrict(a: DataView, b: DataView, state: State<any>): boolean {
+  return areDataViewsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
+}
+
+/**
  * Whether the dates passed are equal in value.
  */
 export function areDatesEqual(a: Date, b: Date): boolean {
   return sameValueEqual(a.getTime(), b.getTime());
+}
+
+/**
+ * Whether the dates passed are equal in value with strict property checking.
+ */
+export function areDatesEqualStrict(a: Date, b: Date, state: State<any>): boolean {
+  return areDatesEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -255,6 +278,17 @@ export function areMapsEqual(a: Map<any, any>, b: Map<any, any>, state: State<an
 }
 
 /**
+ * Whether the `Map`s are equal in value with strict property checking.
+ *
+ * @note
+ * The entries can be circular, so this is wrapped with `createIsCircular` in circular mode like
+ * other containers, and the own properties are compared without additional tracking.
+ */
+export function areMapsEqualStrict(a: Map<any, any>, b: Map<any, any>, state: State<any>): boolean {
+  return areMapsEqual(a, b, state) && areObjectsEqualStrict(a, b, state);
+}
+
+/**
  * Whether the objects are equal in value.
  */
 export function areObjectsEqual(a: AnyObject, b: AnyObject, state: State<any>): boolean {
@@ -316,10 +350,67 @@ export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapp
 }
 
 /**
+ * Whether the primitive wrappers passed are equal in value with strict property checking.
+ *
+ * @note
+ * A `String` wrapper's characters are own index properties, listed first and in order, followed
+ * by `length`. They are covered by the value comparison, so they are skipped, but only when the
+ * value comes from the native `valueOf`. Otherwise (overridden or cross-realm `valueOf`) the value
+ * may not reflect the characters, so they are compared as properties.
+ */
+export function arePrimitiveWrappersEqualStrict(a: PrimitiveWrapper, b: PrimitiveWrapper, state: State<any>): boolean {
+  const value = a.valueOf();
+
+  if (!sameValueEqual(value, b.valueOf())) {
+    return false;
+  }
+
+  // `length` follows the characters, so a native `String` wrapper without other own properties has one more.
+  return typeof value === 'string' && a.valueOf === stringValueOf && b.valueOf === stringValueOf
+    ? areOwnPropertiesEqualStrict(a, b, state, value.length, value.length + 1)
+    : areOwnPropertiesEqualStrict(a, b, state, 0, 0);
+}
+
+/**
  * Whether the regexps passed are equal in value.
  */
 export function areRegExpsEqual(a: RegExp, b: RegExp): boolean {
   return a.source === b.source && a.flags === b.flags;
+}
+
+/**
+ * Whether the regexps passed are equal in value with strict property checking.
+ *
+ * @note
+ * `lastIndex` is an own property that every regexp has, and usually the only one. It is compared
+ * directly so that the common case avoids the full property comparison. If it differs in identity or
+ * writability, or there are other own properties, every own property is compared (including
+ * `lastIndex`, since index properties may be listed before it).
+ */
+export function areRegExpsEqualStrict(a: RegExp, b: RegExp, state: State<any>): boolean {
+  if (!areRegExpsEqual(a, b)) {
+    return false;
+  }
+
+  // Environments that predate (or polyfill around) `lastIndex` being an own property may not have
+  // it, in which case there is nothing to shortcut and every own property is compared.
+  const descriptorA = getOwnPropertyDescriptor(a, 'lastIndex');
+  const descriptorB = getOwnPropertyDescriptor(b, 'lastIndex');
+
+  return areOwnPropertiesEqualStrict(
+    a,
+    b,
+    state,
+    0,
+    descriptorA
+      && descriptorB
+      && a.lastIndex === b.lastIndex
+      && descriptorA.configurable === descriptorB.configurable
+      && descriptorA.enumerable === descriptorB.enumerable
+      && descriptorA.writable === descriptorB.writable
+      ? 1
+      : 0,
+  );
 }
 
 /**
@@ -396,6 +487,16 @@ export function areSetsEqual(a: Set<any>, b: Set<any>, state: State<any>): boole
 }
 
 /**
+ * Whether the `Set`s are equal in value with strict property checking.
+ *
+ * @note
+ * See `areMapsEqualStrict` for why the own properties are compared without additional tracking.
+ */
+export function areSetsEqualStrict(a: Set<any>, b: Set<any>, state: State<any>): boolean {
+  return areSetsEqual(a, b, state) && areObjectsEqualStrict(a, b, state);
+}
+
+/**
  * Whether the TypedArray instances are equal in value.
  */
 export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
@@ -444,15 +545,7 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  * (including symbols) are compared with strict property checking.
  */
 export function areTypedArraysEqualStrict(a: TypedArray, b: TypedArray, state: State<any>): boolean {
-  if (!areTypedArraysEqual(a, b)) {
-    return false;
-  }
-
-  const properties = getStrictProperties(a);
-
-  return (
-    getStrictProperties(b).length === properties.length && areStrictPropertiesEqual(a, b, state, properties, a.length)
-  );
+  return areTypedArraysEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, a.length, a.length);
 }
 
 /**
@@ -475,4 +568,11 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
     && a.hash === b.hash
     && areSearchParamsEqual(a.searchParams, b.searchParams)
   );
+}
+
+/**
+ * Whether the URL instances are equal in value with strict property checking.
+ */
+export function areUrlsEqualStrict(a: URL, b: URL, state: State<any>): boolean {
+  return areUrlsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
