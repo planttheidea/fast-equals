@@ -1,5 +1,16 @@
 # fast-equals CHANGELOG
 
+## 6.3.0
+
+- Check own properties in `strict` mode on every object that holds its value internally, rather than one type at a time.
+  `RegExp` (including `lastIndex`), `URL`, primitive wrappers, `ArrayBuffer` and `DataView` objects now join `Date`,
+  `Map`, `Set` and `TypedArray` objects. Own properties that reference the object are supported in `strict` circular
+  mode. (thanks [@mayankdhingra02](https://github.com/mayankdhingra02) for raising this in
+  [#225](https://github.com/planttheidea/fast-equals/pull/225))
+- Only track circular references for these objects when they have own properties beyond their intrinsic ones, which
+  makes `strict` circular comparisons of `Date` and `TypedArray` objects faster.
+- Avoid comparing the characters of `String` wrappers twice in `strict` mode.
+
 ## 6.2.2
 
 - [#223](https://github.com/planttheidea/fast-equals/pull/223) - Fixed a stack overflow in `strictCircularDeepEqual`

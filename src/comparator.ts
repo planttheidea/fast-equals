@@ -1,19 +1,27 @@
 import {
-  areArrayBuffersEqual,
+  areArrayBuffersEqual as areArrayBuffersEqualDefault,
+  areArrayBuffersEqualStrict as areArrayBuffersEqualStrictDefault,
   areArraysEqual as areArraysEqualDefault,
-  areDataViewsEqual,
+  areDataViewsEqual as areDataViewsEqualDefault,
+  areDataViewsEqualStrict as areDataViewsEqualStrictDefault,
   areDatesEqual as areDatesEqualDefault,
+  areDatesEqualStrict as areDatesEqualStrictDefault,
   areErrorsEqual as areErrorsEqualDefault,
   areErrorsEqualStrict as areErrorsEqualStrictDefault,
   areMapsEqual as areMapsEqualDefault,
+  areMapsEqualStrict as areMapsEqualStrictDefault,
   areObjectsEqual as areObjectsEqualDefault,
   areObjectsEqualStrict as areObjectsEqualStrictDefault,
   arePrimitiveWrappersEqual as arePrimitiveWrappersEqualDefault,
+  arePrimitiveWrappersEqualStrict as arePrimitiveWrappersEqualStrictDefault,
   areRegExpsEqual as areRegExpsEqualDefault,
+  areRegExpsEqualStrict as areRegExpsEqualStrictDefault,
   areSetsEqual as areSetsEqualDefault,
+  areSetsEqualStrict as areSetsEqualStrictDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areTypedArraysEqualStrict as areTypedArraysEqualStrictDefault,
   areUrlsEqual as areUrlsEqualDefault,
+  areUrlsEqualStrict as areUrlsEqualStrictDefault,
   sameValueEqual,
   strictEqual,
 } from './equals.js';
@@ -24,7 +32,7 @@ import type {
   InternalEqualityComparator,
   State,
 } from './internalTypes.js';
-import { combineComparators, createIsCircular, isNullPrototypeComparable } from './utils.js';
+import { createIsCircular, isNullPrototypeComparable } from './utils.js';
 
 interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOptions<Meta>>, 'circular' | 'strict'> {
   comparator: EqualityComparator<Meta>;
@@ -198,27 +206,30 @@ export function createEqualityComparatorConfig<Meta>({
   strict,
   strictNullPrototypeComparison = true,
 }: CustomEqualCreatorOptions<Meta>): ComparatorConfig<Meta> {
+  // In strict mode, every type compares its own properties in addition to its value, because any
+  // object can have properties assigned to it (`date.foo = 'bar'`). For types that hold their value
+  // internally (`Date`, `RegExp`, TypedArrays, etc.), only the properties after the intrinsic ones
+  // are compared, and circular references among them are tracked by the comparator itself (see
+  // `areOwnPropertiesEqualStrict`).
   let config = {
-    areArrayBuffersEqual,
+    areArrayBuffersEqual: strict ? areArrayBuffersEqualStrictDefault : areArrayBuffersEqualDefault,
     areArraysEqual: strict ? areObjectsEqualStrictDefault : areArraysEqualDefault,
-    areDataViewsEqual,
-    areDatesEqual: strict
-      ? combineComparators(areDatesEqualDefault, areObjectsEqualStrictDefault)
-      : areDatesEqualDefault,
+    areDataViewsEqual: strict ? areDataViewsEqualStrictDefault : areDataViewsEqualDefault,
+    areDatesEqual: strict ? areDatesEqualStrictDefault : areDatesEqualDefault,
     // `name` / `message` / `stack` / `cause` / `errors` are not enumerable (unless assigned), which is why
     // errors need a comparator of their own rather than being treated as plain objects. Each variant also
     // compares the own properties that `Error` subclasses routinely carry (`status`, `code`, ...):
     // enumerable ones in loose mode, and all of them (via `areObjectsEqualStrict`) in strict mode.
     areErrorsEqual: strict ? areErrorsEqualStrictDefault : areErrorsEqualDefault,
     areFunctionsEqual: strictEqual,
-    areMapsEqual: strict ? combineComparators(areMapsEqualDefault, areObjectsEqualStrictDefault) : areMapsEqualDefault,
+    areMapsEqual: strict ? areMapsEqualStrictDefault : areMapsEqualDefault,
     areNumbersEqual: sameValueEqual,
     areObjectsEqual: strict ? areObjectsEqualStrictDefault : areObjectsEqualDefault,
-    arePrimitiveWrappersEqual: arePrimitiveWrappersEqualDefault,
-    areRegExpsEqual: areRegExpsEqualDefault,
-    areSetsEqual: strict ? combineComparators(areSetsEqualDefault, areObjectsEqualStrictDefault) : areSetsEqualDefault,
+    arePrimitiveWrappersEqual: strict ? arePrimitiveWrappersEqualStrictDefault : arePrimitiveWrappersEqualDefault,
+    areRegExpsEqual: strict ? areRegExpsEqualStrictDefault : areRegExpsEqualDefault,
+    areSetsEqual: strict ? areSetsEqualStrictDefault : areSetsEqualDefault,
     areTypedArraysEqual: strict ? areTypedArraysEqualStrictDefault : areTypedArraysEqualDefault,
-    areUrlsEqual: areUrlsEqualDefault,
+    areUrlsEqual: strict ? areUrlsEqualStrictDefault : areUrlsEqualDefault,
     getUnsupportedCustomComparator: undefined,
     strictNullPrototypeComparison,
   };
@@ -228,24 +239,16 @@ export function createEqualityComparatorConfig<Meta>({
   }
 
   if (circular) {
-    const areArraysEqual = createIsCircular(config.areArraysEqual);
-    const areDatesEqual = strict ? createIsCircular(config.areDatesEqual) : config.areDatesEqual;
+    // Only containers are wrapped, since they always compare nested values. Types that hold their
+    // value internally only do so for own properties in strict mode, and track those themselves.
     // Errors are included because comparing `cause` and own properties by value means an error
     // that references itself would otherwise recurse without bound.
-    const areErrorsEqual = createIsCircular(config.areErrorsEqual);
-    const areMapsEqual = createIsCircular(config.areMapsEqual);
-    const areObjectsEqual = createIsCircular(config.areObjectsEqual);
-    const areSetsEqual = createIsCircular(config.areSetsEqual);
-    const areTypedArraysEqual = strict ? createIsCircular(config.areTypedArraysEqual) : config.areTypedArraysEqual;
-
     config = Object.assign({}, config, {
-      areArraysEqual,
-      areDatesEqual,
-      areErrorsEqual,
-      areMapsEqual,
-      areObjectsEqual,
-      areSetsEqual,
-      areTypedArraysEqual,
+      areArraysEqual: createIsCircular(config.areArraysEqual),
+      areErrorsEqual: createIsCircular(config.areErrorsEqual),
+      areMapsEqual: createIsCircular(config.areMapsEqual),
+      areObjectsEqual: createIsCircular(config.areObjectsEqual),
+      areSetsEqual: createIsCircular(config.areSetsEqual),
     });
   }
 

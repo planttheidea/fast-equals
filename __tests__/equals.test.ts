@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'vitest';
-import { areArraysEqual, areMapsEqual, areObjectsEqual, areRegExpsEqual, areSetsEqual } from '../src/equals.js';
+import {
+  areArraysEqual,
+  areMapsEqual,
+  areObjectsEqual,
+  areRegExpsEqual,
+  areRegExpsEqualStrict,
+  areSetsEqual,
+} from '../src/equals.js';
 import { deepEqual, sameValueEqual } from '../src/index.js';
 
 const shallowState = {
@@ -213,6 +220,43 @@ describe('areRegExpsEqual', () => {
     const b = new RegExp('foo', 'ig');
 
     expect(areRegExpsEqual(a, b)).toBe(true);
+  });
+});
+
+describe('areRegExpsEqualStrict', () => {
+  // Stand-ins for regexps in environments where `lastIndex` is not an own data property.
+  const create = (properties: PropertyDescriptorMap = {}) =>
+    Object.defineProperties({}, { flags: { value: 'g' }, source: { value: 'a' }, ...properties }) as RegExp;
+  const withAccessor = (value: number) =>
+    create({ lastIndex: { configurable: true, enumerable: false, get: () => value } });
+
+  test('compares every own property when `lastIndex` is not an own property', () => {
+    expect(areRegExpsEqualStrict(create(), create(), deepState)).toBe(true);
+    expect(areRegExpsEqualStrict(create({ meta: { value: 1 } }), create({ meta: { value: 1 } }), deepState)).toBe(true);
+    expect(areRegExpsEqualStrict(create({ meta: { value: 1 } }), create({ meta: { value: 2 } }), deepState)).toBe(
+      false,
+    );
+  });
+
+  test('does not shortcut when only one side has `lastIndex` as an own property', () => {
+    expect(areRegExpsEqualStrict(create({ lastIndex: { value: 0 } }), create({ meta: { value: 0 } }), deepState)).toBe(
+      false,
+    );
+    expect(areRegExpsEqualStrict(create({ meta: { value: 0 } }), create({ lastIndex: { value: 0 } }), deepState)).toBe(
+      false,
+    );
+  });
+
+  test('compares `lastIndex` when it is an accessor', () => {
+    expect(areRegExpsEqualStrict(withAccessor(1), withAccessor(1), deepState)).toBe(true);
+    expect(areRegExpsEqualStrict(withAccessor(1), withAccessor(2), deepState)).toBe(false);
+    expect(
+      areRegExpsEqualStrict(
+        withAccessor(1),
+        create({ lastIndex: { configurable: false, enumerable: false, get: () => 1 } }),
+        deepState,
+      ),
+    ).toBe(false);
   });
 });
 
