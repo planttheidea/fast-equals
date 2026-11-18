@@ -1150,8 +1150,17 @@ describe('strict own properties on value types', () => {
       });
 
       expect(isEqual(new String('x'.repeat(100)), new String('x'.repeat(100)))).toBe(true);
-      // Only `length`, which follows the characters.
-      expect(calls).toBe(1);
+      // Nor `length`, which follows the characters and is implied by them.
+      expect(calls).toBe(0);
+
+      expect(
+        isEqual(
+          Object.assign(new String('x'.repeat(100)), { meta: 'a' }),
+          Object.assign(new String('x'.repeat(100)), { meta: 'a' }),
+        ),
+      ).toBe(true);
+      // `length` and `meta`, since there are own properties beyond the intrinsic ones.
+      expect(calls).toBe(2);
     });
 
     test('compares index properties added after the characters', () => {

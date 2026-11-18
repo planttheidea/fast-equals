@@ -66,7 +66,7 @@ export function areArrayBuffersEqual(a: ArrayBuffer, b: ArrayBuffer): boolean {
  * Whether the array buffers are equal in value with strict property checking.
  */
 export function areArrayBuffersEqualStrict(a: ArrayBuffer, b: ArrayBuffer, state: State<any>): boolean {
-  return areArrayBuffersEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0);
+  return areArrayBuffersEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -105,7 +105,7 @@ export function areDataViewsEqual(a: DataView, b: DataView): boolean {
  * Whether the dataviews are equal in value with strict property checking.
  */
 export function areDataViewsEqualStrict(a: DataView, b: DataView, state: State<any>): boolean {
-  return areDataViewsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0);
+  return areDataViewsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -119,7 +119,7 @@ export function areDatesEqual(a: Date, b: Date): boolean {
  * Whether the dates passed are equal in value with strict property checking.
  */
 export function areDatesEqualStrict(a: Date, b: Date, state: State<any>): boolean {
-  return areDatesEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0);
+  return areDatesEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -361,15 +361,14 @@ export function arePrimitiveWrappersEqual(a: PrimitiveWrapper, b: PrimitiveWrapp
 export function arePrimitiveWrappersEqualStrict(a: PrimitiveWrapper, b: PrimitiveWrapper, state: State<any>): boolean {
   const value = a.valueOf();
 
-  return (
-    sameValueEqual(value, b.valueOf())
-    && areOwnPropertiesEqualStrict(
-      a,
-      b,
-      state,
-      typeof value === 'string' && a.valueOf === stringValueOf && b.valueOf === stringValueOf ? value.length : 0,
-    )
-  );
+  if (!sameValueEqual(value, b.valueOf())) {
+    return false;
+  }
+
+  // `length` follows the characters, so a native `String` wrapper without other own properties has one more.
+  return typeof value === 'string' && a.valueOf === stringValueOf && b.valueOf === stringValueOf
+    ? areOwnPropertiesEqualStrict(a, b, state, value.length, value.length + 1)
+    : areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -546,7 +545,7 @@ export function areTypedArraysEqual(a: TypedArray, b: TypedArray) {
  * (including symbols) are compared with strict property checking.
  */
 export function areTypedArraysEqualStrict(a: TypedArray, b: TypedArray, state: State<any>): boolean {
-  return areTypedArraysEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, a.length);
+  return areTypedArraysEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, a.length, a.length);
 }
 
 /**
@@ -575,5 +574,5 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
  * Whether the URL instances are equal in value with strict property checking.
  */
 export function areUrlsEqualStrict(a: URL, b: URL, state: State<any>): boolean {
-  return areUrlsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0);
+  return areUrlsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }

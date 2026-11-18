@@ -16,8 +16,8 @@
 - [#228](https://github.com/planttheidea/fast-equals/pull/228) - Only track circular references for these objects when
   they have own properties beyond their intrinsic ones, which makes `strict` circular comparisons of `Date` and
   `TypedArray` objects faster.
-- [#228](https://github.com/planttheidea/fast-equals/pull/228) - Avoid comparing the characters of `String` wrappers
-  twice in `strict` mode.
+- [#228](https://github.com/planttheidea/fast-equals/pull/228) - Avoid comparing the characters (or `length`) of
+  `String` wrappers twice in `strict` mode.
 
 ## 6.2.2
 

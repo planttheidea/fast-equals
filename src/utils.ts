@@ -72,7 +72,7 @@ export function areOwnPropertiesEqualStrict(
   b: AnyObject,
   state: State<any>,
   start: number,
-  intrinsic = start,
+  intrinsic: number,
 ): boolean {
   const properties = getOwnKeys(a);
   const length = properties.length;
