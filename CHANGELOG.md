@@ -1,5 +1,14 @@
 # fast-equals CHANGELOG
 
+## 6.4.0
+
+- [#230](https://github.com/planttheidea/fast-equals/pull/230) - Added support for comparing `URLSearchParams` objects
+  by value, using the same comparison already applied to the query of `URL` objects: param order is not significant, but
+  repeated keys are. Own properties are compared in `strict` mode, and the comparison can be customized with the new
+  `areUrlSearchParamsEqual` configuration option. Previously, `URLSearchParams` objects were only equal when they were
+  the same reference. (thanks [@bardrop](https://github.com/bardrop) for raising this in
+  [#229](https://github.com/planttheidea/fast-equals/issues/229))
+
 ## 6.3.0
 
 - [#227](https://github.com/planttheidea/fast-equals/pull/227) - Fixed false negatives when comparing `TypedArray` and

@@ -91,6 +91,11 @@ interface ComparatorConfig<Meta> {
      */
     areTypedArraysEqual: EqualityComparator<Meta>;
     /**
+     * Whether the `URLSearchParams` passed are equal in value. In strict mode, this includes
+     * additional properties added to the `URLSearchParams`.
+     */
+    areUrlSearchParamsEqual: EqualityComparator<Meta>;
+    /**
      * Whether the URLs passed are equal in value. In strict mode, this includes
      * additional properties added to the URL.
      */
