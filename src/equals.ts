@@ -421,13 +421,20 @@ export function areRegExpsEqualStrict(a: RegExp, b: RegExp, state: State<any>): 
  * compared. Repeated keys are, so this is a comparison of multisets rather than of sets:
  * `a=1&a=2` is equal to `a=2&a=1`, but not to `a=1&a=1`.
  */
-function areSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
+export function areUrlSearchParamsEqual(a: URLSearchParams, b: URLSearchParams): boolean {
   const serializedA = a.toString();
   const serializedB = b.toString();
 
   // Identical serializations are equal under any ordering, and this is by far the common case, so
   // it is worth checking before sorting anything.
   return serializedA === serializedB || sortSearchParams(serializedA) === sortSearchParams(serializedB);
+}
+
+/**
+ * Whether the search params passed are equal in value with strict property checking.
+ */
+export function areUrlSearchParamsEqualStrict(a: URLSearchParams, b: URLSearchParams, state: State<any>): boolean {
+  return areUrlSearchParamsEqual(a, b) && areOwnPropertiesEqualStrict(a, b, state, 0, 0);
 }
 
 /**
@@ -566,7 +573,7 @@ export function areUrlsEqual(a: URL, b: URL): boolean {
     && a.host === b.host
     && a.pathname === b.pathname
     && a.hash === b.hash
-    && areSearchParamsEqual(a.searchParams, b.searchParams)
+    && areUrlSearchParamsEqual(a.searchParams, b.searchParams)
   );
 }
 

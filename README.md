@@ -13,7 +13,7 @@ The following types are handled out-of-the-box:
 - `Map` / `Set` iterables
 - `Promise` objects and then-ables
 - `Error` objects, including subclasses and their own properties
-- `URL` objects
+- `URL` / `URLSearchParams` objects
 - Primitive wrappers (`new Boolean()` / `new Number()` / `new String()`, and boxed `BigInt`)
 - Custom class instances, including subclasses of native classes
 
@@ -235,8 +235,8 @@ Performs the same comparison as `deepEqual` but performs a strict comparison of 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
-  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, `URLSearchParams`,
+  primitive wrappers, `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = [{ foo: 'bar' }];
@@ -267,8 +267,8 @@ Performs the same comparison as `shallowEqual` but performs a strict comparison 
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
-  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, `URLSearchParams`,
+  primitive wrappers, `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = ['foo'];
@@ -290,8 +290,8 @@ Performs the same comparison as `circularDeepEqual` but performs a strict compar
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
-  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, `URLSearchParams`,
+  primitive wrappers, `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 function Circular(value) {
@@ -331,8 +331,8 @@ Performs the same comparison as `circularShallowEqual` but performs a strict com
 - Checking full descriptor of properties on the object to match
 - Checking non-index properties on arrays
 - Checking non-key properties on `Map` / `Set` objects
-- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, primitive wrappers,
-  `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
+- Checking own properties on objects that hold their value internally (`Date`, `RegExp`, `URL`, `URLSearchParams`,
+  primitive wrappers, `ArrayBuffer`, `DataView` and `TypedArray` objects), including `lastIndex` on `RegExp` objects
 
 ```ts
 const array = ['foo'];
@@ -377,6 +377,7 @@ interface ComparatorConfig<Meta> {
   areRegExpsEqual: EqualityComparator<Meta>;
   areSetsEqual: EqualityComparator<Meta>;
   areTypedArraysEqual: EqualityComparator<Meta>;
+  areUrlSearchParamsEqual: EqualityComparator<Meta>;
   areUrlsEqual: EqualityComparator<Meta>;
   getUnsupportedCustomComparator:
     (<Type>(a: Type, b: Type, state: State<Meta>, tag: string) => EqualityComparator<Meta> | undefined) | undefined;
