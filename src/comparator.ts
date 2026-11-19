@@ -20,6 +20,8 @@ import {
   areSetsEqualStrict as areSetsEqualStrictDefault,
   areTypedArraysEqual as areTypedArraysEqualDefault,
   areTypedArraysEqualStrict as areTypedArraysEqualStrictDefault,
+  areUrlSearchParamsEqual as areUrlSearchParamsEqualDefault,
+  areUrlSearchParamsEqualStrict as areUrlSearchParamsEqualStrictDefault,
   areUrlsEqual as areUrlsEqualDefault,
   areUrlsEqualStrict as areUrlsEqualStrictDefault,
   sameValueEqual,
@@ -229,6 +231,7 @@ export function createEqualityComparatorConfig<Meta>({
     areRegExpsEqual: strict ? areRegExpsEqualStrictDefault : areRegExpsEqualDefault,
     areSetsEqual: strict ? areSetsEqualStrictDefault : areSetsEqualDefault,
     areTypedArraysEqual: strict ? areTypedArraysEqualStrictDefault : areTypedArraysEqualDefault,
+    areUrlSearchParamsEqual: strict ? areUrlSearchParamsEqualStrictDefault : areUrlSearchParamsEqualDefault,
     areUrlsEqual: strict ? areUrlsEqualStrictDefault : areUrlsEqualDefault,
     getUnsupportedCustomComparator: undefined,
     strictNullPrototypeComparison,
@@ -331,6 +334,7 @@ function createSupportedComparatorMap<Meta>({
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlSearchParamsEqual,
   areUrlsEqual,
 }: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
   return {
@@ -368,6 +372,7 @@ function createSupportedComparatorMap<Meta>({
     '[object Set]': areSetsEqual,
     '[object String]': arePrimitiveWrappersEqual,
     '[object URL]': areUrlsEqual,
+    '[object URLSearchParams]': areUrlSearchParamsEqual,
     '[object Uint8Array]': areTypedArraysEqual,
     '[object Uint8ClampedArray]': areTypedArraysEqual,
     '[object Uint16Array]': areTypedArraysEqual,

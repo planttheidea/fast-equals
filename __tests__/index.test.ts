@@ -606,6 +606,49 @@ describe('correctness fixes', () => {
     });
   });
 
+  describe('URLSearchParams', () => {
+    test('compares the params', () => {
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1'))).toBe(true);
+      expect(deepEqual(new URLSearchParams(), new URLSearchParams(''))).toBe(true);
+      expect(deepEqual(new URLSearchParams({ a: '1', b: '2' }), new URLSearchParams('a=1&b=2'))).toBe(true);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=2'))).toBe(false);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams('a=1&b=2'))).toBe(false);
+      expect(deepEqual(new URLSearchParams('a=1'), new URLSearchParams())).toBe(false);
+    });
+
+    test('does not treat param order as significant', () => {
+      expect(deepEqual(new URLSearchParams('a=1&b=2'), new URLSearchParams('b=2&a=1'))).toBe(true);
+      // Repeated keys are counted, so this compares multisets rather than sets.
+      expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=2&a=1'))).toBe(true);
+      expect(deepEqual(new URLSearchParams('a=1&a=2'), new URLSearchParams('a=1&a=1'))).toBe(false);
+    });
+
+    test('compares nested params in every mode', () => {
+      const a = { query: new URLSearchParams('a=1&b=2') };
+      const b = { query: new URLSearchParams('b=2&a=1') };
+      const c = { query: new URLSearchParams('a=1&b=3') };
+
+      for (const equal of [deepEqual, circularDeepEqual, strictDeepEqual, strictCircularDeepEqual]) {
+        expect(equal(a, b)).toBe(true);
+        expect(equal(a, c)).toBe(false);
+      }
+    });
+
+    test('is not equal to a URL or a plain object', () => {
+      expect(deepEqual(new URLSearchParams('a=1'), new URL('https://foo.com/?a=1'))).toBe(false);
+      expect(deepEqual(new URLSearchParams('a=1'), { a: '1' })).toBe(false);
+    });
+
+    test('can be overridden with a custom config', () => {
+      const equal = createCustomEqual({
+        createCustomConfig: () => ({ areUrlSearchParamsEqual: (a, b) => a.get('id') === b.get('id') }),
+      });
+
+      expect(equal(new URLSearchParams('id=1&x=1'), new URLSearchParams('id=1&x=2'))).toBe(true);
+      expect(equal(new URLSearchParams('id=1'), new URLSearchParams('id=2'))).toBe(false);
+    });
+  });
+
   describe('Error', () => {
     test('compares AggregateError contents', () => {
       const [a, b, c] = [[{ code: 'A' }], [{ code: 'A' }], [{ code: 'B' }]].map(
@@ -1041,6 +1084,7 @@ describe('strict own properties on value types', () => {
     { name: 'String wrapper', create: () => new String('abc') },
     { name: 'TypedArray', create: () => new Uint8Array([1, 2]) },
     { name: 'URL', create: () => new URL('https://example.com/path?a=1') },
+    { name: 'URLSearchParams', create: () => new URLSearchParams('a=1&b=2') },
   ];
 
   describe.each(factories)('$name', ({ create }) => {
@@ -1122,6 +1166,7 @@ describe('strict own properties on value types', () => {
           '[object String]': 'arePrimitiveWrappersEqual',
           '[object Uint8Array]': 'areTypedArraysEqual',
           '[object URL]': 'areUrlsEqual',
+          '[object URLSearchParams]': 'areUrlSearchParamsEqual',
         } as const
       )[Object.prototype.toString.call(value) as '[object Date]'];
       const equal = createCustomEqual({ createCustomConfig: () => ({ [key]: () => true }), strict: true });

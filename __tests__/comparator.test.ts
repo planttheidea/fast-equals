@@ -12,6 +12,7 @@ import {
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlSearchParamsEqual,
   areUrlsEqual,
   sameValueEqual,
   strictEqual,
@@ -33,6 +34,7 @@ const STANDARD_COMPARATOR_OPTIONS = {
   areRegExpsEqual,
   areSetsEqual,
   areTypedArraysEqual,
+  areUrlSearchParamsEqual,
   areUrlsEqual,
   getUnsupportedCustomComparator: undefined,
 };
