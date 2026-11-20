@@ -43,12 +43,14 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 }
 
 const { toString } = Object.prototype;
+const toStringTagSymbol = Symbol.toStringTag;
 
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
 export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   const supportedComparatorMap = createSupportedComparatorMap(config);
+  const supportedComparatorByStringTag = createSupportedComparatorByStringTag(supportedComparatorMap);
   const {
     areArraysEqual,
     areDatesEqual,
@@ -73,25 +75,39 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    * In all cases, these decisions should be reevaluated based on changes to the language and
    * common development practices.
    *
+   * When `Symbol.toStringTag` is a string (TypedArrays, `ArrayBuffer`, `DataView`, `Map`, `URL`, etc.),
+   * `toString()` returns `[object ${stringTag}]` regardless of the object's type, so the comparator is
+   * looked up by the `Symbol.toStringTag` value directly. This avoids building (and then hashing) the
+   * full tag string for every comparison. Otherwise the tag depends on the built-in type, and is
+   * captured with `toString()` as before.
+   *
    * Capturing the tag is reasonably performant in modern environments like v8 and SpiderMonkey. This is
    * kept out of the main comparator so that it stays within the engine's bytecode budget for inlining.
    * See [#207](https://github.com/planttheidea/fast-equals/pull/207) for more details.
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const tag = toString.call(a);
-        const supportedComparator = supportedComparatorMap[tag];
+        const stringTag = a[toStringTagSymbol];
+        const isStringTag = typeof stringTag === 'string';
+        const supportedComparator = isStringTag
+          ? supportedComparatorByStringTag[stringTag]
+          : supportedComparatorMap[toString.call(a)];
 
         if (supportedComparator) {
           return supportedComparator(a, b, state);
         }
 
+        const tag = isStringTag ? `[object ${stringTag}]` : toString.call(a);
         const unsupportedCustomComparator = getUnsupportedCustomComparator(a, b, state, tag);
 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
       }
     : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const supportedComparator = supportedComparatorMap[toString.call(a)];
+        const stringTag = a[toStringTagSymbol];
+        const supportedComparator =
+          typeof stringTag === 'string'
+            ? supportedComparatorByStringTag[stringTag]
+            : supportedComparatorMap[toString.call(a)];
 
         return supportedComparator ? supportedComparator(a, b, state) : false;
       };
@@ -378,4 +394,24 @@ function createSupportedComparatorMap<Meta>({
     '[object Uint16Array]': areTypedArraysEqual,
     '[object Uint32Array]': areTypedArraysEqual,
   };
+}
+
+/**
+ * Create a map of `Symbol.toStringTag` values to their respective handlers, derived from the map of
+ * `toString()` values (`[object ${stringTag}]`).
+ *
+ * @note
+ * The map has a `null` prototype, so a `Symbol.toStringTag` like `constructor` or `toString` cannot
+ * resolve to an inherited `Object.prototype` method.
+ */
+function createSupportedComparatorByStringTag(
+  supportedComparatorMap: Record<string, EqualityComparator<any>>,
+): Record<string, EqualityComparator<any> | undefined> {
+  const supportedComparatorByStringTag: Record<string, EqualityComparator<any> | undefined> = Object.create(null);
+
+  for (const tag in supportedComparatorMap) {
+    supportedComparatorByStringTag[tag.slice(8, -1)] = supportedComparatorMap[tag];
+  }
+
+  return supportedComparatorByStringTag;
 }
