@@ -92,7 +92,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
           a,
           b,
           state,
-          tag === stringTag ? `[object ${tag}]` : tag,
+          tag === stringTag ? toString.call(a) : tag,
         );
 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
