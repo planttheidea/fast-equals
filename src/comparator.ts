@@ -43,7 +43,7 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 }
 
 const { toString } = Object.prototype;
-const toStringTag = typeof Symbol !== 'undefined' && Symbol.toStringTag || null;
+const toStringTag = typeof Symbol !== 'undefined' && Symbol.toStringTag;
 
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
@@ -80,25 +80,25 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const modernSupportedComparator = toStringTag && supportedComparatorMap[a[toStringTag]];
+        const stringTag: string | false | undefined = toStringTag && a[toStringTag];
+        const tag = stringTag || toString.call(a);
+        const supportedComparator = supportedComparatorMap[tag];
 
-        if (modernSupportedComparator) {
-          return modernSupportedComparator(a, b, state);
+        if (supportedComparator) {
+          return supportedComparator(a, b, state);
         }
 
-        const tag = toString.call(a);
-        const legacySupportedComparator = supportedComparatorMap[tag];
-
-        if (legacySupportedComparator) {
-          return legacySupportedComparator(a, b, state);
-        }
-
-        const unsupportedCustomComparator = getUnsupportedCustomComparator(a, b, state, tag);
+        const unsupportedCustomComparator = getUnsupportedCustomComparator(
+          a,
+          b,
+          state,
+          stringTag ? `[object ${stringTag}]` : tag,
+        );
 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
       }
     : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const supportedComparator = supportedComparatorMap[toStringTag && a[toStringTag] || toString.call(a)];
+        const supportedComparator = supportedComparatorMap[(toStringTag && a[toStringTag]) || toString.call(a)];
 
         return supportedComparator ? supportedComparator(a, b, state) : false;
       };
@@ -328,70 +328,55 @@ export function createIsEqual<Meta>({ circular, comparator, createState, equals,
 /**
  * Create a map of `toString()` values to their respective handlers for `tag`-based lookups.
  */
-function createSupportedComparatorMap<Meta>({
-  areArrayBuffersEqual,
-  areArraysEqual,
-  areDataViewsEqual,
-  areDatesEqual,
-  areErrorsEqual,
-  areFunctionsEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  arePrimitiveWrappersEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-  areTypedArraysEqual,
-  areUrlSearchParamsEqual,
-  areUrlsEqual,
-}: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
-  const comparators = [
-    ['Arguments', areObjectsEqual],
-    ['Array', areArraysEqual],
-    ['ArrayBuffer', areArrayBuffersEqual],
-    ['AsyncGeneratorFunction', areFunctionsEqual],
-    ['BigInt', arePrimitiveWrappersEqual],
-    ['BigInt64Array', areTypedArraysEqual],
-    ['BigUint64Array', areTypedArraysEqual],
-    ['Boolean', arePrimitiveWrappersEqual],
-    ['DataView', areDataViewsEqual],
-    ['Date', areDatesEqual],
-    // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
-    // enumerable, and therefore will give false positives if tested like a standard object.
-    ['Error', areErrorsEqual],
-    ['Float16Array', areTypedArraysEqual],
-    ['Float32Array', areTypedArraysEqual],
-    ['Float64Array', areTypedArraysEqual],
-    ['Function', areFunctionsEqual],
-    ['GeneratorFunction', areFunctionsEqual],
-    ['Int8Array', areTypedArraysEqual],
-    ['Int16Array', areTypedArraysEqual],
-    ['Int32Array', areTypedArraysEqual],
-    ['Map', areMapsEqual],
-    ['Number', arePrimitiveWrappersEqual],
-    ['Object', (a: any, b: any, state: any) =>
-      // The exception for value comparison is custom `Promise`-like class instances. These should
-      // be treated the same as standard `Promise` objects, which means strict equality, and if
-      // it reaches this point then that strict equality comparison has already failed.
-      typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state)],
-    // For RegExp, the properties are not enumerable, and therefore will give false positives if
-    // tested like a standard object.
-    ['RegExp', areRegExpsEqual],
-    ['Set', areSetsEqual],
-    ['String', arePrimitiveWrappersEqual],
-    ['URL', areUrlsEqual],
-    ['URLSearchParams', areUrlSearchParamsEqual],
-    ['Uint8Array', areTypedArraysEqual],
-    ['Uint8ClampedArray', areTypedArraysEqual],
-    ['Uint16Array', areTypedArraysEqual],
-    ['Uint32Array', areTypedArraysEqual],
-  ] as const;
+function createSupportedComparatorMap<Meta>(config: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
+  return (
+    [
+      ['Arguments', config.areObjectsEqual],
+      ['Array', config.areArraysEqual],
+      ['ArrayBuffer', config.areArrayBuffersEqual],
+      ['AsyncGeneratorFunction', config.areFunctionsEqual],
+      ['BigInt', config.arePrimitiveWrappersEqual],
+      ['BigInt64Array', config.areTypedArraysEqual],
+      ['BigUint64Array', config.areTypedArraysEqual],
+      ['Boolean', config.arePrimitiveWrappersEqual],
+      ['DataView', config.areDataViewsEqual],
+      ['Date', config.areDatesEqual],
+      // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
+      // enumerable, and therefore will give false positives if tested like a standard object.
+      ['Error', config.areErrorsEqual],
+      ['Float16Array', config.areTypedArraysEqual],
+      ['Float32Array', config.areTypedArraysEqual],
+      ['Float64Array', config.areTypedArraysEqual],
+      ['Function', config.areFunctionsEqual],
+      ['GeneratorFunction', config.areFunctionsEqual],
+      ['Int8Array', config.areTypedArraysEqual],
+      ['Int16Array', config.areTypedArraysEqual],
+      ['Int32Array', config.areTypedArraysEqual],
+      ['Map', config.areMapsEqual],
+      ['Number', config.arePrimitiveWrappersEqual],
+      [
+        'Object',
+        (a: any, b: any, state: any) =>
+          // The exception for value comparison is custom `Promise`-like class instances. These should
+          // be treated the same as standard `Promise` objects, which means strict equality, and if
+          // it reaches this point then that strict equality comparison has already failed.
+          typeof a.then !== 'function' && typeof b.then !== 'function' && config.areObjectsEqual(a, b, state),
+      ],
+      // For RegExp, the properties are not enumerable, and therefore will give false positives if
+      // tested like a standard object.
+      ['RegExp', config.areRegExpsEqual],
+      ['Set', config.areSetsEqual],
+      ['String', config.arePrimitiveWrappersEqual],
+      ['URL', config.areUrlsEqual],
+      ['URLSearchParams', config.areUrlSearchParamsEqual],
+      ['Uint8Array', config.areTypedArraysEqual],
+      ['Uint8ClampedArray', config.areTypedArraysEqual],
+      ['Uint16Array', config.areTypedArraysEqual],
+      ['Uint32Array', config.areTypedArraysEqual],
+    ] as const
+  ).reduce<Record<string, EqualityComparator<any>>>((comparatorMap, [tag, comparator]) => {
+    comparatorMap[tag] = comparatorMap[`[object ${tag}]`] = comparator;
 
-  const comparatorMap: Record<string, EqualityComparator<any>> = {};
-
-  for (const [tag, comparator] of comparators) {
-    comparatorMap[tag] = comparator;
-    comparatorMap['[object ' + tag + ']'] = comparator;
-  }
-
-  return comparatorMap;
+    return comparatorMap;
+  }, {});
 }
