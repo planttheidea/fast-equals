@@ -80,8 +80,8 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const stringTag: string | false | undefined = toStringTag && a[toStringTag];
-        const tag = stringTag || toString.call(a);
+        const stringTag = toStringTag && a[toStringTag];
+        const tag = stringTag && typeof stringTag === 'string' ? stringTag : toString.call(a);
         const supportedComparator = supportedComparatorMap[tag];
 
         if (supportedComparator) {
@@ -92,13 +92,15 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
           a,
           b,
           state,
-          stringTag ? `[object ${stringTag}]` : tag,
+          tag === stringTag ? `[object ${tag}]` : tag,
         );
 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
       }
     : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const supportedComparator = supportedComparatorMap[(toStringTag && a[toStringTag]) || toString.call(a)];
+        const stringTag = toStringTag && a[toStringTag];
+        const supportedComparator =
+          supportedComparatorMap[stringTag && typeof stringTag === 'string' ? stringTag : toString.call(a)];
 
         return supportedComparator ? supportedComparator(a, b, state) : false;
       };
@@ -378,5 +380,5 @@ function createSupportedComparatorMap<Meta>(config: ComparatorConfig<Meta>): Rec
     comparatorMap[tag] = comparatorMap[`[object ${tag}]`] = comparator;
 
     return comparatorMap;
-  }, {});
+  }, Object.create(null));
 }
