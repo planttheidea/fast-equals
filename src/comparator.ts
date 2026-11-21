@@ -43,6 +43,7 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 }
 
 const { toString } = Object.prototype;
+const toStringTag = typeof Symbol !== 'undefined' && Symbol.toStringTag || null;
 
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
@@ -79,11 +80,17 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const tag = toString.call(a);
-        const supportedComparator = supportedComparatorMap[tag];
+        const modernSupportedComparator = toStringTag && supportedComparatorMap[a[toStringTag]];
 
-        if (supportedComparator) {
-          return supportedComparator(a, b, state);
+        if (modernSupportedComparator) {
+          return modernSupportedComparator(a, b, state);
+        }
+
+        const tag = toString.call(a);
+        const legacySupportedComparator = supportedComparatorMap[tag];
+
+        if (legacySupportedComparator) {
+          return legacySupportedComparator(a, b, state);
         }
 
         const unsupportedCustomComparator = getUnsupportedCustomComparator(a, b, state, tag);
@@ -91,7 +98,7 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
       }
     : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const supportedComparator = supportedComparatorMap[toString.call(a)];
+        const supportedComparator = supportedComparatorMap[toStringTag && a[toStringTag] || toString.call(a)];
 
         return supportedComparator ? supportedComparator(a, b, state) : false;
       };
@@ -337,45 +344,54 @@ function createSupportedComparatorMap<Meta>({
   areUrlSearchParamsEqual,
   areUrlsEqual,
 }: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
-  return {
-    '[object Arguments]': areObjectsEqual,
-    '[object Array]': areArraysEqual,
-    '[object ArrayBuffer]': areArrayBuffersEqual,
-    '[object AsyncGeneratorFunction]': areFunctionsEqual,
-    '[object BigInt]': arePrimitiveWrappersEqual,
-    '[object BigInt64Array]': areTypedArraysEqual,
-    '[object BigUint64Array]': areTypedArraysEqual,
-    '[object Boolean]': arePrimitiveWrappersEqual,
-    '[object DataView]': areDataViewsEqual,
-    '[object Date]': areDatesEqual,
+  const comparators = [
+    ['Arguments', areObjectsEqual],
+    ['Array', areArraysEqual],
+    ['ArrayBuffer', areArrayBuffersEqual],
+    ['AsyncGeneratorFunction', areFunctionsEqual],
+    ['BigInt', arePrimitiveWrappersEqual],
+    ['BigInt64Array', areTypedArraysEqual],
+    ['BigUint64Array', areTypedArraysEqual],
+    ['Boolean', arePrimitiveWrappersEqual],
+    ['DataView', areDataViewsEqual],
+    ['Date', areDatesEqual],
     // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
     // enumerable, and therefore will give false positives if tested like a standard object.
-    '[object Error]': areErrorsEqual,
-    '[object Float16Array]': areTypedArraysEqual,
-    '[object Float32Array]': areTypedArraysEqual,
-    '[object Float64Array]': areTypedArraysEqual,
-    '[object Function]': areFunctionsEqual,
-    '[object GeneratorFunction]': areFunctionsEqual,
-    '[object Int8Array]': areTypedArraysEqual,
-    '[object Int16Array]': areTypedArraysEqual,
-    '[object Int32Array]': areTypedArraysEqual,
-    '[object Map]': areMapsEqual,
-    '[object Number]': arePrimitiveWrappersEqual,
-    '[object Object]': (a: any, b: any, state: any) =>
+    ['Error', areErrorsEqual],
+    ['Float16Array', areTypedArraysEqual],
+    ['Float32Array', areTypedArraysEqual],
+    ['Float64Array', areTypedArraysEqual],
+    ['Function', areFunctionsEqual],
+    ['GeneratorFunction', areFunctionsEqual],
+    ['Int8Array', areTypedArraysEqual],
+    ['Int16Array', areTypedArraysEqual],
+    ['Int32Array', areTypedArraysEqual],
+    ['Map', areMapsEqual],
+    ['Number', arePrimitiveWrappersEqual],
+    ['Object', (a: any, b: any, state: any) =>
       // The exception for value comparison is custom `Promise`-like class instances. These should
       // be treated the same as standard `Promise` objects, which means strict equality, and if
       // it reaches this point then that strict equality comparison has already failed.
-      typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state),
+      typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state)],
     // For RegExp, the properties are not enumerable, and therefore will give false positives if
     // tested like a standard object.
-    '[object RegExp]': areRegExpsEqual,
-    '[object Set]': areSetsEqual,
-    '[object String]': arePrimitiveWrappersEqual,
-    '[object URL]': areUrlsEqual,
-    '[object URLSearchParams]': areUrlSearchParamsEqual,
-    '[object Uint8Array]': areTypedArraysEqual,
-    '[object Uint8ClampedArray]': areTypedArraysEqual,
-    '[object Uint16Array]': areTypedArraysEqual,
-    '[object Uint32Array]': areTypedArraysEqual,
-  };
+    ['RegExp', areRegExpsEqual],
+    ['Set', areSetsEqual],
+    ['String', arePrimitiveWrappersEqual],
+    ['URL', areUrlsEqual],
+    ['URLSearchParams', areUrlSearchParamsEqual],
+    ['Uint8Array', areTypedArraysEqual],
+    ['Uint8ClampedArray', areTypedArraysEqual],
+    ['Uint16Array', areTypedArraysEqual],
+    ['Uint32Array', areTypedArraysEqual],
+  ] as const;
+
+  const comparatorMap: Record<string, EqualityComparator<any>> = {};
+
+  for (const [tag, comparator] of comparators) {
+    comparatorMap[tag] = comparator;
+    comparatorMap['[object ' + tag + ']'] = comparator;
+  }
+
+  return comparatorMap;
 }
