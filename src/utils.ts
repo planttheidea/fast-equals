@@ -3,8 +3,6 @@ import type { AnyObject, Cache, CircularState, EqualityComparator, State } from 
 const { getOwnPropertyDescriptor, getOwnPropertyNames, getOwnPropertySymbols } = Object;
 const { hasOwnProperty, toString } = Object.prototype;
 
-const OBJECT_TAG = '[object Object]';
-
 /**
  * Whether the own properties from `end` onward are equal with strict property checking, where the
  * caller has already verified that both objects have the same number of own properties.
@@ -189,11 +187,11 @@ export function isNullPrototypeComparable(a: any, b: any): boolean {
   const bConstructor = b.constructor;
 
   if (aConstructor == null) {
-    return bConstructor === Object || toString.call(b) === OBJECT_TAG;
+    return bConstructor === Object || toString.call(b) === '[object Object]';
   }
 
   if (bConstructor == null) {
-    return aConstructor === Object || toString.call(a) === OBJECT_TAG;
+    return aConstructor === Object || toString.call(a) === '[object Object]';
   }
 
   return false;
