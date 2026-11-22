@@ -43,14 +43,13 @@ interface CreateIsEqualOptions<Meta> extends Pick<Required<CustomEqualCreatorOpt
 }
 
 const { toString } = Object.prototype;
-const toStringTagSymbol = Symbol.toStringTag;
+const toStringTag = typeof Symbol !== 'undefined' && Symbol.toStringTag;
 
 /**
  * Create a comparator method based on the type-specific equality comparators passed.
  */
 export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): EqualityComparator<Meta> {
   const supportedComparatorMap = createSupportedComparatorMap(config);
-  const supportedComparatorByStringTag = createSupportedComparatorByStringTag(supportedComparatorMap);
   const {
     areArraysEqual,
     areDatesEqual,
@@ -75,11 +74,11 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    * In all cases, these decisions should be reevaluated based on changes to the language and
    * common development practices.
    *
-   * When `Symbol.toStringTag` is a string (TypedArrays, `ArrayBuffer`, `DataView`, `Map`, `URL`, etc.),
-   * `toString()` returns `[object ${stringTag}]` regardless of the object's type, so the comparator is
-   * looked up by the `Symbol.toStringTag` value directly. This avoids building (and then hashing) the
-   * full tag string for every comparison. Otherwise the tag depends on the built-in type, and is
-   * captured with `toString()` as before.
+   * When `Symbol.toStringTag` is a non-empty string (TypedArrays, `ArrayBuffer`, `DataView`, `Map`, `URL`,
+   * etc.), `toString()` returns `[object ${stringTag}]` regardless of the object's type, so the comparator
+   * is looked up by the `Symbol.toStringTag` value directly. This avoids building (and then hashing) the
+   * full tag string for every comparison. Otherwise the tag depends on the built-in type, and is captured
+   * with `toString()` as before.
    *
    * Capturing the tag is reasonably performant in modern environments like v8 and SpiderMonkey. This is
    * kept out of the main comparator so that it stays within the engine's bytecode budget for inlining.
@@ -87,27 +86,27 @@ export function createEqualityComparator<Meta>(config: ComparatorConfig<Meta>): 
    */
   const areTaggedObjectsEqual = getUnsupportedCustomComparator
     ? function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const stringTag = a[toStringTagSymbol];
-        const isStringTag = typeof stringTag === 'string';
-        const supportedComparator = isStringTag
-          ? supportedComparatorByStringTag[stringTag]
-          : supportedComparatorMap[toString.call(a)];
+        const stringTag = toStringTag && a[toStringTag];
+        const tag = stringTag && typeof stringTag === 'string' ? stringTag : toString.call(a);
+        const supportedComparator = supportedComparatorMap[tag];
 
         if (supportedComparator) {
           return supportedComparator(a, b, state);
         }
 
-        const tag = isStringTag ? `[object ${stringTag}]` : toString.call(a);
-        const unsupportedCustomComparator = getUnsupportedCustomComparator(a, b, state, tag);
+        const unsupportedCustomComparator = getUnsupportedCustomComparator(
+          a,
+          b,
+          state,
+          tag === stringTag ? toString.call(a) : tag,
+        );
 
         return unsupportedCustomComparator ? unsupportedCustomComparator(a, b, state) : false;
       }
     : function areTaggedObjectsEqual(a: any, b: any, state: State<any>): boolean {
-        const stringTag = a[toStringTagSymbol];
+        const stringTag = toStringTag && a[toStringTag];
         const supportedComparator =
-          typeof stringTag === 'string'
-            ? supportedComparatorByStringTag[stringTag]
-            : supportedComparatorMap[toString.call(a)];
+          supportedComparatorMap[stringTag && typeof stringTag === 'string' ? stringTag : toString.call(a)];
 
         return supportedComparator ? supportedComparator(a, b, state) : false;
       };
@@ -335,83 +334,62 @@ export function createIsEqual<Meta>({ circular, comparator, createState, equals,
 }
 
 /**
- * Create a map of `toString()` values to their respective handlers for `tag`-based lookups.
- */
-function createSupportedComparatorMap<Meta>({
-  areArrayBuffersEqual,
-  areArraysEqual,
-  areDataViewsEqual,
-  areDatesEqual,
-  areErrorsEqual,
-  areFunctionsEqual,
-  areMapsEqual,
-  areObjectsEqual,
-  arePrimitiveWrappersEqual,
-  areRegExpsEqual,
-  areSetsEqual,
-  areTypedArraysEqual,
-  areUrlSearchParamsEqual,
-  areUrlsEqual,
-}: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
-  return {
-    '[object Arguments]': areObjectsEqual,
-    '[object Array]': areArraysEqual,
-    '[object ArrayBuffer]': areArrayBuffersEqual,
-    '[object AsyncGeneratorFunction]': areFunctionsEqual,
-    '[object BigInt]': arePrimitiveWrappersEqual,
-    '[object BigInt64Array]': areTypedArraysEqual,
-    '[object BigUint64Array]': areTypedArraysEqual,
-    '[object Boolean]': arePrimitiveWrappersEqual,
-    '[object DataView]': areDataViewsEqual,
-    '[object Date]': areDatesEqual,
-    // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
-    // enumerable, and therefore will give false positives if tested like a standard object.
-    '[object Error]': areErrorsEqual,
-    '[object Float16Array]': areTypedArraysEqual,
-    '[object Float32Array]': areTypedArraysEqual,
-    '[object Float64Array]': areTypedArraysEqual,
-    '[object Function]': areFunctionsEqual,
-    '[object GeneratorFunction]': areFunctionsEqual,
-    '[object Int8Array]': areTypedArraysEqual,
-    '[object Int16Array]': areTypedArraysEqual,
-    '[object Int32Array]': areTypedArraysEqual,
-    '[object Map]': areMapsEqual,
-    '[object Number]': arePrimitiveWrappersEqual,
-    '[object Object]': (a: any, b: any, state: any) =>
-      // The exception for value comparison is custom `Promise`-like class instances. These should
-      // be treated the same as standard `Promise` objects, which means strict equality, and if
-      // it reaches this point then that strict equality comparison has already failed.
-      typeof a.then !== 'function' && typeof b.then !== 'function' && areObjectsEqual(a, b, state),
-    // For RegExp, the properties are not enumerable, and therefore will give false positives if
-    // tested like a standard object.
-    '[object RegExp]': areRegExpsEqual,
-    '[object Set]': areSetsEqual,
-    '[object String]': arePrimitiveWrappersEqual,
-    '[object URL]': areUrlsEqual,
-    '[object URLSearchParams]': areUrlSearchParamsEqual,
-    '[object Uint8Array]': areTypedArraysEqual,
-    '[object Uint8ClampedArray]': areTypedArraysEqual,
-    '[object Uint16Array]': areTypedArraysEqual,
-    '[object Uint32Array]': areTypedArraysEqual,
-  };
-}
-
-/**
- * Create a map of `Symbol.toStringTag` values to their respective handlers, derived from the map of
- * `toString()` values (`[object ${stringTag}]`).
+ * Create a map of tags to their respective handlers for `tag`-based lookups. Each handler is keyed
+ * by both its `Symbol.toStringTag` value (`Map`) and its `toString()` value (`[object Map]`).
  *
  * @note
  * The map has a `null` prototype, so a `Symbol.toStringTag` like `constructor` or `toString` cannot
  * resolve to an inherited `Object.prototype` method.
  */
-function createSupportedComparatorByStringTag(
-  supportedComparatorMap: Record<string, EqualityComparator<any>>,
-): Record<string, EqualityComparator<any> | undefined> {
-  const supportedComparatorByStringTag: Record<string, EqualityComparator<any> | undefined> = Object.create(null);
+function createSupportedComparatorMap<Meta>(config: ComparatorConfig<Meta>): Record<string, EqualityComparator<any>> {
+  return (
+    [
+      ['Arguments', config.areObjectsEqual],
+      ['Array', config.areArraysEqual],
+      ['ArrayBuffer', config.areArrayBuffersEqual],
+      ['AsyncGeneratorFunction', config.areFunctionsEqual],
+      ['BigInt', config.arePrimitiveWrappersEqual],
+      ['BigInt64Array', config.areTypedArraysEqual],
+      ['BigUint64Array', config.areTypedArraysEqual],
+      ['Boolean', config.arePrimitiveWrappersEqual],
+      ['DataView', config.areDataViewsEqual],
+      ['Date', config.areDatesEqual],
+      // If an error tag, it should be tested explicitly. Like RegExp, the properties are not
+      // enumerable, and therefore will give false positives if tested like a standard object.
+      ['Error', config.areErrorsEqual],
+      ['Float16Array', config.areTypedArraysEqual],
+      ['Float32Array', config.areTypedArraysEqual],
+      ['Float64Array', config.areTypedArraysEqual],
+      ['Function', config.areFunctionsEqual],
+      ['GeneratorFunction', config.areFunctionsEqual],
+      ['Int8Array', config.areTypedArraysEqual],
+      ['Int16Array', config.areTypedArraysEqual],
+      ['Int32Array', config.areTypedArraysEqual],
+      ['Map', config.areMapsEqual],
+      ['Number', config.arePrimitiveWrappersEqual],
+      [
+        'Object',
+        (a: any, b: any, state: any) =>
+          // The exception for value comparison is custom `Promise`-like class instances. These should
+          // be treated the same as standard `Promise` objects, which means strict equality, and if
+          // it reaches this point then that strict equality comparison has already failed.
+          typeof a.then !== 'function' && typeof b.then !== 'function' && config.areObjectsEqual(a, b, state),
+      ],
+      // For RegExp, the properties are not enumerable, and therefore will give false positives if
+      // tested like a standard object.
+      ['RegExp', config.areRegExpsEqual],
+      ['Set', config.areSetsEqual],
+      ['String', config.arePrimitiveWrappersEqual],
+      ['URL', config.areUrlsEqual],
+      ['URLSearchParams', config.areUrlSearchParamsEqual],
+      ['Uint8Array', config.areTypedArraysEqual],
+      ['Uint8ClampedArray', config.areTypedArraysEqual],
+      ['Uint16Array', config.areTypedArraysEqual],
+      ['Uint32Array', config.areTypedArraysEqual],
+    ] as const
+  ).reduce<Record<string, EqualityComparator<any>>>((comparatorMap, [tag, comparator]) => {
+    comparatorMap[tag] = comparatorMap[`[object ${tag}]`] = comparator;
 
-  for (const tag in supportedComparatorMap) {
-    supportedComparatorByStringTag[tag.slice(8, -1)] = supportedComparatorMap[tag];
-  }
-
-  return supportedComparatorByStringTag;
+    return comparatorMap;
+  }, Object.create(null));
 }

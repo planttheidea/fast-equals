@@ -1,5 +1,12 @@
 # fast-equals CHANGELOG
 
+## 6.4.1
+
+- [#233](https://github.com/planttheidea/fast-equals/pull/233) - Look up the comparator for tagged objects by their
+  `Symbol.toStringTag` when it is a non-empty string, falling back to `Object.prototype.toString()` otherwise. This
+  avoids building the full tag string for objects like `TypedArray`, `ArrayBuffer`, `DataView`, `Map`, `Set` and `URL`,
+  which makes their comparisons faster. (thanks [@g4lb](https://github.com/g4lb))
+
 ## 6.4.0
 
 - [#230](https://github.com/planttheidea/fast-equals/pull/230) - Added support for comparing `URLSearchParams` objects
