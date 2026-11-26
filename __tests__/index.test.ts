@@ -604,6 +604,25 @@ describe('correctness fixes', () => {
       expect(deepEqual(new URL('https://foo.com/?a=1&b=2#x'), new URL('https://foo.com/?b=2&a=1#y'))).toBe(false);
       expect(deepEqual(new URL('https://foo.com:1/?a=1&b=2'), new URL('https://foo.com:2/?b=2&a=1'))).toBe(false);
     });
+
+    test('compares an empty query or fragment with a missing one', () => {
+      // `search` and `hash` are both `''` here, but the serializations differ.
+      expect(deepEqual(new URL('https://foo.com/?'), new URL('https://foo.com/'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/#'), new URL('https://foo.com/'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1#'), new URL('https://foo.com/?a=1'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1&b=2#'), new URL('https://foo.com/?b=2&a=1'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?#'), new URL('https://foo.com/?#'))).toBe(true);
+    });
+
+    test('compares the query as serialized rather than as decoded params', () => {
+      // These parse to the same params, but they are different URLs.
+      expect(deepEqual(new URL('https://foo.com/?a=%41'), new URL('https://foo.com/?a=A'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=x+y'), new URL('https://foo.com/?a=x%20y'))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a'), new URL('https://foo.com/?a='))).toBe(false);
+      expect(deepEqual(new URL('https://foo.com/?a=1&'), new URL('https://foo.com/?a=1'))).toBe(false);
+      // Reordering still applies to the pairs as written.
+      expect(deepEqual(new URL('https://foo.com/?a&b=x+y'), new URL('https://foo.com/?b=x+y&a'))).toBe(true);
+    });
   });
 
   describe('URLSearchParams', () => {

@@ -559,21 +559,34 @@ export function areTypedArraysEqualStrict(a: TypedArray, b: TypedArray, state: S
  * Whether the URL instances are equal in value.
  */
 export function areUrlsEqual(a: URL, b: URL): boolean {
+  const hrefA = a.href;
+  const hrefB = b.href;
+
   // `href` is the normalized serialization of every component, so matching hrefs are equal without
   // any further work. Only a difference in query parameter ordering can survive a mismatch here.
-  if (a.href === b.href) {
+  if (hrefA === hrefB) {
     return true;
   }
 
+  // `search` is the query exactly as serialized (or `''` when it is empty or missing). The getters of
+  // the other components hide some differences too (`hash` is `''` for both `#` and no fragment), so
+  // the rest of the URL is compared as serialized, by removing the query from `href`. The first `?` is
+  // always where the query starts, since every component before it percent-encodes `?`.
+  const searchA = a.search;
+  const searchB = b.search;
+
+  if (!searchA || searchA.length !== searchB.length) {
+    return false;
+  }
+
+  const start = hrefA.indexOf('?');
+  const end = start + searchA.length;
+
   return (
-    a.protocol === b.protocol
-    && a.username === b.username
-    && a.password === b.password
-    // `host` covers both the hostname and the port.
-    && a.host === b.host
-    && a.pathname === b.pathname
-    && a.hash === b.hash
-    && areUrlSearchParamsEqual(a.searchParams, b.searchParams)
+    start === hrefB.indexOf('?')
+    && hrefA.slice(0, start) === hrefB.slice(0, start)
+    && hrefA.slice(end) === hrefB.slice(end)
+    && sortSearchParams(searchA.slice(1)) === sortSearchParams(searchB.slice(1))
   );
 }
 
